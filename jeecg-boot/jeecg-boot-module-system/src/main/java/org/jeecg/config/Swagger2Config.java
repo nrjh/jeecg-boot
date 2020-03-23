@@ -57,7 +57,7 @@ public class Swagger2Config implements WebMvcConfigurer {
 	@Bean
 	public Docket createRestApi() {
 		return new Docket(DocumentationType.SWAGGER_2)
-				.apiInfo(apiInfo())
+				.apiInfo(apiInfo()).groupName("system")
 				.select()
 				//此包路径下的类，才生成接口文档
 				.apis(RequestHandlerSelectors.basePackage("org.jeecg.modules"))
@@ -67,6 +67,26 @@ public class Swagger2Config implements WebMvcConfigurer {
 				.build()
 				.securitySchemes(Collections.singletonList(securityScheme()));
 				//.globalOperationParameters(setHeaderToken());
+	}
+
+	/**
+	 * swagger2的配置文件，这里可以配置swagger2的一些基本的内容，比如扫描的包等等
+	 * @ add by zzy 20200305
+	 * @return Docket
+	 */
+	@Bean
+	public Docket createIopRestApi() {
+		return new Docket(DocumentationType.SWAGGER_2)
+				.apiInfo(apiIopInfo()).groupName("iop")
+				.select()
+				//此包路径下的类，才生成接口文档
+				.apis(RequestHandlerSelectors.basePackage("com.nrjh.iop.modules"))
+				//加了ApiOperation注解的类，才生成接口文档
+				.apis(RequestHandlerSelectors.withMethodAnnotation(ApiOperation.class))
+				.paths(PathSelectors.any())
+				.build()
+				.securitySchemes(Collections.singletonList(securityScheme()));
+		//.globalOperationParameters(setHeaderToken());
 	}
 
 	/***
@@ -109,6 +129,27 @@ public class Swagger2Config implements WebMvcConfigurer {
 				.contact("JEECG团队")
                 .license("The Apache License, Version 2.0")
                 .licenseUrl("http://www.apache.org/licenses/LICENSE-2.0.html")
+				.build();
+	}
+
+	/**
+	 * api文档的详细信息函数,注意这里的注解引用的是哪个
+	 *
+	 * @return
+	 */
+	private ApiInfo apiIopInfo() {
+		return new ApiInfoBuilder()
+				// //大标题
+				.title("智能运维 后台服务API接口文档")
+				// 版本号
+				.version("1.0")
+//				.termsOfServiceUrl("NO terms of service")
+				// 描述
+				.description("后台API接口")
+				// 作者
+				.contact("iop团队")
+				.license("The Apache License, Version 2.0")
+				.licenseUrl("http://www.apache.org/licenses/LICENSE-2.0.html")
 				.build();
 	}
 

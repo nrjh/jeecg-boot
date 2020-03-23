@@ -14,7 +14,7 @@
 </template>
 
 <script>
-  import {ajaxGetDictItems} from '@/api/api'
+  import {ajaxGetDictItems,ajaxGetDictItemsIop} from '@/api/api'
 
   export default {
     name: "JDictSelectTag",
@@ -57,13 +57,22 @@
     },
     methods: {
       initDictData() {
-        //根据字典Code, 初始化字典数组
-        ajaxGetDictItems(this.dictCode, null).then((res) => {
-          if (res.success) {
+        if(this.dictCode.toUpperCase().startsWith("IOP")){
+          // 智能运维
+          ajaxGetDictItemsIop(this.dictCode, null).then((res) => {
+            if (res.success) {
+              this.dictOptions = res.result;
+            }
+          })
+        }else{
+          //根据字典Code, 初始化字典数组
+          ajaxGetDictItems(this.dictCode, null).then((res) => {
+            if (res.success) {
 //                console.log(res.result);
-            this.dictOptions = res.result;
-          }
-        })
+              this.dictOptions = res.result;
+            }
+          })
+        }
       },
       handleInput(e) {
         let val;

@@ -4,7 +4,7 @@
  * date: 20190109
  */
 
-import {ajaxGetDictItems} from '@/api/api'
+import {ajaxGetDictItems,ajaxGetDictItemsIop} from '@/api/api'
 import {getAction} from '@/api/manage'
 
 /**
@@ -18,6 +18,20 @@ export async function initDictOptions(dictCode) {
   }
   //获取字典数组
   let res = await ajaxGetDictItems(dictCode);
+  return res;
+}
+
+/**
+ * 获取字典数组  智能运维调用 add by zzy 2020-03-19
+ * @param dictCode 字典Code
+ * @return List<Map>
+ */
+export async function initDictOptionsIop(dictCode) {
+  if (!dictCode) {
+    return '字典Code不能为空!';
+  }
+  //获取字典数组
+  let  res = await ajaxGetDictItemsIop(dictCode);
   return res;
 }
 

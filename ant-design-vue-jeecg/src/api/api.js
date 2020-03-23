@@ -84,6 +84,8 @@ const editDictItem = (params)=>putAction("/sys/dictItem/edit",params);
 
 //字典标签专用（通过code获取字典数组）
 export const ajaxGetDictItems = (code, params)=>getAction(`/sys/dict/getDictItems/${code}`,params);
+// 智能运维 add by zzy 20200319
+export const ajaxGetDictItemsIop = (code, params)=>getAction(`/iop/sys/dict/getDictItems/${code}`,params);
 
 //系统通告
 const doReleaseData = (params)=>getAction("/sys/annountCement/doReleaseData",params);
@@ -104,6 +106,11 @@ const duplicateCheck = (params)=>getAction("/sys/duplicate/check",params);
 // 加载分类字典
 const loadCategoryData = (params)=>getAction("/sys/category/loadAllData",params);
 const checkRuleByCode = (params) => getAction('/sys/checkRule/checkByCode', params)
+
+
+// 智能运维
+// 库房
+const queryStoreList = (params)=>getAction("/iop/reserve/store/list",params);
 
 export {
   // imgView,
@@ -160,7 +167,9 @@ export {
   queryTreeListForDeptRole,
   queryDeptRolePermission,
   saveDeptRolePermission,
-  queryMyDepartTreeList
+  queryMyDepartTreeList,
+
+  queryStoreList
 }
 
 

@@ -1,23 +1,29 @@
 server:
   port: 8080
-  tomcat:
+  tomcat: 
     max-swallow-size: -1
+    connection-timeout: 5000ms
+    uri-encoding: UTF-8
+    #默认200，maxConnections的设置与Tomcat的运行模式有关。如果tomcat使用的是BIO，那么maxConnections的值应该与maxThreads一致；如果tomcat使用的是NIO，maxConnections值应该远大于maxThreads
+    max-threads: 500
   servlet:
     context-path: /jeecg-boot
+    session:
+      timeout: 30m
   compression:
     enabled: true
     min-response-size: 1024
     mime-types: application/javascript,application/json,application/xml,text/html,text/xml,text/plain,text/css,image/*
-
+        
 management:
  endpoints:
   web:
    exposure:
     include: metrics,httptrace
-
+    
 spring:
   servlet:
-     multipart:
+     multipart: 
         max-file-size: 10MB
         max-request-size: 10MB
   mail:
@@ -98,14 +104,18 @@ spring:
         master:
           url: jdbc:mysql://127.0.0.1:3306/jeecg-boot?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false
           username: root
-          password: root
+          password: 123456
           driver-class-name: com.mysql.jdbc.Driver
+          #url: jdbc:oracle:thin:@192.168.32.8:1521:orcl
+          #username: jeecgboot
+          #password: jeecgboot
+          #driver-class-name: oracle.jdbc.OracleDriver
           # 多数据源配置
-          #multi-datasource1:
-          #url: jdbc:mysql://localhost:3306/jeecg-boot2?useUnicode=true&characterEncoding=utf8&autoReconnect=true&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true
-          #username: root
-          #password: root
-          #driver-class-name: com.mysql.jdbc.Driver
+        iop:
+          url: jdbc:oracle:thin:@192.168.32.8:1521:orcl
+          username: iop_20200225
+          password: iop_20200225
+          driver-class-name: oracle.jdbc.OracleDriver
   #redis 配置
   redis:
     database: 0
@@ -121,7 +131,7 @@ spring:
     port: 6379
 #mybatis plus 设置
 mybatis-plus:
-  mapper-locations: classpath*:org/jeecg/modules/**/xml/*Mapper.xml
+  mapper-locations: classpath*:**/modules/**/xml/*Mapper.xml
   global-config:
     # 关闭MP3.0自带的banner
     banner: false

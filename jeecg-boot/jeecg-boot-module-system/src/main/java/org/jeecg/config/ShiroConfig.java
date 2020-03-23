@@ -66,6 +66,8 @@ public class ShiroConfig {
 				filterChainDefinitionMap.put(url,"anon");
 			}
 		}
+		// add by zzy 20200305
+		filterChainDefinitionMap.put("/iop/api/**", "anon"); //测试新添加的module-api，不带token访问
 
 		//cas验证登录
 		filterChainDefinitionMap.put("/cas/client/validateLogin", "anon");
@@ -123,10 +125,10 @@ public class ShiroConfig {
 
 		//排除Online请求
 		filterChainDefinitionMap.put("/auto/cgform/**", "anon");
-
+		
 		//websocket排除
 		filterChainDefinitionMap.put("/websocket/**", "anon");
-
+		
 		//大屏设计器排除
 		filterChainDefinitionMap.put("/big/screen/**", "anon");
 
