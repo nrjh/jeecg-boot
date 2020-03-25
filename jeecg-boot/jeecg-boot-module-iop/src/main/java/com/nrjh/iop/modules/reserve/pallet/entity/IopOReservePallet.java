@@ -35,7 +35,7 @@ public class IopOReservePallet implements Serializable {
     /**
      * 主建
      */
-    @TableId(type = IdType.ID_WORKER_STR)
+    @TableId(type = IdType.UUID)
     @ApiModelProperty(value = "主建")
     private String id;
     /**

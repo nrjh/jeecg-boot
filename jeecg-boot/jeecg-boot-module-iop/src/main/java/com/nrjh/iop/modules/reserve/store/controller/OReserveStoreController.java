@@ -26,7 +26,7 @@ import org.springframework.web.servlet.ModelAndView;
  * @Version: V1.0
  */
 @RestController
-@RequestMapping("/iop/reserve/store")
+@RequestMapping("/iop/reserve/store_old")
 @Slf4j
 public class OReserveStoreController extends JeecgController<OReserveStore, IOReserveStoreService> {
     @Autowired

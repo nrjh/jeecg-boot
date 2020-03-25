@@ -57,14 +57,6 @@
     },
     methods: {
       initDictData() {
-        if(this.dictCode.toUpperCase().startsWith("IOP")){
-          // 智能运维
-          ajaxGetDictItemsIop(this.dictCode, null).then((res) => {
-            if (res.success) {
-              this.dictOptions = res.result;
-            }
-          })
-        }else{
           //根据字典Code, 初始化字典数组
           ajaxGetDictItems(this.dictCode, null).then((res) => {
             if (res.success) {
@@ -72,7 +64,6 @@
               this.dictOptions = res.result;
             }
           })
-        }
       },
       handleInput(e) {
         let val;

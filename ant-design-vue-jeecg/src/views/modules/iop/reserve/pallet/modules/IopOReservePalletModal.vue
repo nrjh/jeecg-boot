@@ -10,9 +10,9 @@
     <a-spin :spinning="confirmLoading">
       <a-form :form="form">
         <a-form-item label="所属货位" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <j-dict-select-tag v-decorator="[ 'storeId', validatorRules.storeId]" :triggerChange="true"
-                             placeholder="请选择所属货位"
-                             dictCode="iop_o_reserve_store,store_name,id,store_level=4"/>
+          <j-dict-select-tag-iop v-decorator="[ 'storeId', validatorRules.storeId]" :triggerChange="true"
+                                 placeholder="请选择所属货位"
+                                 dictCode="iop_o_reserve_store,store_name,id,store_level=4"/>
         </a-form-item>
         <a-form-item label="编号" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input v-decorator="[ 'palletNo', validatorRules.palletNo]" placeholder="请输入编号"></a-input>
@@ -43,7 +43,7 @@
 
   import { httpAction } from '@/api/manage'
   import pick from 'lodash.pick'
-  import { validateDuplicateValue } from '@/utils/util'
+  import { validateDuplicateValue, iopValidateDuplicateValue } from '@/utils/util'
   import JDictSelectTagIop from '@/components/dict/JDictSelectTagIop'
 
   export default {
@@ -67,13 +67,16 @@
           sm: { span: 16 }
         },
         confirmLoading: false,
-        storeIsvirtual:false, //是否虚拟
+        storeIsvirtual: false, //是否虚拟
         validatorRules: {
           storeId: {
             rules: [{ required: true, message: '请输入所属货位' }]
           },
           palletNo: {
-            rules: [{ required: true, message: '请输入托盘编号' }]
+            rules: [
+              { required: true, message: '请输入托盘编号' },
+              { validator: (rule, value, callback) => iopValidateDuplicateValue('iop_o_reserve_pallet', 'pallet_no', value, this.model.id, callback) }
+            ]
           },
           palletOrder: {
             rules: [{ required: true, message: '请输入序号，用于排序' }]
@@ -104,10 +107,10 @@
         this.form.resetFields()
         this.model = Object.assign({}, record)
         this.visible = true
-        if(record.storeIsvirtual==1){
-          this.storeIsvirtual = true;
-        }else{
-          this.storeIsvirtual = false; // 升级兼容 如果没有（后台没有传过来、或者是新建）默认为false
+        if (record.storeIsvirtual == 1) {
+          this.storeIsvirtual = true
+        } else {
+          this.storeIsvirtual = false // 升级兼容 如果没有（后台没有传过来、或者是新建）默认为false
         }
         this.$nextTick(() => {
           this.form.setFieldsValue(pick(this.model, 'palletSize', 'palletColor', 'palletMaterial', 'palletNo', 'palletOrder', 'storeId', 'storeIsvirtual'))
@@ -122,7 +125,7 @@
         // 触发表单验证
         this.form.validateFields((err, values) => {
           if (!err) {
-            this.model.storeIsvirtual = this.storeIsvirtual==true?1:0;  //将true改为1，false改为0
+            this.model.storeIsvirtual = this.storeIsvirtual == true ? 1 : 0  //将true改为1，false改为0
             that.confirmLoading = true
             let httpurl = ''
             let method = ''
@@ -157,11 +160,11 @@
         this.form.setFieldsValue(pick(row, 'palletSize', 'palletColor', 'palletMaterial', 'palletNo', 'palletOrder', 'storeId', 'storeIsvirtual'))
       },
       onChange(checked) {
-        console.log(`a-switch to ${checked}`);
-        if(checked){
-          validatorRules.storeIsvirtual = 1;
-        }else{
-          validatorRules.storeIsvirtual = 0;
+        console.log(`a-switch to ${checked}`)
+        if (checked) {
+          validatorRules.storeIsvirtual = 1
+        } else {
+          validatorRules.storeIsvirtual = 0
         }
       }
     }

@@ -23,8 +23,8 @@ import java.util.Date;
  *  前端控制器
  * </p>
  *
- * @Author zzy
- * @since 2020-03-19
+ * @Author zhangweijian
+ * @since 2018-12-28
  */
 @RestController
 @RequestMapping("/iop/sys/dictItem")
@@ -32,24 +32,24 @@ import java.util.Date;
 public class IopSysDictItemController {
 
 	@Autowired
-	private IIopSysDictItemService iopSysDictItemService;
+	private IIopSysDictItemService sysDictItemService;
 	
 	/**
 	 * @功能：查询字典数据
-	 * @param IopSysDictItem
+	 * @param sysDictItem
 	 * @param pageNo
 	 * @param pageSize
 	 * @param req
 	 * @return
 	 */
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
-	public Result<IPage<IopSysDictItem>> queryPageList(IopSysDictItem IopSysDictItem, @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
+	public Result<IPage<IopSysDictItem>> queryPageList(IopSysDictItem sysDictItem, @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
 													   @RequestParam(name="pageSize", defaultValue="10") Integer pageSize, HttpServletRequest req) {
 		Result<IPage<IopSysDictItem>> result = new Result<IPage<IopSysDictItem>>();
-		QueryWrapper<IopSysDictItem> queryWrapper = QueryGenerator.initQueryWrapper(IopSysDictItem, req.getParameterMap());
+		QueryWrapper<IopSysDictItem> queryWrapper = QueryGenerator.initQueryWrapper(sysDictItem, req.getParameterMap());
 		queryWrapper.orderByAsc("sort_order");
 		Page<IopSysDictItem> page = new Page<IopSysDictItem>(pageNo, pageSize);
-		IPage<IopSysDictItem> pageList = iopSysDictItemService.page(page, queryWrapper);
+		IPage<IopSysDictItem> pageList = sysDictItemService.page(page, queryWrapper);
 		result.setSuccess(true);
 		result.setResult(pageList);
 		return result;
@@ -57,16 +57,16 @@ public class IopSysDictItemController {
 	
 	/**
 	 * @功能：新增
-	 * @param sysDict
+	 * @param sysDictItem
 	 * @return
 	 */
 	@RequestMapping(value = "/add", method = RequestMethod.POST)
 	@CacheEvict(value= CacheConstant.SYS_DICT_CACHE, allEntries=true)
-	public Result<IopSysDictItem> add(@RequestBody IopSysDictItem IopSysDictItem) {
+	public Result<IopSysDictItem> add(@RequestBody IopSysDictItem sysDictItem) {
 		Result<IopSysDictItem> result = new Result<IopSysDictItem>();
 		try {
-			IopSysDictItem.setCreateTime(new Date());
-			iopSysDictItemService.save(IopSysDictItem);
+			sysDictItem.setCreateTime(new Date());
+			sysDictItemService.save(sysDictItem);
 			result.success("保存成功！");
 		} catch (Exception e) {
 			log.error(e.getMessage(),e);
@@ -77,19 +77,19 @@ public class IopSysDictItemController {
 	
 	/**
 	 * @功能：编辑
-	 * @param IopSysDictItem
+	 * @param sysDictItem
 	 * @return
 	 */
 	@RequestMapping(value = "/edit", method = RequestMethod.PUT)
 	@CacheEvict(value=CacheConstant.SYS_DICT_CACHE, allEntries=true)
-	public Result<IopSysDictItem> edit(@RequestBody IopSysDictItem IopSysDictItem) {
+	public Result<IopSysDictItem> edit(@RequestBody IopSysDictItem sysDictItem) {
 		Result<IopSysDictItem> result = new Result<IopSysDictItem>();
-		IopSysDictItem sysdict = iopSysDictItemService.getById(IopSysDictItem.getId());
+		IopSysDictItem sysdict = sysDictItemService.getById(sysDictItem.getId());
 		if(sysdict==null) {
 			result.error500("未找到对应实体");
 		}else {
-			IopSysDictItem.setUpdateTime(new Date());
-			boolean ok = iopSysDictItemService.updateById(IopSysDictItem);
+			sysDictItem.setUpdateTime(new Date());
+			boolean ok = sysDictItemService.updateById(sysDictItem);
 			//TODO 返回false说明什么？
 			if(ok) {
 				result.success("编辑成功!");
@@ -107,11 +107,11 @@ public class IopSysDictItemController {
 	@CacheEvict(value=CacheConstant.SYS_DICT_CACHE, allEntries=true)
 	public Result<IopSysDictItem> delete(@RequestParam(name="id",required=true) String id) {
 		Result<IopSysDictItem> result = new Result<IopSysDictItem>();
-		IopSysDictItem joinSystem = iopSysDictItemService.getById(id);
+		IopSysDictItem joinSystem = sysDictItemService.getById(id);
 		if(joinSystem==null) {
 			result.error500("未找到对应实体");
 		}else {
-			boolean ok = iopSysDictItemService.removeById(id);
+			boolean ok = sysDictItemService.removeById(id);
 			if(ok) {
 				result.success("删除成功!");
 			}
@@ -131,7 +131,7 @@ public class IopSysDictItemController {
 		if(ids==null || "".equals(ids.trim())) {
 			result.error500("参数不识别！");
 		}else {
-			this.iopSysDictItemService.removeByIds(Arrays.asList(ids.split(",")));
+			this.sysDictItemService.removeByIds(Arrays.asList(ids.split(",")));
 			result.success("删除成功!");
 		}
 		return result;

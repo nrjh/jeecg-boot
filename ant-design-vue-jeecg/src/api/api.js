@@ -103,6 +103,8 @@ const queryUserByDepId = (params)=>getAction("/sys/user/queryUserByDepId",params
 const queryUserRoleMap = (params)=>getAction("/sys/user/queryUserRoleMap",params);
 // 重复校验
 const duplicateCheck = (params)=>getAction("/sys/duplicate/check",params);
+// iop 重复校验
+const iopDuplicateCheck = (params)=>getAction("/iop/sys/duplicate/check",params);
 // 加载分类字典
 const loadCategoryData = (params)=>getAction("/sys/category/loadAllData",params);
 const checkRuleByCode = (params) => getAction('/sys/checkRule/checkByCode', params)
@@ -156,6 +158,7 @@ export {
   queryUserByDepId,
   queryUserRoleMap,
   duplicateCheck,
+  iopDuplicateCheck,
   queryTreeListForRole,
   getSystemMenuList,
   getSystemSubmenu,

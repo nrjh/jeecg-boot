@@ -44,12 +44,12 @@
 	</select>
 
 	<!-- 重复校验 sql语句 -->
-	<select id="duplicateCheckCountSql" resultType="Long" parameterType="org.jeecg.modules.system.model.DuplicateCheckVo">
+	<select id="duplicateCheckCountSql" resultType="Long" parameterType="com.nrjh.iop.modules.sys.dict.model.IopDuplicateCheckVo">
 		SELECT COUNT(*) FROM ${tableName} WHERE ${fieldName} = #{fieldVal} and id &lt;&gt; #{dataId}
 	</select>
 	
 	<!-- 重复校验 sql语句 -->
-	<select id="duplicateCheckCountSqlNoDataId" resultType="Long" parameterType="org.jeecg.modules.system.model.DuplicateCheckVo">
+	<select id="duplicateCheckCountSqlNoDataId" resultType="Long" parameterType="com.nrjh.iop.modules.sys.dict.model.IopDuplicateCheckVo">
 		SELECT COUNT(*) FROM ${tableName} WHERE ${fieldName} = #{fieldVal}
 	</select>
 		
