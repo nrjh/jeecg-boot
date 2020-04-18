@@ -634,7 +634,7 @@
   import { FormTypes, VALIDATE_NO_PASSED } from '@/utils/JEditableTableUtil'
   import { cloneObject, randomString } from '@/utils/util'
   import JDate from '@/components/jeecg/JDate'
-  import { initDictOptions } from '@/components/dict/JDictSelectUtil'
+  import { initDictOptions,initDictOptionsIop } from '@/components/dict/JDictSelectUtil'
 
 
   // 行高，需要在实例加载完成前用到
@@ -2101,20 +2101,38 @@
       },
       /** 加载数据字典并合并到 options */
       _loadDictConcatToOptions(column) {
-        initDictOptions(column.dictCode).then((res) => {
-          if (res.success) {
-            let newOptions = (column.options || [])// .concat(res.result)
-            res.result.forEach(item => {
-              for (let option of newOptions) if (option.value === item.value) return
-              newOptions.push(item)
-            })
-            column.options = newOptions
-          } else {
-            console.group(`JEditableTable 查询字典(${column.dictCode})发生异常`)
-            console.log(res.message)
-            console.groupEnd()
-          }
-        })
+        if(column.dataFrom=="iop"){
+          initDictOptionsIop(column.dictCode).then((res) => {
+            if (res.success) {
+              let newOptions = (column.options || [])// .concat(res.result)
+              res.result.forEach(item => {
+                for (let option of newOptions) if (option.value === item.value) return
+                newOptions.push(item)
+              })
+              column.options = newOptions
+            } else {
+              console.group(`JEditableTable 查询字典(${column.dictCode})发生异常`)
+              console.log(res.message)
+              console.groupEnd()
+            }
+          })
+        }else{
+          initDictOptions(column.dictCode).then((res) => {
+            if (res.success) {
+              let newOptions = (column.options || [])// .concat(res.result)
+              res.result.forEach(item => {
+                for (let option of newOptions) if (option.value === item.value) return
+                newOptions.push(item)
+              })
+              column.options = newOptions
+            } else {
+              console.group(`JEditableTable 查询字典(${column.dictCode})发生异常`)
+              console.log(res.message)
+              console.groupEnd()
+            }
+          })
+        }
+
       },
 
       /* --- common function end --- */

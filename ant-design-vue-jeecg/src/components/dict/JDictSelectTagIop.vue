@@ -18,7 +18,7 @@
   import { ajaxGetDictItemsIop } from '@/api/api'
 
   export default {
-    name: 'ajaxGetDictItemsIop',
+    name: 'JDictSelectTagIop',
     props: {
       dictCode: String,
       placeholder: String,
