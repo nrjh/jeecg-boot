@@ -18,10 +18,12 @@
             <span style="float: left;overflow: hidden;" class="table-page-search-submitButtons">
               <a-button type="primary" @click="searchQuery" icon="search">查询</a-button>
               <a-button type="primary" @click="searchReset" icon="reload" style="margin-left: 8px">重置</a-button>
+              <!--
               <a @click="handleToggleSearch" style="margin-left: 8px">
                 {{ toggleSearchStatus ? '收起' : '展开' }}
                 <a-icon :type="toggleSearchStatus ? 'up' : 'down'"/>
               </a>
+              -->
             </span>
           </a-col>
 
@@ -113,6 +115,7 @@
   import PrdAttributeModal from './modules/PrdAttributeModal'
   import JDictSelectTag from '@/components/dict/JDictSelectTag.vue'
   import {filterMultiDictText} from '@/components/dict/JDictSelectUtil'
+  import { initDictOptions, filterDictText } from '@/components/dict/JDictSelectUtil'
 
   export default {
     name: "PrdAttributeList",
@@ -149,7 +152,10 @@
           {
             title:'显示类型',
             align:"center",
-            dataIndex: 'displayType_dictText'
+            dataIndex: 'displayType',
+            customRender: (text, record, index) => {
+              return filterDictText(this.displayDictOptions, text)
+            }
           },
           {
             title: '操作',
@@ -168,6 +174,9 @@
         dictOptions:{},
       }
     },
+    created() {
+      this.initDictConfig();
+    },
     computed: {
       importExcelUrl: function(){
         return `${window._CONFIG['domianURL']}/${this.url.importExcelUrl}`;
@@ -175,6 +184,12 @@
     },
     methods: {
       initDictConfig(){
+        //初始化字典 - 显示类型
+        initDictOptions('IOP_PRD_DISPLAY_TYPE').then((res) => {
+          if (res.success) {
+            this.displayDictOptions = res.result
+          }
+        });
       }
        
     }
