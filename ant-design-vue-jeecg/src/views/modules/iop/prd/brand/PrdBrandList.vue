@@ -135,6 +135,7 @@
     </div>
 
     <prdBrand-modal ref="modalForm" @ok="modalFormOk"></prdBrand-modal>
+    <prdBrand-modalView ref="modalFormView" @ok=""></prdBrand-modalView>
   </a-card>
 </template>
 
@@ -142,6 +143,7 @@
 
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
   import PrdBrandModal from './modules/PrdBrandModal'
+  import PrdBrandModalView from './modules/PrdBrandModalView'
   import { initDictOptions,initDictOptionsIop, filterDictText } from '@/components/dict/JDictSelectUtil'
   import JDictSelectTag from '@/components/dict/JDictSelectTag'
   import JDictSelectTagIop from '@/components/dict/JDictSelectTagIop'
@@ -153,6 +155,7 @@
     mixins:[JeecgListMixin],
     components: {
       PrdBrandModal,
+      PrdBrandModalView,
       JDictSelectTag,
       JDictSelectTagIop,
       JSearchSelectTagIop
@@ -238,6 +241,31 @@
             this.manufactorDictOptions = res.result
           }
         });
+      },
+      handleEdit: function (record,title) {
+        this.$refs.modalForm.edit(record);
+        if(!title ||  typeof(title) != 'string'){
+          title = "编辑";
+        }
+        this.$refs.modalForm.title = title;
+        this.$refs.modalForm.disableSubmit = false;
+      },
+      handleAdd: function (title) {
+        this.$refs.modalForm.add();
+        if(!title || typeof(title) != 'string'){
+          title = "新增";
+        }
+        this.$refs.modalForm.title = title;
+        this.$refs.modalForm.disableSubmit = false;
+      },
+      // 查看详情页面
+      handleDetail:function(record,title){
+        this.$refs.modalFormView.detail(record);
+        if(!title ||  typeof(title) != 'string'){
+          title = "详情";
+        }
+        this.$refs.modalFormView.title=title;
+        this.$refs.modalFormView.disableSubmit = false;
       }
     }
   }

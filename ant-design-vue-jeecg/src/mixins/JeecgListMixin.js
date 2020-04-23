@@ -183,20 +183,14 @@ export const JeecgListMixin = {
         }
       });
     },
-    handleEdit: function (record,title) {
+    handleEdit: function (record) {
       this.$refs.modalForm.edit(record);
-      if(!title ||  typeof(title) != 'string'){
-        title = "编辑";
-      }
-      this.$refs.modalForm.title = title;
+      this.$refs.modalForm.title = "编辑";
       this.$refs.modalForm.disableSubmit = false;
     },
-    handleAdd: function (title) {
+    handleAdd: function () {
       this.$refs.modalForm.add();
-      if(!title || typeof(title) != 'string'){
-        title = "新增";
-      }
-      this.$refs.modalForm.title = title;
+      this.$refs.modalForm.title = "新增";
       this.$refs.modalForm.disableSubmit = false;
     },
     handleTableChange(pagination, filters, sorter) {
@@ -216,12 +210,9 @@ export const JeecgListMixin = {
       // 新增/修改 成功时，重载列表
       this.loadData();
     },
-    handleDetail:function(record,title){
-      this.$refs.modalForm.view(record);
-      if(!title ||  typeof(title) != 'string'){
-        title = "详情";
-      }
-      this.$refs.modalForm.title=title;
+    handleDetail:function(record){
+      this.$refs.modalForm.edit(record);
+      this.$refs.modalForm.title="详情";
       this.$refs.modalForm.disableSubmit = true;
     },
     /* 导出 */

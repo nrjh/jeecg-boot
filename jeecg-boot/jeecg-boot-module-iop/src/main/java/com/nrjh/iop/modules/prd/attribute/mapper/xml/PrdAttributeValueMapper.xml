@@ -2,15 +2,18 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.nrjh.iop.modules.prd.attribute.mapper.PrdAttributeValueMapper">
 
-	<delete id="deleteByMainId" parameterType="java.lang.String">
-		DELETE 
-		FROM  prd_attribute_value 
-		WHERE
-			 attribute_id = #{mainId} 	</delete>
-	
-	<select id="selectByMainId" parameterType="java.lang.String" resultType="com.nrjh.iop.modules.prd.attribute.entity.PrdAttributeValue">
-		SELECT * 
-		FROM  prd_attribute_value
-		WHERE
-			 attribute_id = #{mainId} 	</select>
+    <delete id="deleteByMainId" parameterType="java.lang.String">
+        DELETE
+        FROM prd_attribute_value
+        WHERE
+        attribute_id = #{mainId}
+    </delete>
+
+    <select id="selectByMainId" parameterType="java.lang.String"
+            resultType="com.nrjh.iop.modules.prd.attribute.entity.PrdAttributeValue">
+        SELECT *
+        FROM prd_attribute_value
+        WHERE
+        attribute_id = #{mainId}
+    </select>
 </mapper>

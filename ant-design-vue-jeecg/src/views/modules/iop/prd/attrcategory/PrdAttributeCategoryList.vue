@@ -115,6 +115,7 @@
         </template>
 
         <span slot="action" slot-scope="text, record">
+          <a @click="handleDetail(record)">查看</a> &nbsp;&nbsp;
           <a @click="handleEdit(record)">编辑</a>
 
           <a-divider type="vertical"/>
@@ -134,6 +135,7 @@
     </div>
 
     <prdAttributeCategory-modal ref="modalForm" @ok="modalFormOk"></prdAttributeCategory-modal>
+    <prdAttributeCategory-modalView ref="modalFormView" @ok=""></prdAttributeCategory-modalView>
   </a-card>
 </template>
 
@@ -141,6 +143,7 @@
 
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
   import PrdAttributeCategoryModal from './modules/PrdAttributeCategoryModal'
+  import PrdAttributeCategoryModalView from './modules/PrdAttributeCategoryModalView'
   import JDictSelectTagIop from '@/components/dict/JDictSelectTagIop'
   import { filterMultiDictText } from '@/components/dict/JDictSelectUtil'
   import { initDictOptions,initDictOptionsIop, filterDictText } from '@/components/dict/JDictSelectUtil'
@@ -150,7 +153,8 @@
     mixins: [JeecgListMixin],
     components: {
       JDictSelectTagIop,
-      PrdAttributeCategoryModal
+      PrdAttributeCategoryModal,
+      PrdAttributeCategoryModalView
     },
     data() {
       return {
@@ -243,6 +247,15 @@
             this.categoryDictOptions = res.result
           }
         });
+      },
+      // 查看详情页面
+      handleDetail:function(record,title){
+        this.$refs.modalFormView.detail(record);
+        if(!title ||  typeof(title) != 'string'){
+          title = "详情";
+        }
+        this.$refs.modalFormView.title=title;
+        this.$refs.modalFormView.disableSubmit = false;
       }
 
     }

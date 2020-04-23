@@ -3,6 +3,8 @@ package com.nrjh.iop.modules.prd.attrcategory.service;
 import com.nrjh.iop.modules.prd.attrcategory.entity.PrdAttrCategAttrValueRel;
 import com.nrjh.iop.modules.prd.attrcategory.entity.PrdAttributeCategory;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.apache.ibatis.annotations.Param;
+
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
@@ -36,5 +38,7 @@ public interface IPrdAttributeCategoryService extends IService<PrdAttributeCateg
 	 * 批量删除一对多
 	 */
 	public void delBatchMain(Collection<? extends Serializable> idList);
+
+	public List<PrdAttributeCategory> selectAttrCategoryListByCategoryId( String categoryId);
 	
 }

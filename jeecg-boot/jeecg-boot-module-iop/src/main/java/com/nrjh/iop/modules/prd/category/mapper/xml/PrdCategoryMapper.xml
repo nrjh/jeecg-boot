@@ -2,4 +2,35 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.nrjh.iop.modules.prd.category.mapper.PrdCategoryMapper">
 
+    <select id="selectCategoryListByBrandId" parameterType="java.lang.String"
+            resultType="com.nrjh.iop.modules.prd.category.entity.PrdCategory">
+        SELECT
+        *
+        FROM
+        PRD_CATEGORY
+        WHERE
+        id IN (
+        SELECT DISTINCT
+        CATEGORY_ID
+        FROM
+        PRD_PRODUCT
+        WHERE
+        BRAND_ID = #{brandId})
+    </select>
+
+    <select id="selectCategoryListByCategoryId" parameterType="java.lang.String"
+            resultType="com.nrjh.iop.modules.prd.category.entity.PrdCategory">
+        SELECT
+        *
+        FROM
+        PRD_CATEGORY
+        WHERE
+        PID = (
+        SELECT PID
+        FROM
+        PRD_CATEGORY
+        WHERE
+        ID = #{categoryId})
+        and id != #{categoryId}
+    </select>
 </mapper>

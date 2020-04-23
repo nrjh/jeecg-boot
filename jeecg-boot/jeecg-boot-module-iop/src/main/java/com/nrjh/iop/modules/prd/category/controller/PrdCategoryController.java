@@ -83,9 +83,22 @@ public class PrdCategoryController extends JeecgController<PrdCategory, IPrdCate
 	@PostMapping(value = "/add")
 	public Result<?> add(@RequestBody PrdCategory prdCategory) {
 		prdCategoryService.save(prdCategory);
+		updateComplateName(prdCategory);
 		return Result.ok("添加成功！");
 	}
-	
+
+	 /**
+	  * 更新代码路径和名称路径
+	  * @param prdCategory
+	  */
+	private void updateComplateName( PrdCategory prdCategory){
+		PrdCategory prdCategoryParent = prdCategoryService.getById(prdCategory.getPid().toString());
+		if(prdCategoryParent!=null){
+			prdCategory.setCompleteName(prdCategoryParent.getCompleteName()+"/"+prdCategory.getName());
+			prdCategory.setIdPath(prdCategoryParent.getIdPath()+"/"+prdCategory.getId());
+			prdCategoryService.updateById(prdCategory);
+		}
+	}
 	/**
 	 *  编辑
 	 *
@@ -97,6 +110,7 @@ public class PrdCategoryController extends JeecgController<PrdCategory, IPrdCate
 	@PutMapping(value = "/edit")
 	public Result<?> edit(@RequestBody PrdCategory prdCategory) {
 		prdCategoryService.updateById(prdCategory);
+		updateComplateName(prdCategory);
 		return Result.ok("编辑成功!");
 	}
 	
@@ -129,21 +143,48 @@ public class PrdCategoryController extends JeecgController<PrdCategory, IPrdCate
 	}
 	
 	/**
-	 * 通过id查询
-	 *
-	 * @param id
-	 * @return
-	 */
-	@AutoLog(value = "品类-通过id查询")
-	@ApiOperation(value="品类-通过id查询", notes="品类-通过id查询")
-	@GetMapping(value = "/queryById")
-	public Result<?> queryById(@RequestParam(name="id",required=true) String id) {
-		PrdCategory prdCategory = prdCategoryService.getById(id);
-		if(prdCategory==null) {
-			return Result.error("未找到对应数据");
-		}
-		return Result.ok(prdCategory);
-	}
+	  * 通过id查询
+	  *
+	  * @param id
+	  * @return
+	  */
+	 @AutoLog(value = "品类-通过id查询")
+	 @ApiOperation(value="品类-通过id查询", notes="品类-通过id查询")
+	 @GetMapping(value = "/queryById")
+	 public Result<?> queryById(@RequestParam(name="id",required=true) String id) {
+		 PrdCategory prdCategory = prdCategoryService.getById(id);
+		 if(prdCategory==null) {
+			 return Result.error("未找到对应数据");
+		 }
+		 return Result.ok(prdCategory);
+	 }
+
+	 /**
+	  * 通过id查询
+	  *
+	  * @param id
+	  * @return
+	  */
+	 @AutoLog(value = "品牌-通过id查询")
+	 @ApiOperation(value = "品牌-通过id查询相关品类", notes = "品牌-通过id查询相关品类")
+	 @GetMapping(value = "/queryPrdCategoryListByBrandId")
+	 public Result<?> queryPrdCategoryListByBrandId(@RequestParam(name = "id", required = true) String id) {
+		 List<PrdCategory> prdCategoryList = prdCategoryService.selectCategoryListByBrandId(id);
+		 return Result.ok(prdCategoryList);
+	 }
+	 /**
+	  * 通过id查询
+	  *
+	  * @param id
+	  * @return
+	  */
+	 @AutoLog(value = "品类-通过id查询相关品类")
+	 @ApiOperation(value="品类-通过id查询相关品类", notes="品类-通过id查询相关品类")
+	 @GetMapping(value = "/queryPrdCategoryListByCategoryId")
+	 public Result<?> queryPrdCategoryListByCategoryId(@RequestParam(name="id",required=true) String id) {
+		 List<PrdCategory> prdCategoryList = prdCategoryService.selectCategoryListByCategoryId(id);
+		 return Result.ok(prdCategoryList);
+	 }
 
     /**
     * 导出excel

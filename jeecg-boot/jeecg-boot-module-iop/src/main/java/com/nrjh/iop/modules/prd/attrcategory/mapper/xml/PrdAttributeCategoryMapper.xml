@@ -2,4 +2,24 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.nrjh.iop.modules.prd.attrcategory.mapper.PrdAttributeCategoryMapper">
 
+    <select id="selectAttrCategoryListByCategoryId" parameterType="java.lang.String"
+            resultType="com.nrjh.iop.modules.prd.attribute.entity.PrdAttributeValue">
+        SELECT
+        *
+        FROM
+        PRD_ATTRIBUTE_CATEGORY
+        WHERE
+        ID IN (
+        SELECT DISTINCT
+        ATTRIBUTE_CATEGORY_ID
+        FROM
+        PRD_PRODUCT_ATTR_CATEG_REL
+        WHERE
+        PRODUCT_ID IN (SELECT
+        id
+        FROM
+        PRD_PRODUCT
+        WHERE
+        CATEGORY_ID = #{categoryId}))
+    </select>
 </mapper>

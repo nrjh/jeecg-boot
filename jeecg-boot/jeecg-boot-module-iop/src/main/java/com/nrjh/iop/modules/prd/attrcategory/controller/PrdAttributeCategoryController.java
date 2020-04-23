@@ -176,6 +176,20 @@ public class PrdAttributeCategoryController {
 		return Result.ok(prdAttrCategAttrValueRelList);
 	}
 
+	 /**
+	  * 通过id查询
+	  *
+	  * @param id
+	  * @return
+	  */
+	 @AutoLog(value = "物品规格与产品属性值关系集合-通过id查询品类相关规格")
+	 @ApiOperation(value="物品规格与产品属性值关系集合-通过id查询品类相关规格", notes="物品规格与产品属性值关系-通过id查询品类相关规格")
+	 @GetMapping(value = "/selectAttrCategoryListByCategoryId")
+	 public Result<?> selectAttrCategoryListByCategoryId(@RequestParam(name="id",required=true) String id) {
+		 List<PrdAttributeCategory> prdAttributeCategoryList = prdAttributeCategoryService.selectAttrCategoryListByCategoryId(id);
+		 return Result.ok(prdAttributeCategoryList);
+	 }
+
     /**
     * 导出excel
     *

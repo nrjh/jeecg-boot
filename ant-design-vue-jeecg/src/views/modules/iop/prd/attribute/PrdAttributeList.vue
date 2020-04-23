@@ -87,6 +87,7 @@
         </template>
 
         <span slot="action" slot-scope="text, record">
+          <a @click="handleDetail(record)">查看</a>&nbsp;&nbsp;
           <a @click="handleEdit(record)">编辑</a>
 
           <a-divider type="vertical" />
@@ -106,6 +107,7 @@
     </div>
 
     <prdAttribute-modal ref="modalForm" @ok="modalFormOk"></prdAttribute-modal>
+    <prdAttribute-modalView ref="modalFormView" @ok=""></prdAttribute-modalView>
   </a-card>
 </template>
 
@@ -113,6 +115,7 @@
 
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
   import PrdAttributeModal from './modules/PrdAttributeModal'
+  import PrdAttributeModalView from './modules/PrdAttributeModalView'
   import JDictSelectTag from '@/components/dict/JDictSelectTag.vue'
   import {filterMultiDictText} from '@/components/dict/JDictSelectUtil'
   import { initDictOptions, filterDictText } from '@/components/dict/JDictSelectUtil'
@@ -122,7 +125,8 @@
     mixins:[JeecgListMixin],
     components: {
       JDictSelectTag,
-      PrdAttributeModal
+      PrdAttributeModal,
+      PrdAttributeModalView
     },
     data () {
       return {
@@ -190,6 +194,15 @@
             this.displayDictOptions = res.result
           }
         });
+      },
+      // 查看详情页面
+      handleDetail:function(record,title){
+        this.$refs.modalFormView.detail(record);
+        if(!title ||  typeof(title) != 'string'){
+          title = "详情";
+        }
+        this.$refs.modalFormView.title=title;
+        this.$refs.modalFormView.disableSubmit = false;
       }
        
     }

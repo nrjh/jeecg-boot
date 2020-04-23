@@ -83,7 +83,9 @@
           categoryType: {rules: [
             {required: true, message: '请选择品类类型!'},
           ]},
-          active: {rules: [
+          active: {
+            valuePropName: 'checked',
+            rules: [
             {required: true, message: '请选择状态!'},
           ]},
           sequence: {rules: [

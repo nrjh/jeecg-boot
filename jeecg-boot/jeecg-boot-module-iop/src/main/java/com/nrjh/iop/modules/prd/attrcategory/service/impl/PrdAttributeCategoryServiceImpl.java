@@ -79,5 +79,12 @@ public class PrdAttributeCategoryServiceImpl extends ServiceImpl<PrdAttributeCat
 			prdAttributeCategoryMapper.deleteById(id);
 		}
 	}
+
+	@Override
+	public List<PrdAttributeCategory> selectAttrCategoryListByCategoryId(String categoryId) {
+		return prdAttributeCategoryMapper.selectAttrCategoryListByCategoryId(categoryId);
+	}
+
+
 	
 }

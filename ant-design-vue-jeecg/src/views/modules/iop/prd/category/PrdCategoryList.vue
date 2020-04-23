@@ -96,6 +96,8 @@
         </template>
 
         <span slot="action" slot-scope="text, record">
+          <a @click="handleDetail(record,'品牌 / 详情')">查看</a>
+          &nbsp;&nbsp;
           <a @click="handleEdit(record)">编辑</a>
 
           <a-divider type="vertical" />
@@ -115,6 +117,7 @@
     </div>
 
     <prdCategory-modal ref="modalForm" @ok="modalFormOk"></prdCategory-modal>
+    <prdCategory-modalView ref="modalFormView" @ok=""></prdCategory-modalView>
   </a-card>
 </template>
 
@@ -122,6 +125,7 @@
 
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
   import PrdCategoryModal from './modules/PrdCategoryModal'
+  import PrdCategoryModalView from './modules/PrdCategoryModalView'
   import { initDictOptions,initDictOptionsIop, filterDictText } from '@/components/dict/JDictSelectUtil'
   import JDictSelectTag from '@/components/dict/JDictSelectTag'
   import JDictSelectTagIop from '@/components/dict/JDictSelectTagIop'
@@ -131,6 +135,7 @@
     mixins:[JeecgListMixin],
     components: {
       PrdCategoryModal,
+      PrdCategoryModalView,
       JDictSelectTag,
       JDictSelectTagIop
     },
@@ -214,7 +219,18 @@
             this.categporyDictOptions = res.result
           }
         });
-      }
+      },
+
+      // 查看详情页面
+      handleDetail:function(record,title){
+        debugger;
+        this.$refs.modalFormView.detail(record);
+        if(!title ||  typeof(title) != 'string'){
+          title = "详情";
+        }
+        this.$refs.modalFormView.title=title;
+        this.$refs.modalFormView.disableSubmit = true;
+      },
     }
   }
 </script>
