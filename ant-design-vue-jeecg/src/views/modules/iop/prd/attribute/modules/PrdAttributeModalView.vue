@@ -49,7 +49,8 @@
             :maxHeight="300"
             :rowNumber="true"
             :rowSelection="false"
-            :actionButton="false"/>
+            :actionButton="false"
+            :disabled="true"/>
         </a-tab-pane>
 
       </a-tabs>
