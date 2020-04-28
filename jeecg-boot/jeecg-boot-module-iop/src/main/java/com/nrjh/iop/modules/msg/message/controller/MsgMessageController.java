@@ -90,6 +90,9 @@ public class MsgMessageController {
 	@ApiOperation(value="消息-添加", notes="消息-添加")
 	@PostMapping(value = "/add")
 	public Result<?> add(@RequestBody MsgMessagePage msgMessagePage) {
+		/**
+		 * 此功能暂时只支持  旧文本  新文本 字段存储，无论什么类型都存储到这两个字段
+		 */
 		MsgMessage msgMessage = new MsgMessage();
 		BeanUtils.copyProperties(msgMessagePage, msgMessage);
 		msgMessageService.saveMain(msgMessage, msgMessagePage.getMsgTrackingValueList());

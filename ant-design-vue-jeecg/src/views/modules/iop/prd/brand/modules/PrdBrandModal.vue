@@ -139,9 +139,9 @@
         if (!title) this.title = title
         if (copy == true) record.id = null
         this.form.resetFields()
+        this.active = record.active == 1 ? true : false
         this.model = Object.assign({}, record)
         this.visible = true
-        this.active = record.active == 1 ? true : false
         this.$nextTick(() => {
           this.form.setFieldsValue(pick(this.model, 'name', 'firstLetter', 'manufactorId', 'active', 'description'))
         })
@@ -149,9 +149,9 @@
       view(record) {
         this.viewStatus = true
         this.form.resetFields()
+        record.active = record.active == 1 ? true : false
         this.model = Object.assign({}, record)
         this.visible = true
-        this.active = record.active == 1 ? true : false
         this.$nextTick(() => {
           this.form.setFieldsValue(pick(this.model, 'name', 'firstLetter', 'manufactorId', 'active', 'description'))
         })
