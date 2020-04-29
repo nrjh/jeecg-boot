@@ -1,31 +1,31 @@
 package org.jeecg.modules.system.aspect;
 
-import java.lang.reflect.Field;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
+import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.aspect.annotation.Dict;
+import org.jeecg.common.aspect.annotation.DictIop;
 import org.jeecg.common.constant.CommonConstant;
 import org.jeecg.common.util.oConvertUtils;
+import org.jeecg.modules.system.service.ISysDictIopService;
 import org.jeecg.modules.system.service.ISysDictService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import lombok.extern.slf4j.Slf4j;
+import java.lang.reflect.Field;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * @Description: 字典aop类
@@ -36,12 +36,15 @@ import lombok.extern.slf4j.Slf4j;
 @Aspect
 @Component
 @Slf4j
-public class DictAspect {
+public class DictIopAspect {
+
     @Autowired
     private ISysDictService dictService;
+    @Autowired
+    private ISysDictIopService dictIopService;
 
     // 定义切点Pointcut
-    @Pointcut("execution(public * org.jeecg.modules..*.*Controller.*(..))")
+    @Pointcut("execution(public * com.nrjh.iop.modules..*.*Controller.*(..))")
     public void excudeService() {
     }
 
@@ -99,14 +102,15 @@ public class DictAspect {
                     //for (Field field : record.getClass().getDeclaredFields()) {
                     for (Field field : oConvertUtils.getAllFields(record)) {
                         //update-end--Author:scott  -- Date:20190603 ----for：解决继承实体字段无法翻译问题------
-                        if (field.getAnnotation(Dict.class) != null) {
-                            String code = field.getAnnotation(Dict.class).dicCode();
-                            String text = field.getAnnotation(Dict.class).dicText();
-                            String table = field.getAnnotation(Dict.class).dictTable();
+                        if (field.getAnnotation(DictIop.class) != null) {
+                            String code = field.getAnnotation(DictIop.class).dicCode();
+                            String text = field.getAnnotation(DictIop.class).dicText();
+                            String table = field.getAnnotation(DictIop.class).dictTable();
+                            String dataSource = field.getAnnotation(DictIop.class).dataSource();
                             String key = String.valueOf(item.get(field.getName()));
 
                             //翻译字典值对应的txt
-                            String textValue = translateDictValue(code, text, table, key);
+                            String textValue = translateDictValue(code, text, table, key,dataSource);
 
                             log.debug(" 字典Val : " + textValue);
                             log.debug(" __翻译字典字段__ " + field.getName() + CommonConstant.DICT_TEXT_SUFFIX + "： " + textValue);
@@ -135,7 +139,7 @@ public class DictAspect {
      * @param key
      * @return
      */
-    private String translateDictValue(String code, String text, String table, String key) {
+    private String translateDictValue(String code, String text, String table, String key,String dataSource) {
         if (oConvertUtils.isEmpty(key)) {
             return null;
         }
@@ -148,9 +152,17 @@ public class DictAspect {
                 continue; //跳过循环
             }
             if (!StringUtils.isEmpty(table)) {
-                tmpValue = dictService.queryTableDictTextByKey(table, text, code, k.trim());
+                if("iop".equals(dataSource)){
+                    tmpValue = dictIopService.queryTableDictTextByKey(table, text, code, k.trim());
+                }else{
+                    tmpValue = dictService.queryTableDictTextByKey(table, text, code, k.trim());
+                }
             } else {
-                tmpValue = dictService.queryDictTextByKey(code, k.trim());
+                if("iop".equals(dataSource)){
+                    tmpValue = dictIopService.queryDictTextByKey(code, k.trim());
+                }else{
+                    tmpValue = dictService.queryDictTextByKey(code, k.trim());
+                }
             }
 
             if (tmpValue != null) {
