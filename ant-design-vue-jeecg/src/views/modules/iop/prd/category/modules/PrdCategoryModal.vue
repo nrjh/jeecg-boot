@@ -107,11 +107,10 @@
         this.edit({active:1});
       },
       edit (record) {
-        debugger;
         this.form.resetFields();
+        record.active = record.active==1 ? true:false;
         this.model = Object.assign({}, record);
         this.visible = true;
-        this.active = record.active==1 ? true:false;
         this.$nextTick(() => {
           this.form.setFieldsValue(pick(this.model,'name','pid','categoryType','active','sequence','completeName','removalStrategyId'))
         })

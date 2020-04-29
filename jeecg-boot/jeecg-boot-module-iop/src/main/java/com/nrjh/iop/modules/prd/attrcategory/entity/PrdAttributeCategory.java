@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import org.jeecg.common.aspect.annotation.DictIop;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.jeecgframework.poi.excel.annotation.Excel;
 import org.jeecg.common.aspect.annotation.Dict;
@@ -47,8 +48,8 @@ public class PrdAttributeCategory implements Serializable {
     @ApiModelProperty(value = "编码")
     private String code;
 	/**品类  物品品类外键*/
-	@Excel(name = "所属品类", width = 15, dictTable = "PRD_CATEGORY", dicText = "NAME", dicCode = "ID")
-    @Dict(dictTable = "PRD_CATEGORY", dicText = "NAME", dicCode = "ID")
+	@Excel(name = "所属品类", width = 15)
+    @DictIop(dictTable = "PRD_CATEGORY", dicText = "NAME", dicCode = "ID",dataSource = "iop")
     @ApiModelProperty(value = "所属品类")
     private Integer categoryId;
 	/**属性数量*/

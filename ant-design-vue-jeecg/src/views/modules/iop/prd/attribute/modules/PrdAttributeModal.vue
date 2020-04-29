@@ -64,6 +64,7 @@
   import { JEditableTableMixin } from '@/mixins/JEditableTableMixin'
   import { validateDuplicateValue } from '@/utils/util'
   import JDictSelectTag from '@/components/dict/JDictSelectTag'
+  import { httpAction, getAction } from '@/api/manage'
 
   export default {
     name: 'PrdAttributeModal',
@@ -177,6 +178,31 @@
       },
       popupCallback(row) {
         this.form.setFieldsValue(pick(row, 'name', 'sequence', 'displayType'))
+      },
+      // 重写
+      request(formData) {
+        let url = this.url.add, method = 'post'
+        if (this.model.id) {
+          url = this.url.edit
+          method = 'put'
+        }
+        // 清楚子表ID
+        for (var i = 0; i < formData.prdAttributeValueList.length; i++) {
+          formData.prdAttributeValueList[i].id = '';
+        }
+
+        this.confirmLoading = true
+        httpAction(url, formData, method).then((res) => {
+          if (res.success) {
+            this.$message.success(res.message)
+            this.$emit('ok')
+            this.close()
+          } else {
+            this.$message.warning(res.message)
+          }
+        }).finally(() => {
+          this.confirmLoading = false
+        })
       }
 
     }

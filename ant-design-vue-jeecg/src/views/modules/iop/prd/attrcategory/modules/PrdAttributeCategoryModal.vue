@@ -27,8 +27,8 @@
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="启用" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <j-dict-select-tag type="list" v-decorator="['active', validatorRules.active]" :trigger-change="true" dictCode="IOP_PUB_ACTION" placeholder="请选择启用"/>
+            <a-form-item label="状态" :labelCol="labelCol" :wrapperCol="wrapperCol">
+              <j-dict-select-tag type="list" v-decorator="['active', validatorRules.active]" :trigger-change="true" dictCode="IOP_PUB_ACTION" placeholder="请选择状态"/>
             </a-form-item>
           </a-col>
           <a-col :span="12">
@@ -67,6 +67,7 @@
   import { JEditableTableMixin } from '@/mixins/JEditableTableMixin'
   import { validateDuplicateValueIop } from '@/utils/util'
   import JDictSelectTagIop from "@/components/dict/JDictSelectTagIop"
+  import { httpAction, getAction } from '@/api/manage'
 
   export default {
     name: 'PrdAttributeCategoryModal',
@@ -108,8 +109,6 @@
           ]},
           categoryId: {rules: [
             {required: true, message: '请选择所属品类!'},
-          ]},
-          attributeQty: {rules: [
           ]},
         },
         refKeys: ['prdAttrCategAttrValueRel', ],
@@ -160,7 +159,7 @@
       },
       /** 调用完edit()方法之后会自动调用此方法 */
       editAfter() {
-        let fieldval = pick(this.model,'active','sequence','name','code','categoryId','attributeQty')
+        let fieldval = pick(this.model,'active','sequence','name','code','categoryId')
         this.$nextTick(() => {
           this.form.setFieldsValue(fieldval)
         })
@@ -183,8 +182,33 @@
         this.$message.error(msg)
       },
      popupCallback(row){
-       this.form.setFieldsValue(pick(row,'active','sequence','name','code','categoryId','attributeQty'))
+       this.form.setFieldsValue(pick(row,'active','sequence','name','code','categoryId'))
      },
+      // 重写
+      request(formData) {
+        let url = this.url.add, method = 'post'
+        if (this.model.id) {
+          url = this.url.edit
+          method = 'put'
+        }
+        // 清楚子表ID
+        for (var i = 0; i < formData.prdAttrCategAttrValueRelList.length; i++) {
+          formData.prdAttrCategAttrValueRelList[i].id = '';
+        }
+
+        this.confirmLoading = true
+        httpAction(url, formData, method).then((res) => {
+          if (res.success) {
+            this.$message.success(res.message)
+            this.$emit('ok')
+            this.close()
+          } else {
+            this.$message.warning(res.message)
+          }
+        }).finally(() => {
+          this.confirmLoading = false
+        })
+      }
 
     }
   }

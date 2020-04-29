@@ -31,9 +31,9 @@
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="启用" :labelCol="labelCol" :wrapperCol="wrapperCol">
+            <a-form-item label="状态" :labelCol="labelCol" :wrapperCol="wrapperCol">
               <j-dict-select-tag type="list" v-decorator="['active', validatorRules.active]" :trigger-change="true"
-                                 dictCode="IOP_PUB_ACTION" placeholder="请选择启用" disabled="disabled"/>
+                                 dictCode="IOP_PUB_ACTION" placeholder="请选择状态" disabled="disabled"/>
             </a-form-item>
           </a-col>
           <a-col :span="12">
@@ -126,9 +126,6 @@
               { required: true, message: '请选择所属品类!' }
             ]
           },
-          attributeQty: {
-            rules: []
-          }
         },
         refKeys: ['prdAttrCategAttrValueRel'],
         tableKeys: ['prdAttrCategAttrValueRel'],
@@ -182,7 +179,7 @@
         this.visible = true
         this.activeKey = this.refKeys[0]
         this.form.resetFields()
-        record.active = record.active == 1 ? true : false
+       // record.active = record.active == 1 ? true : false
         this.model = Object.assign({}, record)
         if (typeof this.editAfter === 'function') this.editAfter(this.model)
       },
@@ -192,7 +189,7 @@
       },
       /** 调用完edit()方法之后会自动调用此方法 */
       editAfter() {
-        let fieldval = pick(this.model, 'active', 'sequence', 'name', 'code', 'categoryId', 'attributeQty')
+        let fieldval = pick(this.model, 'active', 'sequence', 'name', 'code', 'categoryId' )
         this.$nextTick(() => {
           this.form.setFieldsValue(fieldval)
         })
@@ -215,7 +212,7 @@
         this.$message.error(msg)
       },
       popupCallback(row) {
-        this.form.setFieldsValue(pick(row, 'active', 'sequence', 'name', 'code', 'categoryId', 'attributeQty'))
+        this.form.setFieldsValue(pick(row, 'active', 'sequence', 'name', 'code', 'categoryId' ))
       }
 
     }

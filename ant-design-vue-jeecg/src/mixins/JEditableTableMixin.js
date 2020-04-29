@@ -96,18 +96,6 @@ export const JEditableTableMixin = {
         url = this.url.edit
         method = 'put'
       }
-      // 判断url,去除自动生成的主键
-      if(url.indexOf("attribute")>-1){
-          //属性管理  属性值字表主键
-         for(var i =0 ;i<formData.prdAttributeValueList.length;i++){
-           formData.prdAttributeValueList[i].id = "";
-         }
-      }else if(url.indexOf("attrcategory")>-1){
-        //规格管理  相关属性值字表主键
-        for(var i =0 ;i<formData.prdAttrCategAttrValueRelList.length;i++){
-          formData.prdAttrCategAttrValueRelList[i].id = "";
-        }
-      }
       this.confirmLoading = true
       httpAction(url, formData, method).then((res) => {
         if (res.success) {

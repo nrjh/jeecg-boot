@@ -214,7 +214,7 @@
     methods: {
       /** 当点击了查看按钮时调用此方法 */
       detail(record) {
-        refKeys: ['prdCategoryValue', 'prdAttrCategoryValue', 'prdProduceValue']
+       // refKeys: ['prdCategoryValue', 'prdAttrCategoryValue', 'prdProduceValue']
         if (typeof this.editBefore === 'function') this.editBefore(record)
         this.visible = true
         this.detailStatus = true

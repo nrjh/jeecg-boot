@@ -223,7 +223,6 @@
 
       // 查看详情页面
       handleDetail:function(record,title){
-        debugger;
         this.$refs.modalFormView.detail(record);
         if(!title ||  typeof(title) != 'string'){
           title = "详情";
