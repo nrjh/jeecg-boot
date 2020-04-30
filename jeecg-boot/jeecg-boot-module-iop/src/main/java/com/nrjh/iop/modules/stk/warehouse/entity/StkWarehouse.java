@@ -12,6 +12,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.jeecgframework.poi.excel.annotation.Excel;
 import org.jeecg.common.aspect.annotation.Dict;
+import org.jeecg.common.aspect.annotation.DictIop;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.EqualsAndHashCode;
@@ -38,7 +40,7 @@ public class StkWarehouse implements Serializable {
 	/**启用*/
 	@Excel(name = "启用", width = 15,dicCode = "IOP_PUB_ACTION")
     @ApiModelProperty(value = "启用")
-    @Dict(dicCode = "IOP_PUB_ACTION")
+    @DictIop(dicCode = "IOP_PUB_ACTION")
     private Integer active;
 	/**代码*/
 	@Excel(name = "代码", width = 15)

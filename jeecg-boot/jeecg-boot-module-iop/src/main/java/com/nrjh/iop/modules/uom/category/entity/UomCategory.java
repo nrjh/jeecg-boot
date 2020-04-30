@@ -10,6 +10,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.jeecgframework.poi.excel.annotation.Excel;
 import org.jeecg.common.aspect.annotation.Dict;
+import org.jeecg.common.aspect.annotation.DictIop;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -35,7 +37,7 @@ public class UomCategory implements Serializable {
     private String name;
 	/**计量类型*/
 	@Excel(name = "计量类型", width = 15, dicCode = "IOP_UOM_MEASURE_TYPE")
-    @Dict(dicCode = "IOP_UOM_MEASURE_TYPE")
+    @DictIop(dicCode = "IOP_UOM_MEASURE_TYPE")
     @ApiModelProperty(value = "计量类型")
     private String measureType;
 	/**创建人*/
