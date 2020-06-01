@@ -10,8 +10,8 @@
             </a-form-item>
           </a-col>
           <a-col :xl="6" :lg="7" :md="8" :sm="24">
-            <a-form-item label="作业（出入库）类型">
-              <a-input placeholder="请输入作业（出入库）类型" v-model="queryParam.code"></a-input>
+            <a-form-item label="作业类型">
+              <JDictSelectTag v-model="queryParam.code" placeholder="请选择作业类型" dictCode="IOP_STK_PICKING_TYPE"/>
             </a-form-item>
           </a-col>
           <a-col :xl="6" :lg="7" :md="8" :sm="24">
@@ -113,12 +113,13 @@
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
   import StkPickingTypeModal from './modules/StkPickingTypeModal'
   import {filterMultiDictText} from '@/components/dict/JDictSelectUtil'
+  import JDictSelectTag from '@/components/dict/JDictSelectTag.vue'
 
   export default {
     name: "StkPickingTypeList",
     mixins:[JeecgListMixin],
     components: {
-      StkPickingTypeModal
+      StkPickingTypeModal,JDictSelectTag
     },
     data () {
       return {
@@ -141,75 +142,75 @@
             dataIndex: 'name'
           },
           {
-            title:'作业（出入库）类型',
+            title:'作业类型',
             align:"center",
-            dataIndex: 'code'
+            dataIndex: 'code_dictText'
           },
           {
             title:'颜色',
             align:"center",
-            dataIndex: 'color'
+            dataIndex: 'color_dictText'
           },
           {
             title:'默认源位置',
             align:"center",
-            dataIndex: 'defaultLoactionSrcId'
+            dataIndex: 'defaultLoactionSrcId_dictText'
           },
           {
             title:'默认目标位置',
             align:"center",
-            dataIndex: 'defaultLocationDestId'
+            dataIndex: 'defaultLocationDestId_dictText'
           },
           {
             title:'退回作业类型',
             align:"center",
-            dataIndex: 'returnPickingTypeId'
+            dataIndex: 'returnPickingTypeId_dictText'
           },
           {
             title:'整个包裹',
             align:"center",
-            dataIndex: 'showEntirePacks'
+            dataIndex: 'showEntirePacks_dictText'
           },
           {
             title:'仓库',
             align:"center",
-            dataIndex: 'warehouseId'
+            dataIndex: 'warehouseId_dictText'
           },
           {
-            title:'启用',
+            title:'状态',
             align:"center",
-            dataIndex: 'active'
+            dataIndex: 'active_dictText'
           },
-          {
-            title:'使用新建批号',
-            align:"center",
-            dataIndex: 'useCreateLots'
-          },
-          {
-            title:'利用已存在批号',
-            align:"center",
-            dataIndex: 'useExstingLots'
-          },
-          {
-            title:'详细作业',
-            align:"center",
-            dataIndex: 'showOperations'
-          },
-          {
-            title:'被保留详细作业',
-            align:"center",
-            dataIndex: 'showReserved'
-          },
-          {
-            title:'条码',
-            align:"center",
-            dataIndex: 'barcode'
-          },
-          {
-            title:'单位',
-            align:"center",
-            dataIndex: 'companyId'
-          },
+          // {
+          //   title:'使用新建批号',
+          //   align:"center",
+          //   dataIndex: 'useCreateLots'
+          // },
+          // {
+          //   title:'利用已存在批号',
+          //   align:"center",
+          //   dataIndex: 'useExstingLots'
+          // },
+          // {
+          //   title:'详细作业',
+          //   align:"center",
+          //   dataIndex: 'showOperations'
+          // },
+          // {
+          //   title:'被保留详细作业',
+          //   align:"center",
+          //   dataIndex: 'showReserved'
+          // },
+          // {
+          //   title:'条码',
+          //   align:"center",
+          //   dataIndex: 'barcode'
+          // },
+          // {
+          //   title:'单位',
+          //   align:"center",
+          //   dataIndex: 'companyId'
+          // },
           {
             title: '操作',
             dataIndex: 'action',

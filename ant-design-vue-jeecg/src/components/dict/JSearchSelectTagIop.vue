@@ -35,7 +35,7 @@
 </template>
 
 <script>
-  import { ajaxGetDictItems } from '@/api/api'
+  import { ajaxGetDictItems,ajaxGetDictItemsIop } from '@/api/api'
   import debounce from 'lodash/debounce';
   import { getAction } from '../../api/manage'
 
@@ -113,6 +113,7 @@
         getAction(`/iop/sys/dict/loadDict/${this.dict}`,{keyword:value}).then(res=>{
           this.loading=false
           if(res.success){
+            debugger;
             if(currentLoad!=this.lastLoad){
               return
             }

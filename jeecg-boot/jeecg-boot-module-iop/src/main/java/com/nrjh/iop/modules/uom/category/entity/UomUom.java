@@ -58,7 +58,7 @@ public class UomUom implements Serializable {
 	/**创建人*/
 	@Excel(name = "创建人", width = 15)
 	@ApiModelProperty(value = "创建人")
-	private String createUid;
+	private String createBy;
 	/**创建时间*/
 	@Excel(name = "创建时间", width = 20, format = "yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
@@ -68,7 +68,7 @@ public class UomUom implements Serializable {
 	/**修改人*/
 	@Excel(name = "修改人", width = 15)
 	@ApiModelProperty(value = "修改人")
-	private String writeUid;
+	private String writeBy;
 	/**修改时间*/
 	@Excel(name = "修改时间", width = 20, format = "yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")

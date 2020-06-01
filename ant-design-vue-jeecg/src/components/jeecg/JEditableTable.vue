@@ -1562,6 +1562,11 @@
                 this.slotValues[modelKey] = newValue
                 edited = true
               }
+              // 在  sel_search中寻找  add by zzy 20200512
+              if(!edited&& this.searchSelectValues.hasOwnProperty(modelKey)){
+                this.searchSelectValues[modelKey] = newValue
+                edited = true
+              }
             }
           }
         })

@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import org.jeecg.common.aspect.annotation.DictIop;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.jeecgframework.poi.excel.annotation.Excel;
 import org.jeecg.common.aspect.annotation.Dict;
@@ -32,7 +33,7 @@ public class StkPickingType implements Serializable {
     private static final long serialVersionUID = 1L;
 
 	/**标识*/
-	@TableId(type = IdType.ID_WORKER_STR)
+	@TableId(type = IdType.AUTO)
     @ApiModelProperty(value = "标识")
     private Integer id;
 	/**名称*/
@@ -40,11 +41,13 @@ public class StkPickingType implements Serializable {
     @ApiModelProperty(value = "名称")
     private String name;
 	/**作业（出入库）类型*/
-	@Excel(name = "作业（出入库）类型", width = 15)
-    @ApiModelProperty(value = "作业（出入库）类型")
+	@Excel(name = "作业类型", width = 15,dicCode = "IOP_STK_PICKING_TYPE")
+    @DictIop(dicCode = "IOP_STK_PICKING_TYPE")
+    @ApiModelProperty(value = "作业类型")
     private String code;
 	/**颜色*/
-	@Excel(name = "颜色", width = 15)
+	@Excel(name = "颜色", width = 15,dicCode = "IOP_PUB_COLOR")
+    @DictIop(dicCode = "IOP_PUB_COLOR")
     @ApiModelProperty(value = "颜色")
     private java.lang.Integer color;
 	/**序号*/
@@ -62,27 +65,33 @@ public class StkPickingType implements Serializable {
     private java.lang.String sequenceCode;
 	/**默认源位置*/
 	@Excel(name = "默认源位置", width = 15)
+    @DictIop(dictTable = "stk_location",dicCode = "id",dicText = "name",dataSource = "iop")
     @ApiModelProperty(value = "默认源位置")
     private java.lang.Integer defaultLoactionSrcId;
 	/**默认目标位置*/
 	@Excel(name = "默认目标位置", width = 15)
+    @DictIop(dictTable = "stk_location",dicCode = "id",dicText = "name",dataSource = "iop")
     @ApiModelProperty(value = "默认目标位置")
     private java.lang.Integer defaultLocationDestId;
 	/**退回作业类型*/
 	@Excel(name = "退回作业类型", width = 15)
+    @DictIop(dictTable = "stk_picking_type",dicCode = "id",dicText = "name",dataSource = "iop")
     @ApiModelProperty(value = "退回作业类型")
     private java.lang.Integer returnPickingTypeId;
 	/**整个包裹*/
-	@Excel(name = "整个包裹", width = 15)
+	@Excel(name = "整个包裹", width = 15,dicCode = "yn")
+    @DictIop(dicCode = "yn")
     @ApiModelProperty(value = "整个包裹")
     private java.lang.Integer showEntirePacks;
 	/**仓库*/
 	@Excel(name = "仓库", width = 15)
+    @DictIop(dictTable = "stk_warehouse",dicCode = "id",dicText = "name",dataSource = "iop")
     @ApiModelProperty(value = "仓库")
     private java.lang.Integer warehouseId;
 	/**启用*/
-	@Excel(name = "启用", width = 15)
-    @ApiModelProperty(value = "启用")
+	@Excel(name = "状态", width = 15,dicCode = "IOP_PUB_ACTION")
+    @DictIop(dicCode = "IOP_PUB_ACTION")
+    @ApiModelProperty(value = "状态")
     private java.lang.Integer active;
 	/**使用新建批号*/
 	@Excel(name = "使用新建批号", width = 15)

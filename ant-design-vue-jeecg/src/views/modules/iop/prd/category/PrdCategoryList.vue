@@ -11,7 +11,7 @@
           </a-col>
           <a-col :xl="6" :lg="7" :md="8" :sm="24">
             <a-form-item label="状态">
-              <JDictSelectTag  v-model="queryParam.active" placeholder="请选择状态" dictCode="IOP_PUB_ACTION"/>
+              <j-dict-select-tag v-model="queryParam.active" placeholder="请选择状态" dictCode="IOP_PUB_ACTION"/>
             </a-form-item>
           </a-col>
           <a-col :xl="6" :lg="7" :md="8" :sm="24">
@@ -29,7 +29,7 @@
           <template v-if="toggleSearchStatus">
             <a-col :xl="6" :lg="7" :md="8" :sm="24">
               <a-form-item label="品类类型">
-                <JDictSelectTag  v-model="queryParam.categoryType" placeholder="请选择品类类型" dictCode="IOP_PRD_CATEGORY_TYPE"/>
+                <j-dict-select-tag  v-model="queryParam.categoryType" placeholder="请选择品类类型" dictCode="IOP_PRD_CATEGORY_TYPE"/>
               </a-form-item>
             </a-col>
           </template>

@@ -27,11 +27,11 @@ public class StkLocation implements Serializable {
 	@TableId(type = IdType.AUTO)
 	private Integer id;
 	/**启用*/
-	@Excel(name = "启用", width = 15,dicCode = "IOP_PUB_ACTION")
+	@Excel(name = "状态", width = 15,dicCode = "IOP_PUB_ACTION")
 	@Dict(dicCode="IOP_PUB_ACTION")
 	private Integer active;
 	/**父位置*/
-	@Excel(name = "父位置", width = 15)
+	@Excel(name = "父位置", width = 15,dictTable = "stk_location",dicCode = "id",dicText = "name",dataSoruce = "iop")
 	private String pid;
 	/**父路径*/
 	@Excel(name = "父路径", width = 15)

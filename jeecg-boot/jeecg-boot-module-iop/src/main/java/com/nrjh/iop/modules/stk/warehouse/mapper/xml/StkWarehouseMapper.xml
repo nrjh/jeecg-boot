@@ -2,4 +2,10 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.nrjh.iop.modules.stk.warehouse.mapper.StkWarehouseMapper">
 
+    <select id="selectByViewLocationId" parameterType="java.lang.Integer" resultType="com.nrjh.iop.modules.stk.warehouse.entity.StkWarehouse">
+        SELECT *
+        FROM  stk_warehouse
+        WHERE
+        view_location_id = #{locationId} 	</select>
+
 </mapper>

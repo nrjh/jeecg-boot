@@ -1,5 +1,6 @@
 package com.nrjh.iop.modules.stk.pickingtype.service.impl;
 
+import com.baomidou.dynamic.datasource.annotation.DS;
 import com.nrjh.iop.modules.stk.pickingtype.entity.StkPickingType;
 import com.nrjh.iop.modules.stk.pickingtype.mapper.StkPickingTypeMapper;
 import com.nrjh.iop.modules.stk.pickingtype.service.IStkPickingTypeService;
@@ -14,6 +15,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
  * @Version: V1.0
  */
 @Service
+@DS("iop")
 public class StkPickingTypeServiceImpl extends ServiceImpl<StkPickingTypeMapper, StkPickingType> implements IStkPickingTypeService {
 
 }
