@@ -31,7 +31,7 @@ public class StkLocation implements Serializable {
 	@Dict(dicCode="IOP_PUB_ACTION")
 	private Integer active;
 	/**父位置*/
-	@Excel(name = "父位置", width = 15,dictTable = "stk_location",dicCode = "id",dicText = "name",dataSoruce = "iop")
+	@Excel(name = "父位置", width = 15,dictTable = "stk_location",dicCode = "id",dicText = "name",dataSource = "iop")
 	private String pid;
 	/**父路径*/
 	@Excel(name = "父路径", width = 15)

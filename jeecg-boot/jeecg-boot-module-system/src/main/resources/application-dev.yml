@@ -102,24 +102,19 @@ spring:
         connectionProperties: druid.stat.mergeSql\=true;druid.stat.slowSqlMillis\=5000
       datasource:
         master:
-          url: jdbc:mysql://127.0.0.1:3306/jeecg-boot?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false
+          url: jdbc:mysql://localhost:3306/jeecg-boot?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false
           username: root
           password: 123456
           driver-class-name: com.mysql.jdbc.Driver
-          #url: jdbc:oracle:thin:@192.168.32.8:1521:orcl
-          #username: jeecgboot
-          #password: jeecgboot
-          #driver-class-name: oracle.jdbc.OracleDriver
-          # 多数据源配置
         iop:
-          url: jdbc:oracle:thin:@192.168.32.8:1521:orcl
-          username: iop_20200225
-          password: iop_20200225
-          driver-class-name: oracle.jdbc.OracleDriver
+          url: jdbc:mysql://localhost:3306/iop?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false
+          username: root
+          password: 123456
+          driver-class-name: com.mysql.jdbc.Driver
   #redis 配置
   redis:
     database: 0
-    host: 127.0.0.1
+    host: 192.168.110.241
     lettuce:
       pool:
         max-active: 8   #最大连接数据库连接数,设 0 为没有限制

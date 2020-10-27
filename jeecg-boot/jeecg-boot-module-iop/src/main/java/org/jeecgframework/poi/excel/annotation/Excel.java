@@ -176,5 +176,5 @@ public @interface Excel {
      * 数据源
      * @return
      */
-    public String dataSoruce() default "";
+    public String dataSource() default "";
 }

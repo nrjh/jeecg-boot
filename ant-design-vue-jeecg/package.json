@@ -54,6 +54,7 @@
     "html-webpack-plugin": "^4.0.0-beta.11",
     "less": "^3.9.0",
     "less-loader": "^4.1.0",
+    "mini-css-extract-plugin": "^0.9.0",
     "vue-template-compiler": "^2.6.10"
   },
   "eslintConfig": {
@@ -93,7 +94,10 @@
       "vue/no-parsing-error": 0,
       "no-console": 0,
       "no-tabs": 0,
-      "indent": [1, 4]
+      "indent": [
+        1,
+        4
+      ]
     }
   },
   "postcss": {

@@ -76,7 +76,7 @@ public class ImportBaseService {
         excelEntity.setMultiReplace(excel.multiReplace());
         if(StringUtils.isNotEmpty(excel.dicCode())){
             // 判断数据源
-            if(excel.dataSoruce()=="iop"){
+            if(excel.dataSource()=="iop"){
                 AutoPoiDictIopServiceI jeecgDictIopService = null;
                 try {
                     jeecgDictIopService = ApplicationContextUtil.getContext().getBean(AutoPoiDictIopServiceI.class);
