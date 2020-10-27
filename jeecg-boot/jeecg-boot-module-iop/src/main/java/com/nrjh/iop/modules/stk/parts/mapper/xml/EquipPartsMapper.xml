@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nrjh.iop.modules.stk.parts.mapper.EquipPartsMapper">
+
+    <insert id="insertStkPart">
+        insert into STK_PART(PRO_ID,PART_ID)
+        (
+        <foreach collection="list" item="item" index="" separator="union all">
+            select
+            #{item.prId}, #{item.pId}
+            from dual
+        </foreach>
+        )
+    </insert>
+
+    <delete id="deleteStkPartByPartId">
+        DELETE FROM STK_PART WHERE PART_ID = #{id}
+    </delete>
+
+    <select id="selectTreeList" resultType="com.nrjh.iop.modules.stk.parts.entity.model.TreeModel">
+SELECT 'a01' id,'厦门计量中心' title,'00' pid ,'0' is_part,'0' is_equip FROM IOP.P_COMM_CODE
+UNION
+SELECT param_id id ,param_name title, 'a01' pid,'0' is_part,'0' is_equip FROM IOP.P_COMM_CODE T WHERE SORT_ID = 'EQUIP_CATEG' AND STATUS = '1'
+UNION
+SELECT area_id id,area_name title,EQUIP_CATEG pid ,'0' is_part,'0' is_equip FROM IOP.o_area WHERE NEW_FLAG = '1'
+UNION
+SELECT equip_id id,name title, area_id pid ,'0' is_part,'1' is_equip FROM IOP.o_equip WHERE NEW_FLAG = '1'
+UNION
+SELECT PARTS_ID id,parts_name title, equip_id pid, '1' is_part,'0' is_equip FROM IOP.O_EQUIP_PARTS WHERE NEW_FLAG = '1'
+    </select>
+
+    <select id="selectEquipCategById" resultType="java.util.Map">
+SELECT param_id id ,param_name title FROM IOP.P_COMM_CODE WHERE SORT_ID = 'EQUIP_CATEG' AND STATUS = '1'
+and param_id = #{id}
+    </select>
+
+    <select id="selectAreaById" resultType="java.util.Map">
+SELECT area_id id,area_name title,EQUIP_CATEG pid FROM IOP.o_area WHERE NEW_FLAG = '1'
+AND area_id = #{id}
+    </select>
+
+    <select id="selectEquipById" resultType="java.util.Map">
+SELECT equip_id id,name title, area_id pid FROM IOP.o_equip WHERE NEW_FLAG = '1'
+and equip_id = #{id}
+    </select>
+
+    <select id="selectStkPart" resultType="java.util.Map">
+SELECT PRO_ID prid,PART_ID pid FROM IOP.STK_PART
+WHERE PART_ID = #{id}
+    </select>
+
+</mapper>

@@ -3,28 +3,28 @@
     <div class="container">
       <div class="top">
         <div class="header">
+          <img  src="~@/assets/loginNew.png" alt="logo">
           <a href="/">
-            <img src="~@/assets/logo.svg" class="logo" alt="logo">
-            <span class="title">Jeecg Boot</span>
+            <!--<span class="title">智能运维</span>-->
           </a>
         </div>
-        <div class="desc">
-          Jeecg Boot 是中国最具影响力的 企业级 快速开发平台
-        </div>
+        <!--<div class="desc">-->
+          <!--计量中心智能运维系统-->
+        <!--</div>-->
       </div>
 
       <route-view></route-view>
 
-      <div class="footer">
-        <div class="links">
-          <a href="http://doc.jeecg.com" target="_blank">帮助</a>
-          <a href="https://github.com/zhangdaiscott/jeecg-boot" target="_blank">隐私</a>
-          <a href="https://github.com/zhangdaiscott/jeecg-boot/blob/master/LICENSE" target="_blank">条款</a>
-        </div>
-        <div class="copyright">
-          Copyright &copy; 2019 <a href="http://www.jeecg.com" target="_blank">JEECG开源社区</a> 出品
-        </div>
-      </div>
+      <!--<div class="footer">-->
+        <!--<div class="links">-->
+          <!--<a href="http://doc.jeecg.com" target="_blank">帮助</a>-->
+          <!--<a href="https://github.com/zhangdaiscott/jeecg-boot" target="_blank">隐私</a>-->
+          <!--<a href="https://github.com/zhangdaiscott/jeecg-boot/blob/master/LICENSE" target="_blank">条款</a>-->
+        <!--</div>-->
+        <!--<div class="copyright">-->
+          <!--Copyright &copy; 2019 <a href="http://www.jeecg.com" target="_blank">智能运维</a> 出品-->
+        <!--</div>-->
+      <!--</div>-->
     </div>
   </div>
 </template>
@@ -65,7 +65,7 @@
     .container {
       width: 100%;
       min-height: 100%;
-      background: #f0f2f5 url(~@/assets/background.svg) no-repeat 50%;
+      background: #005f646b url(~@/assets/background.svg) no-repeat 50%;
       background-size: 100%;
       padding: 110px 0 144px;
       position: relative;
@@ -108,17 +108,17 @@
           }
         }
         .desc {
-          font-size: 14px;
-          color: rgba(0, 0, 0, 0.45);
-          margin-top: 12px;
-          margin-bottom: 40px;
-        }
+        font-size: 14px;
+        color: rgba(0, 0, 0, 0.45);
+        margin-top: 12px;
+        margin-bottom: 40px;
+      }
       }
 
       .main {
-        min-width: 260px;
-        width: 368px;
-        margin: 0 auto;
+        margin: 163px 0;
+        position: absolute;
+        right: calc((100vw - 800px)/2);
       }
 
       .footer {

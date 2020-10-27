@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nrjh.iop.modules.app.orderWorkManagement.mapper.OrderWorkManagementMapper">
+
+    <select id="queryOrderWorkInfoList" resultType="com.nrjh.iop.modules.workOrder.entity.OrdWorkOrderInfo">
+        select
+        o.ID as id,
+        o.ORDER_TYPE as orderType,
+        o.FAULT_ID as faultId,
+        o.LINE_NO as lineNo,
+        NVL(o.EQUIP_NO,'') as equipNo,
+        NVL(o.EQUIP_NAME,'') as equipName,
+        o.ALARM_TIME as alarmTime,
+        o.ALARM_SOURCE as alarmSource,
+        NVL(o.ALARM_REASON,'') as alarmReason,
+        o.ALARM_DESC as alarmDesc,
+        o.ALARM_SUGG as alarmSugg,
+        o.ALARM_STATUS as alarmStatus,
+        NVL(o.CREATE_TIME,'') as createTime,
+        o.ACCEPT_TIME as acceptTime,
+        o.DISPATCH_TIME as dispatchTime,
+        o.PRESS_TIME as pressTime,
+        o.PRESS_LABE as pressLabe,
+        o.LOCK_TIME as lockTime,
+        o.PROCESS_TIME as processTime,
+        o.RESUME_TIME as resumeTime,
+        o.RECOVERY_TIME as recoveryTime,
+        o.PROCESS_STATUS as processStatus,
+        o.CREATE_ID as createId,
+        o.CREATE_NAME as cerateName,
+        o.DISPATCH_USER as dispatchUser,
+        o.PROCESS_USER as processUser,
+        o.METER_REPLACE as meterReplace,
+        o.ORDER_OUT_ID as orderOutId,
+        o.IS_SUSPEND as isSuspend,
+        o.DISPATCH_TO_USER as dispatchToUser,
+        o.UPDATE_BY as updateBy,
+        o.UPDATE_NAME as updateName,
+        o.UPDATE_TIME as updateTime,
+        o.IS_DEL as isDel,
+        NVL(a.AREA_NAME,'') as lineName,
+        NVL((
+		SELECT
+			f.FAULT_GRADE
+		FROM
+			fault_prd_product_info f
+		WHERE
+			1 = 1
+			AND f.fault_grade IS NOT NULL
+			AND rownum = 1
+			AND f.product_Id = p.equip_id
+			AND f.line_no = a.AREA_ID
+			),'') AS alarmLevel
+        from ORD_WORK_ORDER_INFO o
+        left join O_EQUIP p on o.EQUIP_NO = p.EQUIP_NO
+        left join O_AREA a on p.AREA_ID = a.AREA_ID
+        where o.IS_DEL = 0 and o.PROCESS_STATUS = '02'
+        and o.LINE_NO in( select AREA_ID from O_AREA_STAFF_REL where STAFF_ID = #{userId})
+        order by o.CREATE_TIME desc
+    </select>
+</mapper>

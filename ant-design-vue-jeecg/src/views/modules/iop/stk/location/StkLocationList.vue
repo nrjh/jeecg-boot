@@ -10,31 +10,31 @@
             </a-form-item>
           </a-col>
           <a-col :xl="6" :lg="7" :md="8" :sm="24">
-            <a-form-item label="启用">
-              <JDictSelectTag v-model="queryParam.active" placeholder="请选择状态" dictCode="IOP_PUB_ACTION"/>
+            <a-form-item label="位置类型">
+              <JDictSelectTag v-model="queryParam.usageType" placeholder="请选择位置类型" dictCode="IOP_STK_USAGE_TYPE"/>
+            </a-form-item>
+          </a-col>
+          <a-col :xl="6" :lg="7" :md="8" :sm="24">
+            <a-form-item label="位置全称">
+              <a-input placeholder="请输入位置全称" v-model="queryParam.completeName"></a-input>
             </a-form-item>
           </a-col>
           <a-col :xl="6" :lg="7" :md="8" :sm="24">
             <span style="float: left;overflow: hidden;" class="table-page-search-submitButtons">
               <a-button type="primary" @click="searchQuery" icon="search">查询</a-button>
               <a-button type="primary" @click="searchReset" icon="reload" style="margin-left: 8px">重置</a-button>
-              <a @click="handleToggleSearch" style="margin-left: 8px">
-                {{ toggleSearchStatus ? '收起' : '展开' }}
-                <a-icon :type="toggleSearchStatus ? 'up' : 'down'"/>
-              </a>
+<!--              <a @click="handleToggleSearch" style="margin-left: 8px">-->
+<!--                {{ toggleSearchStatus ? '收起' : '展开' }}-->
+<!--                <a-icon :type="toggleSearchStatus ? 'up' : 'down'"/>-->
+<!--              </a>-->
             </span>
           </a-col>
         </a-row>
         <a-row :gutter="24">
-          <template v-if="toggleSearchStatus">
+          <template v-if="true">
             <a-col :xl="6" :lg="7" :md="8" :sm="24">
-              <a-form-item label="位置全称">
-                <a-input placeholder="请输入位置全称" v-model="queryParam.completeName"></a-input>
-              </a-form-item>
-            </a-col>
-            <a-col :xl="6" :lg="7" :md="8" :sm="24">
-              <a-form-item label="位置类型">
-                <JDictSelectTag v-model="queryParam.usageType" placeholder="请选择位置类型" dictCode="IOP_STK_USAGE_TYPE"/>
+              <a-form-item label="启用">
+                <JDictSelectTag v-model="queryParam.active" placeholder="请选择状态" dictCode="IOP_PUB_ACTION"/>
               </a-form-item>
             </a-col>
           </template>
@@ -114,7 +114,7 @@
               <a-menu-item>
                 <a href="javascript:;" @click="handleAddSub(record)">添加子位置</a>
               </a-menu-item>
-              <a-menu-item>
+              <a-menu-item v-if="record.hasChild === null">
                 <a-popconfirm title="确定删除吗?" @confirm="() => handleDelete(record.id)">
                   <a>删除</a>
                 </a-popconfirm>

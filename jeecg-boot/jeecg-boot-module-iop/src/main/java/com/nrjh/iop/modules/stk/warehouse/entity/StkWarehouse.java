@@ -6,6 +6,7 @@ import java.util.Date;
 import java.math.BigDecimal;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -135,4 +136,7 @@ public class StkWarehouse implements Serializable {
     @Excel(name = "地址", width = 255)
     @ApiModelProperty(value = "地址")
 	private String address;
+
+    @TableLogic
+    private Integer isDel;
 }

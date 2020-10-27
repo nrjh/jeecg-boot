@@ -12,15 +12,13 @@
       <a-form :form="form">
         <template v-if="!viewStatus">
           <a-form-item label="品牌名称" :labelCol="labelCol" :wrapperCol="wrapperCol">
-            <a-input v-decorator="[ 'name', validatorRules.name]" placeholder="请输入品牌名称"></a-input>
+            <a-input v-decorator="[ 'name', validatorRules.name]" placeholder="请输入品牌名称" autocomplete ='off'></a-input>
           </a-form-item>
           <a-form-item label="首字母" :labelCol="labelCol" :wrapperCol="wrapperCol">
-            <a-input v-decorator="[ 'firstLetter', validatorRules.firstLetter]" placeholder="请输入首字母"></a-input>
+            <a-input v-decorator="[ 'firstLetter', validatorRules.firstLetter]" placeholder="请输入首字母" autocomplete ='off'></a-input>
           </a-form-item>
           <a-form-item label="制造商" :labelCol="labelCol" :wrapperCol="wrapperCol">
-            <j-dict-select-tag-iop v-decorator="[ 'manufactorId', validatorRules.manufactorId]" :triggerChange="true"
-                                   placeholder="请选择制造商"
-                                   dictCode="RES_PARTNER,NAME,ID"/>
+            <a-input placeholder="请输入制造商" v-decorator="[ 'manufactorName', validatorRules.manufactorName]" autocomplete ='off'></a-input>
           </a-form-item>
           <a-form-item label="状态" :labelCol="labelCol" :wrapperCol="wrapperCol">
             <a-switch checkedChildren="启用" unCheckedChildren="禁用" v-decorator="['active', validatorRules.active]"/>
@@ -109,8 +107,13 @@
           },
           manufactorId: {
             rules: [
-              { required: true, message: '请选择制造商!' }
+              { required: true, message: '请选择制造商!' },
             ]
+          },
+          manufactorName: {
+              rules: [
+                  { }
+              ]
           },
           active: {
             valuePropName: 'checked',
@@ -139,11 +142,11 @@
         if (!title) this.title = title
         if (copy == true) record.id = null
         this.form.resetFields()
-        this.active = record.active == 1 ? true : false
+        record.active = record.active == 1 ? true : false
         this.model = Object.assign({}, record)
         this.visible = true
         this.$nextTick(() => {
-          this.form.setFieldsValue(pick(this.model, 'name', 'firstLetter', 'manufactorId', 'active', 'description'))
+          this.form.setFieldsValue(pick(this.model, 'name', 'firstLetter', 'manufactorName', 'active', 'description'))
         })
       },
       view(record) {

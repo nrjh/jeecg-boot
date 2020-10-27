@@ -10,6 +10,9 @@ import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * @Description: 位置
@@ -35,7 +38,7 @@ public class StkLocationServiceImpl extends ServiceImpl<StkLocationMapper, StkLo
 		}
 		baseMapper.insert(stkLocation);
 	}
-	
+
 	@Override
 	public void updateStkLocation(StkLocation stkLocation) {
 		StkLocation entity = this.getById(stkLocation.getId());
@@ -55,7 +58,7 @@ public class StkLocationServiceImpl extends ServiceImpl<StkLocationMapper, StkLo
 		}
 		baseMapper.updateById(stkLocation);
 	}
-	
+
 	@Override
 	public void deleteStkLocation(String id) throws JeecgBootException {
 		StkLocation stkLocation = this.getById(id);
@@ -92,4 +95,17 @@ public class StkLocationServiceImpl extends ServiceImpl<StkLocationMapper, StkLo
 		}
 	}
 
+	@Override
+	@Transactional(rollbackFor = JeecgBootException.class)
+	public void deleteBatchByPid(String pid) {
+		baseMapper.deleteById(pid);
+		baseMapper.deleteBatchByPid(pid);
+	}
+
+	@Override
+	public List<StkLocation> getStkLocationByPid(String pid) {
+		QueryWrapper queryWrapper = new QueryWrapper();
+		queryWrapper.eq("pid",pid);
+		return baseMapper.selectList(queryWrapper);
+	}
 }

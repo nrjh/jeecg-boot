@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nrjh.iop.modules.centralizedControl.centralizedMonitoring.mapper.CheckPassRateMapper">
+    <select id="getByHours" resultType="com.nrjh.iop.modules.centralizedControl.centralizedMonitoring.vo.CheckPassRateVO">
+        SELECT
+            t1.xTime,
+            t1.taskCount,
+            t2.qualifiedCount,
+            ROUND(t2.qualifiedCount / t1.taskCount,2) passRate
+        FROM
+        (
+            WITH t AS ( SELECT ROWNUM - 1 xTime FROM dual CONNECT BY ROWNUM &lt;= 24 ),
+            t1 AS(
+                select
+                count(1) taskCount,
+                TO_CHAR(DETECT_END_DATE,'hh24') hour
+                from
+                MIDHD.MT_DETECT_TASK_INFO
+                <where>
+                        IS_DEL = 0
+                        AND
+                        TO_CHAR(DETECT_END_DATE,'yyyy-mm-dd') = TO_CHAR(#{dto.startDealTime},'yyyy-mm-dd')
+                        <if test="dto.equipCateg != null and dto.equipCateg !=''">
+                                AND EQUIP_CATEG = #{dto.equipCateg}
+                        </if>
+                        <if test="dto.lineNo !=null and dto.lineNo !=''">
+                                AND LINE_NO = #{dto.lineNo}
+                        </if>
+                </where>
+                GROUP BY
+                TO_CHAR(DETECT_END_DATE,'hh24')
+                )
+            SELECT
+                xTime,
+                taskCount
+            FROM
+                t
+            LEFT JOIN
+                t1
+            ON
+                t1.hour  = t.xTime
+            ORDER BY
+                xTime ASC
+        )t1
+        LEFT JOIN
+        (
+            SELECT
+            count(1) qualifiedCount,
+            TO_CHAR(DETECT_END_DATE,'hh24') xTime
+            FROM
+            MIDHD.MT_POSITION_DETECT_INFO
+            <where>
+                IS_DEL = 0
+                AND
+                TO_CHAR(DETECT_END_DATE,'yyyy-mm-dd') = TO_CHAR(#{dto.startDealTime},'yyyy-mm-dd')
+                AND
+                DET_CONC_CODE = 1
+                <if test="dto.equipCateg != null and dto.equipCateg !=''">
+                    AND EQUIP_CATEG = #{dto.equipCateg}
+                </if>
+                <if test="dto.equipSpecCode != null and dto.equipSpecCode!=''">
+                    AND   EQUIP_SPEC_CODE = #{dto.equipSpecCode}
+                </if>
+                <if test="dto.lineNo !=null and dto.lineNo !=''">
+                    AND LINE_NO = #{dto.lineNo}
+                </if>
+             </where>
+            GROUP BY
+                TO_CHAR(DETECT_END_DATE,'hh24')
+        )t2
+        ON
+        t1.xTime = t2.xTime
+    </select>
+    <select id="getByDays" resultType="com.nrjh.iop.modules.centralizedControl.centralizedMonitoring.vo.CheckPassRateVO">
+        SELECT
+        t1.xTime,
+        t1.taskCount,
+        t2.qualifiedCount,
+        ROUND(t2.qualifiedCount / t1.taskCount,2) passRate
+        FROM
+        (
+        select
+        count(1) taskCount,
+        TO_CHAR(DETECT_END_DATE,'yyyy/mm/dd') xTime
+        from
+        MIDHD.MT_DETECT_TASK_INFO
+        <where>
+            IS_DEL = 0
+            AND	TO_CHAR(DETECT_END_DATE,'yyyy/mm/dd') BETWEEN to_char(#{dto.startDealTime},'yyyy/mm/dd') AND to_char(#{dto.endDealTime},'yyyy/mm/dd')
+            <if test="dto.equipCateg != null and dto.equipCateg !=''">
+                AND EQUIP_CATEG = #{dto.equipCateg}
+            </if>
+            <if test="dto.lineNo !=null and dto.lineNo !=''">
+                AND LINE_NO = #{dto.lineNo}
+            </if>
+        </where>
+        GROUP BY
+        TO_CHAR(DETECT_END_DATE,'yyyy/mm/dd')
+        )t1
+        LEFT JOIN
+        (
+        SELECT
+        count(1) qualifiedCount,
+        TO_CHAR(DETECT_END_DATE,'yyyy/mm/dd') xTime
+        FROM
+        MIDHD.MT_POSITION_DETECT_INFO
+        <where>
+            IS_DEL = 0
+            AND DET_CONC_CODE = 1
+            AND TO_CHAR(DETECT_END_DATE,'yyyy/mm/dd') BETWEEN to_char(#{dto.startDealTime},'yyyy/mm/dd') AND to_char(#{dto.endDealTime},'yyyy/mm/dd')
+            <if test="dto.equipCateg != null and dto.equipCateg !=''">
+                AND EQUIP_CATEG = #{dto.equipCateg}
+            </if>
+            <if test="dto.equipSpecCode != null and dto.equipSpecCode!=''">
+                AND   EQUIP_SPEC_CODE = #{dto.equipSpecCode}
+            </if>
+            <if test="dto.lineNo !=null and dto.lineNo !=''">
+                AND LINE_NO = #{dto.lineNo}
+            </if>
+        </where>
+        GROUP BY
+        TO_CHAR(DETECT_END_DATE,'yyyy/mm/dd')
+        )t2
+        ON
+        t1.xTime = t2.xTime
+    </select>
+    <select id="getByMonths" resultType="com.nrjh.iop.modules.centralizedControl.centralizedMonitoring.vo.CheckPassRateVO">
+        SELECT
+        t1.xTime,
+        t1.taskCount,
+        t2.qualifiedCount,
+        ROUND(t2.qualifiedCount / t1.taskCount,2) passRate
+        FROM
+        (
+        select
+        count(1) taskCount,
+        TO_CHAR(DETECT_END_DATE,'yyyy/mm') xTime
+        from
+        MIDHD.MT_DETECT_TASK_INFO
+        <where>
+            IS_DEL = 0
+            AND	TO_CHAR(DETECT_END_DATE,'yyyy/mm') BETWEEN to_char(#{dto.startDealTime},'yyyy/mm') AND to_char(#{dto.endDealTime},'yyyy/mm')
+            <if test="dto.equipCateg != null and dto.equipCateg !=''">
+                    AND EQUIP_CATEG = #{dto.equipCateg}
+            </if>
+            <if test="dto.lineNo !=null and dto.lineNo !=''">
+                    AND LINE_NO = #{dto.lineNo}
+            </if>
+        </where>
+        GROUP BY
+        TO_CHAR(DETECT_END_DATE,'yyyy/mm')
+        )t1
+        LEFT JOIN
+        (
+        SELECT
+        count(1) qualifiedCount,
+        TO_CHAR(DETECT_END_DATE,'yyyy/mm') xTime
+        FROM
+        MIDHD.MT_POSITION_DETECT_INFO
+        <where>
+            IS_DEL = 0
+            AND DET_CONC_CODE = 1
+            AND TO_CHAR(DETECT_END_DATE,'yyyy/mm') BETWEEN to_char(#{dto.startDealTime},'yyyy/mm') AND to_char(#{dto.endDealTime},'yyyy/mm')
+            <if test="dto.equipCateg != null and dto.equipCateg !=''">
+                    AND EQUIP_CATEG = #{dto.equipCateg}
+            </if>
+            <if test="dto.equipSpecCode != null and dto.equipSpecCode!=''">
+                    AND   EQUIP_SPEC_CODE = #{dto.equipSpecCode}
+            </if>
+            <if test="dto.lineNo !=null and dto.lineNo !=''">
+                    AND LINE_NO = #{dto.lineNo}
+            </if>
+        </where>
+        GROUP BY
+        TO_CHAR(DETECT_END_DATE,'yyyy/mm')
+        )t2
+        ON
+        t1.xTime = t2.xTime
+    </select>
+    <select id="getTaskCountEquipSpecCodeWithHours" resultType="com.nrjh.iop.modules.centralizedControl.centralizedMonitoring.vo.PartOperationStatusVO">
+        SELECT
+        COUNT(1) taskCount,
+        TO_CHAR(DETECT_END_DATE,'hh24') xTime
+        FROM
+        MIDHD.MT_DETECT_TASK_INFO mdti
+        <where>
+            IS_DEL = 0
+            <if test="dto.startDealTime != null and dto.endDealTime == null">
+                AND TO_CHAR(DETECT_END_DATE,'yyyy-mm-dd') = TO_CHAR(#{dto.startDealTime},'yyyy-mm-dd')
+            </if>
+            <if test="dto.equipCateg != null and dto.equipCateg !=''">
+                AND EQUIP_CATEG = #{dto.equipCateg}
+            </if>
+            <if test="dto.lineNo !=null and dto.lineNo !=''">
+                AND LINE_NO = #{dto.lineNo}
+            </if>
+        </where>
+        AND mdti.DETECT_TASK_NO IN
+        (
+        SELECT
+        DISTINCT
+        TASK_NO
+        FROM
+        MIDHD.MT_POSITION_DETECT_INFO
+        <where>
+            IS_DEL = 0
+            AND DET_CONC_CODE = 1
+            <if test="dto.startDealTime != null and dto.endDealTime == null">
+                AND TO_CHAR(DETECT_END_DATE,'yyyy-mm-dd') = TO_CHAR(#{dto.startDealTime},'yyyy-mm-dd')
+            </if>
+            <if test="dto.equipCateg != null and dto.equipCateg !=''">
+                AND EQUIP_CATEG = #{dto.equipCateg}
+            </if>
+            <if test="dto.lineNo !=null and dto.lineNo !=''">
+                AND LINE_NO = #{dto.lineNo}
+            </if>
+            <if test="dto.equipSpecCode != null and dto.equipSpecCode!=''">
+                AND  EQUIP_SPEC_CODE = #{dto.equipSpecCode}
+            </if>
+        </where>
+        )
+        GROUP BY
+        TO_CHAR(DETECT_END_DATE,'hh24')
+    </select>
+    <select id="getTaskCountEquipSpecCodeWithDays" resultType="com.nrjh.iop.modules.centralizedControl.centralizedMonitoring.vo.PartOperationStatusVO">
+        SELECT
+        COUNT(1) taskCount,
+        TO_CHAR(DETECT_END_DATE,'yyyy/mm/dd') xTime
+        FROM
+        MIDHD.MT_DETECT_TASK_INFO mdti
+        <where>
+            IS_DEL = 0
+            <if test="dto.startDealTime != null and dto.endDealTime != null">
+     				AND TO_CHAR(DETECT_END_DATE,'yyyy-mm-dd') between TO_CHAR(#{dto.startDealTime},'yyyy-mm-dd') AND TO_CHAR(#{dto.endDealTime},'yyyy-mm-dd')
+     		</if>
+     		<if test="dto.equipCateg != null and dto.equipCateg !=''">
+     				AND EQUIP_CATEG = #{dto.equipCateg}
+     		</if>
+     		<if test="dto.lineNo !=null and dto.lineNo !=''">
+     				AND LINE_NO = #{dto.lineNo}
+     		</if>
+        </where>
+        AND mdti.DETECT_TASK_NO IN
+        (
+        SELECT
+        DISTINCT
+        TASK_NO
+        FROM
+        MIDHD.MT_POSITION_DETECT_INFO
+        <where>
+            IS_DEL = 0
+            AND DET_CONC_CODE = 1
+            <if test="dto.startDealTime != null and dto.endDealTime != null ">
+     				AND TO_CHAR(DETECT_END_DATE,'yyyy-mm-dd') between TO_CHAR(#{dto.startDealTime},'yyyy-mm-dd') AND TO_CHAR(#{dto.endDealTime},'yyyy-mm-dd')
+     		</if>
+     		<if test="dto.equipCateg != null and dto.equipCateg !=''">
+     				AND EQUIP_CATEG = #{dto.equipCateg}
+     		</if>
+     		<if test="dto.lineNo !=null and dto.lineNo !=''">
+     				AND LINE_NO = #{dto.lineNo}
+     		</if>
+     		<if test="dto.equipSpecCode != null and dto.equipSpecCode!=''">
+     				AND  EQUIP_SPEC_CODE = #{dto.equipSpecCode}
+     		</if>
+        </where>
+        )
+        GROUP BY
+        TO_CHAR(DETECT_END_DATE,'yyyy/mm/dd')
+    </select>
+    <select id="getTaskCountEquipSpecCodeWithMonths" resultType="com.nrjh.iop.modules.centralizedControl.centralizedMonitoring.vo.PartOperationStatusVO">
+        SELECT
+        COUNT(1) taskCount,
+        TO_CHAR(DETECT_END_DATE,'yyyy/mm') xTime
+        FROM
+        MIDHD.MT_DETECT_TASK_INFO mdti
+        <where>
+            IS_DEL = 0
+     		<if test="dto.startDealTime != null and dto.endDealTime != null">
+     				AND TO_CHAR(DETECT_END_DATE,'yyyy-mm') between TO_CHAR(#{dto.startDealTime},'yyyy-mm') AND TO_CHAR(#{dto.endDealTime},'yyyy-mm')
+     		</if>
+     		<if test="dto.equipCateg != null and dto.equipCateg !=''">
+     				AND EQUIP_CATEG = #{dto.equipCateg}
+     		</if>
+     		<if test="dto.lineNo !=null and dto.lineNo !=''">
+     				AND LINE_NO = #{dto.lineNo}
+     		</if>
+        </where>
+        AND mdti.DETECT_TASK_NO IN
+        (
+        SELECT
+        DISTINCT
+        TASK_NO
+        FROM
+        MIDHD.MT_POSITION_DETECT_INFO
+        <where>
+            IS_DEL = 0
+            AND
+            DET_CONC_CODE = 1
+     		<if test="dto.startDealTime != null and dto.endDealTime != null ">
+     				AND TO_CHAR(DETECT_END_DATE,'yyyy-mm') between TO_CHAR(#{dto.startDealTime},'yyyy-mm') AND TO_CHAR(#{dto.endDealTime},'yyyy-mm')
+     		</if>
+     		<if test="dto.equipCateg != null and dto.equipCateg !=''">
+     				AND EQUIP_CATEG = #{dto.equipCateg}
+     		</if>
+     		<if test="dto.lineNo !=null and dto.lineNo !=''">
+     				AND LINE_NO = #{dto.lineNo}
+     		</if>
+     		<if test="dto.equipSpecCode != null and dto.equipSpecCode!=''">
+     				AND  EQUIP_SPEC_CODE = #{dto.equipSpecCode}
+     		</if>
+        </where>
+        )
+        GROUP BY
+        TO_CHAR(DETECT_END_DATE,'yyyy/mm')
+    </select>
+</mapper>

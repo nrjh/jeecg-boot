@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nrjh.iop.modules.centralizedControl.centralizedMonitoring.mapper.CheckEquipOccupyRateMapper">
+
+    <!--  查询条件(按时)-设备规格、类型  -->
+    <select id="getByEquipType" resultType="com.nrjh.iop.modules.centralizedControl.centralizedMonitoring.vo.CheckEquipOccupyRateVO">
+        SELECT
+		count(1) AS value,
+		EQUIP_SPEC_CODE AS name
+        FROM
+            midhd.MT_POSITION_DETECT_INFO
+        WHERE
+            IS_DEL = 0
+            <choose>
+                <when test="dto.equipCateg != '03' and dto.equipCateg != '09'">
+                    AND WIRING_MODE = #{dto.equipCateg}
+                </when>
+                <otherwise>
+                    AND EQUIP_CATEG = #{dto.equipCateg}
+                </otherwise>
+            </choose>
+            <if test="dto.lineNo!=null and dto.lineNo!=''">
+                AND LINE_NO = #{dto.lineNo}
+            </if>
+            <if test='dto.timeFlag == "1"'>
+                AND to_char(DETECT_END_DATE,'yyyy-mm-dd') = to_char(#{dto.startDealTime},'yyyy-mm-dd')
+            </if>
+            <if test= 'dto.timeFlag == "2"'>
+                AND to_char(DETECT_END_DATE,'yyyy-mm-dd') between to_char(#{dto.startDealTime},'yyyy-mm-dd') AND to_char(#{dto.endDealTime},'yyyy-mm-dd')
+            </if>
+            <if test='dto.timeFlag == "3"'>
+                AND to_char(DETECT_END_DATE,'yyyy-mm') between to_char(#{dto.startDealTime},'yyyy-mm') AND to_char(#{dto.endDealTime},'yyyy-mm')
+            </if>
+            GROUP BY
+                EQUIP_SPEC_CODE
+    </select>
+    <!-- 查询条件(按时)-设备类型-设备规格 -->
+    <select id="getByEquipTypeAndCateg" resultType="com.nrjh.iop.modules.centralizedControl.centralizedMonitoring.vo.CheckEquipOccupyRateVO">
+        SELECT
+            count(1) AS value
+        FROM
+            midhd.MT_POSITION_DETECT_INFO
+        WHERE
+            IS_DEL = 0
+        <choose>
+            <when test="dto.equipCateg != '03' and dto.equipCateg != '09'">
+                AND WIRING_MODE = #{dto.equipCateg}
+            </when>
+            <otherwise>
+                AND EQUIP_CATEG = #{dto.equipCateg}
+            </otherwise>
+        </choose>
+        <if test="dto.lineNo!=null and dto.lineNo!=''">
+            AND LINE_NO = #{dto.lineNo}
+        </if>
+        <if test="dto.equipSpecCode != null and dto.equipSpecCode !=''">
+            AND EQUIP_SPEC_CODE = #{dto.equipSpecCode}
+        </if>
+        <if test='dto.timeFlag == "1"'>
+            AND to_char(DETECT_END_DATE,'yyyy-mm-dd') = to_char(#{dto.startDealTime},'yyyy-mm-dd')
+        </if>
+        <if test= 'dto.timeFlag == "2"'>
+            AND to_char(DETECT_END_DATE,'yyyy-mm-dd') between to_char(#{dto.startDealTime},'yyyy-mm-dd') AND to_char(#{dto.endDealTime},'yyyy-mm-dd')
+        </if>
+        <if test='dto.timeFlag == "3"'>
+            AND to_char(DETECT_END_DATE,'yyyy-mm') between to_char(#{dto.startDealTime},'yyyy-mm') AND to_char(#{dto.endDealTime},'yyyy-mm')
+        </if>
+    </select>
+
+
+    <select id="getNotOne" resultType="com.nrjh.iop.modules.centralizedControl.centralizedMonitoring.vo.CheckEquipOccupyRateVO">
+        SELECT
+        count(1) AS value,
+        EQUIP_CATEG AS name
+        FROM
+        midhd.MT_POSITION_DETECT_INFO
+        WHERE
+        IS_DEL = 0
+        AND EQUIP_CATEG not like '01'
+        <if test='dto.timeFlag == "1"'>
+            AND to_char(DETECT_END_DATE,'yyyy-mm-dd') = to_char(#{dto.startDealTime},'yyyy-mm-dd')
+        </if>
+        <if test= 'dto.timeFlag == "2"'>
+            AND to_char(DETECT_END_DATE,'yyyy-mm-dd') between to_char(#{dto.startDealTime},'yyyy-mm-dd') AND to_char(#{dto.endDealTime},'yyyy-mm-dd')
+        </if>
+        <if test='dto.timeFlag == "3"'>
+            AND to_char(DETECT_END_DATE,'yyyy-mm') between to_char(#{dto.startDealTime},'yyyy-mm') AND to_char(#{dto.endDealTime},'yyyy-mm')
+        </if>
+        <if test="dto.lineNo!=null and dto.lineNo!=''">
+            AND LINE_NO = #{dto.lineNo}
+        </if>
+        GROUP BY
+        EQUIP_CATEG
+    </select>
+
+    <select id="getHaveOne" resultType="com.nrjh.iop.modules.centralizedControl.centralizedMonitoring.vo.CheckEquipOccupyRateVO">
+            SELECT
+                count(1) AS value,
+                WIRING_MODE AS name
+            FROM
+                midhd.MT_POSITION_DETECT_INFO
+            WHERE
+            IS_DEL = 0
+            AND EQUIP_CATEG = '01'
+            <if test='dto.timeFlag == "1"'>
+                AND to_char(DETECT_END_DATE,'yyyy-mm-dd') = to_char(#{dto.startDealTime},'yyyy-mm-dd')
+            </if>
+            <if test= 'dto.timeFlag == "2"'>
+                AND to_char(DETECT_END_DATE,'yyyy-mm-dd') between to_char(#{dto.startDealTime},'yyyy-mm-dd') AND to_char(#{dto.endDealTime},'yyyy-mm-dd')
+            </if>
+            <if test='dto.timeFlag == "3"'>
+                AND to_char(DETECT_END_DATE,'yyyy-mm') between to_char(#{dto.startDealTime},'yyyy-mm') AND to_char(#{dto.endDealTime},'yyyy-mm')
+            </if>
+            <if test="dto.lineNo!=null and dto.lineNo!=''">
+                AND LINE_NO = #{dto.lineNo}
+            </if>
+            GROUP BY
+                WIRING_MODE
+    </select>
+
+</mapper>

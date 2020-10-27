@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nrjh.iop.modules.centralizedControl.DevMonitorInfo.mapper.DevMonitorInfoMapper">
+    <select id="queryDevList" resultType="com.nrjh.iop.modules.centralizedControl.DevMonitorInfo.dto.DevMonitorVo" parameterType="java.lang.String">
+        SELECT DISTINCT
+        dm.LINE_NO,
+        dm.EQUIP_TYPE,
+        dm.equip_no,
+        oa.AREA_NAME,
+        dm.equip_labe AS equip_Name,
+        CASE	　　
+        WHEN (
+        SELECT
+        count( 1 ) FROM  V_ALARM_INFO v   WHERE  ( v.EQUIP_NO = dm.equip_no OR oe.EQUIP_FNO = v.EQUIP_NO) AND ( v.IS_HANDLED != '1' OR v.IS_HANDLED IS NULL )
+        ) > 0 THEN  '0'
+        WHEN ( SELECT count( 1 ) FROM equip_remote_user er WHERE er.equip_no = dm.equip_no AND er.statue = '1' and er.area_id=dm.line_no ) > 0 THEN
+        '2' 　　 ELSE '1' 　　
+        END AS IS_HANDLED
+        FROM
+        DEV_MONITOR_INFO dm left join O_AREA oa ON dm.LINE_NO = oa.AREA_ID left join O_EQUIP oe ON oe.EQUIP_NO = dm.EQUIP_NO
+        where 1=1
+            <if test="lineNo != null and lineNo != ''">
+                where LINE_NO=#{lineNo}
+            </if>
+    </select>
+
+</mapper>

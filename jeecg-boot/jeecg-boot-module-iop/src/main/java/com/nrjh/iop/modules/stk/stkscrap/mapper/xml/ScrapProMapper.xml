@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nrjh.iop.modules.stk.stkscrap.mapper.ScrapProMapper">
+
+    <!-- 查询物料信息列表-->
+    <select  id="queryProdList" resultType="com.nrjh.iop.modules.stk.stkscrap.entity.ScrapPro" >
+        SELECT
+        p.id,
+        p.VENDOR_ID,
+        s.location_id,
+        p.NAME AS rpoductName,
+        s.Product_NO,
+        l.NAME,
+        p.CATEGORY_ID,
+        cat.NAME as cate_name,
+        s.ATTRIBUTE_CATEGORY_ID,
+        pc.name as ac_name,
+        s.product_uom_id,
+        uu.name as uu_name ,
+        s.STATUS,
+        s.product_qty,
+        s.virtual_qty,
+        s.price,
+        s.product_id,
+        s.category_type
+        FROM
+        prd_product AS p
+        LEFT JOIN stk_stock s ON p.id = s.product_id
+        LEFT JOIN stk_production_lot l ON s.product_lot_id = l.id
+        left join  PRD_ATTRIBUTE_CATEGORY pc on pc.id=s.ATTRIBUTE_CATEGORY_ID
+        left join   prd_category cat on cat.id=s.CATEGORY_ID
+        left join uom_uom uu on uu.id=s.product_uom_id
+
+        WHERE
+        s.product_id IS NOT NULL
+        AND s.product_qty != 0
+        AND s.product_qty IS NOT NULL
+        and p.id in (select ssp.pro_id  from stk_spare_parts ssp )
+
+            <if test="rpoductName != null and rpoductName != ''">
+                and p.name = #{rpoductName}
+            </if>
+            <if test="productNo != null and productNo != ''">
+                and s.Product_NO = #{productNo}
+            </if>
+            <if test="attributeCategoryId != null and attributeCategoryId != ''">
+                and p.ATTRIBUTE_CATEGORY_ID = #{attributeCategoryId}
+            </if>
+            <if test="vendorId != null and vendorId != ''">
+                and p.VENDOR_ID = #{vendorId}
+            </if>
+            <if test="status != null and status != ''">
+                and s.status = #{status}
+            </if>
+            <if test="categoryId != null and categoryId != ''">
+                and p.CATEGORY_ID = #{categoryId}
+            </if>
+            <if test="locationID != null and locationID != ''">
+                and s.location_id = #{locationId}
+            </if>
+            <if test="productId != null and productId != ''">
+                and s.product_id = #{productId}
+            </if>
+            <if test="categoryType != null and categoryType != ''">
+                and s.category_type = #{categoryType}
+            </if>
+
+
+    </select>
+
+    <!-- 保存报废详情信息-->
+    <insert id="saveProdList" parameterType="com.nrjh.iop.modules.stk.stkscrap.entity.ScrapPro">
+        INSERT INTO scrap_pro
+        (scrapInventoryOrder,rpoductName,productNo,attributeCategoryID,vendorID,status,categoryID,locationID,productUomID,productQty,price,scrapQty)
+        VALUES
+        (
+        '${scrapInventoryOrder}',
+        '${rpoductName}',
+        '${productNo}',
+        ${attributeCategoryID},
+        ${vendorID},
+        '${status}',
+        ${categoryID},
+        ${locationID},
+        ${productUomID},
+        ${productQty},
+        '${price}',
+        ${scrapQty}
+        )
+    </insert>
+    <!-- 修改库存数量-->
+    <update  id="updateStockQty" >
+        update stk_stock set product_qty = product_qty-${realQty} , virtual_qty = virtual_qty-${virtualQty} where Product_NO = #{prdNo}
+    </update>
+
+    <!-- 通过物料编号查询库存信息-->
+    <select  id="queryStockList" resultType="com.nrjh.iop.modules.stk.spareparts.entity.StkStock"  parameterType="java.lang.String">
+        select * from stk_stock where Product_NO = #{prdNo}
+    </select>
+
+    <!-- 查看报废详情信息-->
+    <select  id="lookScrapPro" resultType="com.nrjh.iop.modules.stk.stkscrap.entity.ScrapPro"  parameterType="Map">
+        select * from scrap_pro where scrapInventoryOrder = #{scrapInventoryOrder}
+    </select>
+
+    <!-- 提交报废详情信息-->
+    <update id="submitScrapPro">
+        update stk_scrap set status = '2' where scrapInventoryOrder = #{scrapInventoryOrder}
+    </update>
+
+    <!-- 确认-->
+    <update id="submitScrapPro">
+        update stk_scrap set status = '3' where scrapInventoryOrder = #{scrapInventoryOrder}
+    </update>
+    <!-- 审核-->
+    <update id="shenheScrapPro">
+        update stk_scrap set status = '4' where scrapInventoryOrder = #{scrapInventoryOrder}
+    </update>
+
+    <!-- 作废-->
+    <update id="badScrapPro">
+
+        update stk_scrap set status = '5' where scrapInventoryOrder = #{scrapInventoryOrder}
+    </update>
+
+</mapper>

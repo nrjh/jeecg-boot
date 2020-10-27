@@ -6,6 +6,7 @@ import java.util.Date;
 import java.math.BigDecimal;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -79,7 +80,7 @@ public class PrdCategory implements Serializable {
     @ApiModelProperty(value = "修改人")
     private java.lang.String updateBy;
 	/**修改时间
-            
+
             公共字段，所有业务表都必须有该字段*/
 	@Excel(name = "修改时间", width = 20, format = "yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
@@ -91,4 +92,6 @@ public class PrdCategory implements Serializable {
     @ApiModelProperty(value = "状态")
 	@Dict(dicCode="IOP_PUB_ACTION")
     private java.lang.Integer active;
+	@TableLogic
+	private Integer isDel;
 }

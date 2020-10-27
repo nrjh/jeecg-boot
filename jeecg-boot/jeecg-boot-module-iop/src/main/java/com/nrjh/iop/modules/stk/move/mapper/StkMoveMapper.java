@@ -2,6 +2,7 @@ package com.nrjh.iop.modules.stk.move.mapper;
 
 import java.util.List;
 
+import com.nrjh.iop.modules.stk.picking.entity.StkPicking;
 import org.apache.ibatis.annotations.Param;
 import com.nrjh.iop.modules.stk.move.entity.StkMove;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -18,6 +19,6 @@ public interface StkMoveMapper extends BaseMapper<StkMove> {
 
     public List<StkMove> selectByPickingId(@Param("mainId") String mainId);
 
-
+    List<StkMove> selectStkMoveByOrign(@Param("orign") String orign );
 
 }

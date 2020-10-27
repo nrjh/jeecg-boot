@@ -20,4 +20,8 @@ public interface PrdAttributeCategoryMapper extends BaseMapper<PrdAttributeCateg
      * @return
      */
     public List<PrdAttributeCategory> selectAttrCategoryListByCategoryId(@Param("categoryId") String categoryId);
+
+    PrdAttributeCategory selectAttributeByProductId(@Param("productId") String productId);
+
+
 }

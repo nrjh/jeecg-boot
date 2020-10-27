@@ -1,6 +1,7 @@
 package com.nrjh.iop.modules.prd.attrcategory.service.impl;
 
 import com.baomidou.dynamic.datasource.annotation.DS;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.nrjh.iop.modules.prd.attrcategory.entity.PrdAttributeCategory;
 import com.nrjh.iop.modules.prd.attrcategory.entity.PrdAttrCategAttrValueRel;
 import com.nrjh.iop.modules.prd.attrcategory.mapper.PrdAttrCategAttrValueRelMapper;
@@ -28,7 +29,7 @@ public class PrdAttributeCategoryServiceImpl extends ServiceImpl<PrdAttributeCat
 	private PrdAttributeCategoryMapper prdAttributeCategoryMapper;
 	@Autowired
 	private PrdAttrCategAttrValueRelMapper prdAttrCategAttrValueRelMapper;
-	
+
 	@Override
 	@Transactional
 	public void saveMain(PrdAttributeCategory prdAttributeCategory, List<PrdAttrCategAttrValueRel> prdAttrCategAttrValueRelList) {
@@ -38,6 +39,7 @@ public class PrdAttributeCategoryServiceImpl extends ServiceImpl<PrdAttributeCat
 			for(PrdAttrCategAttrValueRel entity:prdAttrCategAttrValueRelList) {
 				//外键设置
 				entity.setAttributeCategoryId(prdAttributeCategory.getId());
+				entity.setActive(prdAttributeCategory.getActive());
 				prdAttrCategAttrValueRelMapper.insert(entity);
 			}
 			prdAttributeCategoryMapper.updateById(prdAttributeCategory);
@@ -48,10 +50,10 @@ public class PrdAttributeCategoryServiceImpl extends ServiceImpl<PrdAttributeCat
 	@Transactional
 	public void updateMain(PrdAttributeCategory prdAttributeCategory,List<PrdAttrCategAttrValueRel> prdAttrCategAttrValueRelList) {
 		prdAttributeCategoryMapper.updateById(prdAttributeCategory);
-		
+
 		//1.先删除子表数据
 		prdAttrCategAttrValueRelMapper.deleteByMainId(prdAttributeCategory.getId().toString());
-		
+
 		//2.子表数据重新插入
 		if(prdAttrCategAttrValueRelList!=null && prdAttrCategAttrValueRelList.size()>0) {
 			prdAttributeCategory.setAttributeQty(prdAttrCategAttrValueRelList.size());
@@ -67,7 +69,10 @@ public class PrdAttributeCategoryServiceImpl extends ServiceImpl<PrdAttributeCat
 	@Override
 	@Transactional
 	public void delMain(String id) {
-		prdAttrCategAttrValueRelMapper.deleteByMainId(id);
+		QueryWrapper queryWrapper = new QueryWrapper();
+		queryWrapper.eq("attribute_category_id",id);
+		prdAttrCategAttrValueRelMapper.delete(queryWrapper);
+//		prdAttrCategAttrValueRelMapper.deleteByMainId(id);
 		prdAttributeCategoryMapper.deleteById(id);
 	}
 
@@ -85,6 +90,10 @@ public class PrdAttributeCategoryServiceImpl extends ServiceImpl<PrdAttributeCat
 		return prdAttributeCategoryMapper.selectAttrCategoryListByCategoryId(categoryId);
 	}
 
+	@Override
+	public PrdAttributeCategory selectAttributeByProductId(String productId) {
+		return prdAttributeCategoryMapper.selectAttributeByProductId(productId);
+	}
 
-	
+
 }

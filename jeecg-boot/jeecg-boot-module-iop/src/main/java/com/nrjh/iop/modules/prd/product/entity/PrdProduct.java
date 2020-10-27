@@ -69,7 +69,7 @@ public class PrdProduct implements Serializable {
 	@Excel(name = "所属生产设施", width = 15,dicCode = "IOP_PUB_CATEGORY")
     @ApiModelProperty(value = "所属生产设施")
     @DictIop(dicCode = "IOP_PUB_CATEGORY")
-    private Integer belongEquip;
+    private String belongEquip;
 	/**计量单位 与 计量单位[UOM_UOM]表关联*/
 	@Excel(name = "计量单位", width = 15)
     @ApiModelProperty(value = "计量单位")
@@ -79,7 +79,7 @@ public class PrdProduct implements Serializable {
 	@Excel(name = "被替代", width = 15)
     @ApiModelProperty(value = "被替代")
     private Integer replaced;
-	/**内部说明*/
+	/**内部说明*/		
 	@Excel(name = "内部说明", width = 15)
     @ApiModelProperty(value = "内部说明")
     private String description;

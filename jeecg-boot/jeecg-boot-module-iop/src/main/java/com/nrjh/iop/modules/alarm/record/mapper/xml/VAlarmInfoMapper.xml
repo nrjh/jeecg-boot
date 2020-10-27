@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nrjh.iop.modules.alarm.record.mapper.VAlarmInfoMapper">
+
+    <select id="alarmAmount" parameterType="java.lang.String" resultType="java.lang.String">
+        select count(1) as alarmAmount from v_alarm_info v where v.EQUIP_NO= #{equipNo}
+        AND
+            ALARM_TIME BETWEEN TO_DATE( to_char(ALARM_TIME,'yyyy-mm-dd'), 'yyyy-mm-dd hh24:mi:ss' )
+            AND TO_DATE( to_char(ALARM_TIME+1,'yyyy-mm-dd'), 'yyyy-mm-dd hh24:mi:ss' )
+    </select>
+
+    <select id="alarmAmountByEquipId" parameterType="java.lang.String" resultType="java.lang.String">
+        select count(1) as alarmAmount from v_alarm_info v where v.EQUIP_NO= #{equipNo}
+    </select>
+
+    <select id="queryEquipOrEquipfno" parameterType="java.lang.String" resultType="com.nrjh.iop.modules.alarm.bind.entity.Equip">
+
+        select *   from o_equip v where v.EQUIP_NO= #{equipNo} OR v.EQUIP_FNO= #{equipNo}
+    </select>
+
+</mapper>

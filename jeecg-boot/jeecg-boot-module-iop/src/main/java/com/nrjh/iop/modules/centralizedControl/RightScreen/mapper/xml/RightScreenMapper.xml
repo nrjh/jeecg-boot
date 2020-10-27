@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nrjh.iop.modules.centralizedControl.RightScreen.mapper.RightScreenMapper">
+
+    <select id="detailDetectTaskInfoVoList" resultType="com.nrjh.iop.modules.centralizedControl.RightScreen.entity.vo.DetectTaskInfoVO">
+        SELECT mdti.DETECT_TASK_NO task_id,
+        mdti.ARRIVE_BATCH_NO batch_id,
+        mdti.MODEL_CODE device_model,
+        bsn.PARTNER_NAME supplier,
+        mdti.TASK_TYPE task_type,
+        MDTI.WRITE_TIME create_time,
+        MDTI.EQUIP_QTY total_task,
+        mdti.TASK_STATUS,
+        oa.AREA_NAME,
+        oa.area_id
+        FROM MIDHD.MT_DETECT_TASK_INFO mdti
+        LEFT JOIN MIDHD_MDS.T_DETECT_TASK tdt ON tdt.TASK_NO = mdti.DETECT_TASK_NO
+        LEFT JOIN MIDHD_MDS.B_SUPPLIER_NEW bsn ON TDT.SUPPLY_NO = bsn.SUPPLIER_ID
+        LEFT JOIN IOP.O_AREA oa ON oa.AREA_ID = mdti.LINE_NO
+		WHERE to_char(MDTI.WRITE_TIME,'yyyy-MM-dd') = to_char(SYSDATE,'yyyy-MM-dd')
+<if test="areaId != null and areaId != ''">
+    and oa.area_id = #{areaId}
+</if>
+ORDER BY MDTI.WRITE_TIME DESC
+    </select>
+
+    <select id="detailDeliveryTaskVOList" resultType="com.nrjh.iop.modules.centralizedControl.RightScreen.entity.vo.DeliveryTaskVO">
+SELECT OO.ORG_NAME accept_unit,
+udtd.DIST_NUM equip_qty,
+udt.APPROVER_DATE departure_time,
+UDT.SIGN_DATE complete_time,
+udt.AUTO_INFO plate_num
+FROM MIDHD_MDS.U_DIST_TASK udt
+LEFT JOIN MIDHD_MDS.U_DIST_TASK_DET udtd  ON udt.TASK_NO = udtd.TASK_NO
+LEFT JOIN MIDHD_MDS.O_ORG oo ON OO.ORG_NO = udtd.RECV_ORG_NO
+ORDER BY udt.APPROVER_DATE DESC
+    </select>
+
+    <select id="detailAlarmInfoVoList" resultType="com.nrjh.iop.modules.centralizedControl.RightScreen.entity.vo.AlarmInfoVO">
+SELECT
+	vai.ALARM_TIME,
+	vai.fault_desc alarm_name,
+	fti.IS_STATUS fault_status,
+	oa.area_id,
+	oa.area_name,
+	equip_name,
+	fpp.fault_grade AS failure_level,
+	vai.EXEC_TIME end_time
+FROM
+	IOP.V_ALARM_INFO vai
+LEFT JOIN IOP.O_EQUIP oe ON (
+	vai.equip_no = oe.equip_no
+	OR oe.equip_fno = vai.equip_no
+)
+LEFT JOIN IOP.FAULT_TASK_INFO FTI ON oe.equip_TYPE = fti.FAULT_TYPE
+AND fti.is_del != '1'
+AND fti.IS_STATUS = '1'
+LEFT JOIN IOP.LINE_EXPLAIN_INFO lei ON （lei.LINE_EXPLAIN_ID = vai.LINE_NO
+OR lei.iop_area_id = vai.LINE_NO
+)
+LEFT JOIN IOP.O_AREA OA ON oa.area_id = lei.IOP_AREA_ID
+LEFT JOIN FAULT_PRD_PRODUCT_INFO fpp ON fpp.FAULT_TASK_ID = fti. ID
+WHERE
+	TO_CHAR (
+		vai.ALARM_TIME,
+		'yyyy-MM-dd'
+	) = TO_CHAR (SYSDATE, 'yyyy-MM-dd')
+AND vai.ALARM_TIME IS NOT NULL
+AND oa.area_id IS NOT NULL
+AND oa.area_name IS NOT NULL
+AND vai.fault_desc IS NOT NULL
+AND fpp.fault_grade IS NOT NULL
+<if test="areaId != '' and areaId != null">
+	AND oa.area_id = #{areaId}
+</if>
+ORDER BY
+	vai.ALARM_TIME DESC
+    </select>
+
+    <select id="detailEquipFailureVoList" resultType="com.nrjh.iop.modules.centralizedControl.RightScreen.entity.vo.EquipFailureVO">
+        SELECT
+        oa.area_id,
+        oa.area_name,
+        T . NAME equip_name,
+        T .frequency
+        FROM
+        (
+        SELECT
+        oa.area_id,
+        OE. NAME,
+        COUNT (fti.fault_name) frequency
+        FROM
+        IOP.V_ALARM_INFO vai
+        LEFT JOIN IOP.O_EQUIP oe ON (
+        vai.equip_no = oe.equip_no
+        OR oe.equip_fno = vai.equip_no
+        )
+        AND OE.EQUIP_ID IN (
+        SELECT
+        fppi.product_id
+        FROM
+        IOP.FAULT_PRD_PRODUCT_INFO fppi
+        )
+        LEFT JOIN IOP.FAULT_TASK_INFO FTI ON oe.equip_TYPE = fti.FAULT_TYPE
+        AND fti.is_del != '1'
+        AND fti.IS_STATUS = '1'
+        LEFT JOIN IOP.LINE_EXPLAIN_INFO lei ON （lei.LINE_EXPLAIN_ID = vai.LINE_NO
+        OR lei.iop_area_id = vai.LINE_NO
+        )
+        LEFT JOIN IOP.O_AREA OA ON oa.area_id = lei.IOP_AREA_ID
+        WHERE
+        oa.area_id IS NOT NULL
+        AND OE. NAME IS NOT NULL
+		<if test="areaId != '' and areaId != null">
+			AND oa.area_id = #{areaId}
+		</if>
+        AND TO_CHAR (
+        vai.ALARM_TIME,
+        'yyyy-MM-dd'
+        ) = TO_CHAR (SYSDATE, 'yyyy-MM-dd')
+        GROUP BY
+        oa.area_id,
+        OE. NAME
+        ORDER BY
+        COUNT (fti.fault_name) DESC
+        ) T
+        LEFT JOIN IOP.O_AREA oa ON oa.area_id = T .area_id
+        WHERE rownum <![CDATA[ <= ]]> 8
+    </select>
+
+    <select id="detailDevProduceCycleList" resultType="com.nrjh.iop.modules.centralizedControl.ProductPlanInfo.entity.DevProduceCycle">
+		SELECT *
+		FROM IOP.DEV_PRODUCE_CYCLE
+		WHERE PARENT_ID IN (
+		SELECT ID
+		FROM IOP.DEV_PRODUCE_CYCLE
+		WHERE PARENT_ID IN (SELECT ID FROM IOP.DEV_PRODUCE_CYCLE WHERE IS_DEL = '0'
+		<if test="dataMap.year != '' and dataMap.year != null">
+		AND CYCLE_YEAR = #{dataMap.year}
+		</if>
+		)
+		<if test="dataMap.month != '' and dataMap.month != null">
+			AND CYCLE_MONTH = #{dataMap.month}
+		</if>
+		 AND IS_DEL = '0') AND IS_DEL = '0'
+    </select>
+
+    <select id="detailDetectTaskInfoMap" resultType="java.util.HashMap">
+SELECT EQUIP_CATEG categ,count(EQUIP_CATEG) num
+FROM MIDHD.MT_DETECT_TASK_INFO
+<where>
+    <if test="status == 2">
+		TO_CHAR (
+		WRITE_TIME,
+		'yyyy-MM-dd'
+		) = TO_CHAR (SYSDATE, 'yyyy-MM-dd')
+    </if>
+    <if test="status == 1">
+		TO_CHAR (
+		WRITE_TIME,
+		'yyyy-MM'
+		) = TO_CHAR (SYSDATE, 'yyyy-MM')
+    </if>
+</where>
+GROUP BY EQUIP_CATEG
+    </select>
+
+    <select id="detailProduceDPlanMapList" resultType="java.util.HashMap">
+		SELECT EQUIP_CATEG categ,SUM(PLAN_DAY_NUMBER) num
+		FROM IOP.DEV_PRODUCE_DPLAN
+		<where>
+            <if test="dataMap.year != '' and dataMap.year != null">
+                AND CYCLE_YEAR = #{dataMap.year}
+            </if>
+            <if test="dataMap.month != '' and dataMap.month != null">
+                AND CYCLE_MONTH = #{dataMap.month}
+            </if>
+            <if test="dataMap.day != '' and dataMap.day != null">
+                AND CYCLE_DAY = #{dataMap.day}
+            </if>
+        </where>
+		GROUP BY EQUIP_CATEG
+    </select>
+
+    <select id="detailFaultTypeVoList" resultType="com.nrjh.iop.modules.centralizedControl.RightScreen.entity.vo.FaultTypeVO">
+SELECT
+	oa.area_id,
+	oa.area_name,
+	T .labe,
+	T .num
+FROM
+	(
+		SELECT
+			oa.area_id,
+			fti.FAULT_LABE labe,
+			COUNT (fti.fault_name) num
+		FROM
+			IOP.V_ALARM_INFO vai
+		LEFT JOIN IOP.O_EQUIP oe ON (
+			vai.equip_no = oe.equip_no
+			OR oe.equip_fno = vai.equip_no
+		)
+		AND OE.EQUIP_ID IN (
+			SELECT
+				fppi.product_id
+			FROM
+				IOP.FAULT_PRD_PRODUCT_INFO fppi
+		)
+		LEFT JOIN IOP.FAULT_TASK_INFO FTI ON oe.equip_TYPE = fti.FAULT_TYPE
+		AND fti.is_del != '1'
+		AND fti.IS_STATUS = '1'
+		LEFT JOIN IOP.LINE_EXPLAIN_INFO lei ON （lei.LINE_EXPLAIN_ID = vai.LINE_NO
+		OR lei.iop_area_id = vai.LINE_NO
+	)
+LEFT JOIN IOP.O_AREA OA ON oa.area_id = lei.IOP_AREA_ID
+WHERE
+	oa.area_id IS NOT NULL
+AND fti.FAULT_LABE IS NOT NULL
+AND TO_CHAR (
+	vai.ALARM_TIME,
+	'yyyy-MM-dd'
+) = TO_CHAR (SYSDATE, 'yyyy-MM-dd')
+<if test="areaId != '' and areaId != null">
+	AND oa.area_id = #{areaId}
+</if>
+GROUP BY
+	oa.AREA_ID,
+	fti.FAULT_LABE
+) T
+LEFT JOIN IOP.O_AREA oa ON oa.area_id = T .area_id
+    </select>
+
+    <select id="detailLineFaultVoList" resultType="com.nrjh.iop.modules.centralizedControl.RightScreen.entity.vo.LineFaultVO">
+SELECT
+	oa.area_id,
+	oa.area_name,
+	T .num
+FROM
+	(
+		SELECT
+			oa.area_id,
+			COUNT (fti.fault_name) num
+		FROM
+			IOP.V_ALARM_INFO vai
+		LEFT JOIN IOP.O_EQUIP oe ON (
+			vai.equip_no = oe.equip_no
+			OR oe.equip_fno = vai.equip_no
+		)
+		AND OE.EQUIP_ID IN (
+			SELECT
+				fppi.product_id
+			FROM
+				IOP.FAULT_PRD_PRODUCT_INFO fppi
+		)
+		LEFT JOIN IOP.FAULT_TASK_INFO FTI ON oe.equip_TYPE = fti.FAULT_TYPE
+		AND fti.is_del != '1'
+		AND fti.IS_STATUS = '1'
+		LEFT JOIN IOP.LINE_EXPLAIN_INFO lei ON （lei.LINE_EXPLAIN_ID = vai.LINE_NO
+		OR lei.iop_area_id = vai.LINE_NO
+	)
+LEFT JOIN IOP.O_AREA OA ON oa.area_id = lei.IOP_AREA_ID
+WHERE
+	oa.area_id IS NOT NULL
+AND TO_CHAR (
+	vai.ALARM_TIME,
+	'yyyy-MM-dd'
+) = TO_CHAR (SYSDATE, 'yyyy-MM-dd')
+<if test="areaId != '' and areaId != null">
+	AND oa.area_id = #{areaId}
+</if>
+GROUP BY
+	oa.area_id
+) T
+LEFT JOIN IOP.O_AREA oa ON oa.area_id = T .area_id
+    </select>
+
+    <select id="detailAreaFaultVoList" resultType="com.nrjh.iop.modules.centralizedControl.RightScreen.entity.vo.FaultAreaVO">
+SELECT
+			PCC.param_name EQUIP_TYPE,
+			COUNT (fti.fault_name) num
+		FROM
+			IOP.V_ALARM_INFO vai
+		LEFT JOIN IOP.O_EQUIP oe ON (
+			vai.equip_no = oe.equip_no
+			OR oe.equip_fno = vai.equip_no
+		)
+		AND OE.EQUIP_ID IN (
+			SELECT
+				fppi.product_id
+			FROM
+				IOP.FAULT_PRD_PRODUCT_INFO fppi
+		)
+		LEFT JOIN IOP.FAULT_TASK_INFO FTI ON oe.equip_TYPE = fti.FAULT_TYPE
+		AND fti.is_del != '1'
+		AND fti.IS_STATUS = '1'
+		LEFT JOIN IOP.LINE_EXPLAIN_INFO lei ON （lei.LINE_EXPLAIN_ID = vai.LINE_NO
+		OR lei.iop_area_id = vai.LINE_NO
+	)
+LEFT JOIN IOP.O_AREA OA ON oa.area_id = lei.IOP_AREA_ID
+<if test="areaId != null and areaId != ''">
+AND oa.area_id = #{areaId}
+</if>
+LEFT JOIN IOP.P_COMM_CODE pcc ON OE.EQUIP_TYPE = pcc.PARAM_ID
+AND pcc.SORT_ID = 'EQUIP_TYPE'
+AND pcc.STATUS = '1'
+WHERE 1=1
+AND	TO_CHAR (vai.ALARM_TIME,'yyyy-MM-dd') = TO_CHAR (SYSDATE, 'yyyy-MM-dd')
+AND oa.area_id IS NOT NULL
+AND PCC.param_name IS NOT NULL
+GROUP BY
+	pcc.param_name
+ORDER BY
+	COUNT (fti.fault_name) DESC
+    </select>
+
+    <select id="detailDetectTrendVoList" resultType="com.nrjh.iop.modules.centralizedControl.RightScreen.entity.vo.DetectTrendVO">
+		SELECT OA.AREA_ID,
+		OA.AREA_NAME,
+		to_char(mpdi.WRITE_TIME, 'hh24') hours,
+		sum(mpdi.DET_SORT_NUM) num
+		FROM IOP.O_AREA oa
+		LEFT JOIN MIDHD.MT_POSITION_DETECT_INFO mpdi ON mpdi.LINE_NO = OA.AREA_ID
+		where to_char(mpdi.WRITE_TIME, 'hh24') IS NOT NULL
+		AND to_char(mpdi.WRITE_TIME,'yyyy-MM-dd') = to_char(SYSDATE,'yyyy-MM-dd')
+		<if test="areaId != '' and areaId != null">
+			AND OA.AREA_ID = #{areaId}
+		</if>
+		GROUP BY to_char(mpdi.WRITE_TIME, 'hh24'),OA.AREA_ID,OA.AREA_NAME
+    </select>
+
+    <select id="detailDetectInfoVoList" resultType="com.nrjh.iop.modules.centralizedControl.RightScreen.entity.vo.DetectInfoVO">
+SELECT MDTI.TASK_STATUS,
+CASE
+WHEN VAI.ID IS NOT NULL THEN '1'
+ELSE '0'
+END status
+FROM MIDHD.MT_DETECT_TASK_INFO mdti
+LEFT JOIN IOP.V_ALARM_INFO vai ON vai.ALARM_NO = MDTI.LINE_NO
+WHERE to_char(MDTI.WRITE_TIME,'yyyy-MM-dd') = to_char(SYSDATE,'yyyy-MM-dd')
+    </select>
+
+    <select id="detailArea" resultType="java.lang.String">
+SELECT OA.AREA_ID id FROM IOP.O_AREA oa
+WHERE OA.AREA_NAME concat(concat('%',#{name}),'%')
+    </select>
+
+    <select id="detailCompleteNum" resultType="java.util.Map">
+SELECT oa.area_id id,
+oa.area_name name,
+count(area_id) num
+FROM MIDHD.MT_DETECT_TASK_INFO mdti
+LEFT JOIN IOP.O_AREA oa ON oa.AREA_ID = mdti.LINE_NO
+WHERE oa.area_id = #{areaId}
+<if test="thatDay == 1">
+	and to_char(MDTI.WRITE_TIME,'yyyy-MM-dd') = to_char(SYSDATE,'yyyy-MM-dd')
+</if>
+GROUP BY oa.area_id,oa.area_name
+    </select>
+
+    <select id="detailAreaList" resultType="org.jeecg.common.system.vo.DictModel">
+SELECT AREA_NAME text,AREA_ID value FROM O_AREA
+    </select>
+
+	<select id="detailStkInOutTEquipInfo" resultType="com.nrjh.iop.modules.centralizedControl.RightScreen.entity.vo.AccessEquipVO">
+SELECT
+	IO_TASK_NO task_id,
+	IO_WH_SORT_CODE sort_code,
+	PCC.PARAM_NAME equip_categ,
+	BOX_BAR_CODE,
+	PILE_NO pile_no,
+	SYS_NO,
+	ARRIVE_BATCH_NO batch_id,
+	PALLET_NO,
+	WRITE_DATE,
+	oa.area_name sys_name,
+	oa.area_id area_id
+FROM
+	MIDHD_MDS.MD_IO_DET mid
+LEFT JOIN IOP.P_COMM_CODE pcc ON MID.EQUIP_CATEG = PCC.PARAM_ID
+AND SORT_ID = 'EQUIP_CATEG'
+AND STATUS = '1'
+LEFT JOIN IOP.LINE_EXPLAIN_INFO lei ON (
+	lei.line_explain_id = MID.sys_no
+	OR mid.sys_no = lei.iop_area_id
+)
+LEFT JOIN IOP.O_AREA oa ON oa.area_id = lei.iop_area_id
+WHERE
+	SUBSTR (WRITE_DATE, 0, 10) = TO_CHAR (SYSDATE, 'yyyy-MM-dd')
+	<if test="areaId != null and areaId != ''">
+        --AND lei.iop_area_id = #{areaId}
+	</if>
+	</select>
+
+</mapper>

@@ -11,27 +11,27 @@
           </a-col>
           <a-col :xl="6" :lg="7" :md="8" :sm="24">
             <a-form-item label="启用">
-              <JDictSelectTag  v-model="queryParam.active" placeholder="请选择状态" dictCode="IOP_PUB_ACTION"/>
+              <JDictSelectTag v-model="queryParam.active" placeholder="请选择状态" dictCode="IOP_PUB_ACTION"/>
+            </a-form-item>
+          </a-col>
+          <a-col :xl="6" :lg="7" :md="8" :sm="24">
+            <a-form-item label="代码">
+              <a-input placeholder="请输入代码" v-model="queryParam.code"></a-input>
             </a-form-item>
           </a-col>
           <a-col :xl="6" :lg="7" :md="8" :sm="24">
             <span style="float: left;overflow: hidden;" class="table-page-search-submitButtons">
               <a-button type="primary" @click="searchQuery" icon="search">查询</a-button>
               <a-button type="primary" @click="searchReset" icon="reload" style="margin-left: 8px">重置</a-button>
-              <a @click="handleToggleSearch" style="margin-left: 8px">
-                {{ toggleSearchStatus ? '收起' : '展开' }}
-                <a-icon :type="toggleSearchStatus ? 'up' : 'down'"/>
-              </a>
+<!--              <a @click="handleToggleSearch" style="margin-left: 8px">-->
+<!--                {{ toggleSearchStatus ? '收起' : '展开' }}-->
+<!--                <a-icon :type="toggleSearchStatus ? 'up' : 'down'"/>-->
+<!--              </a>-->
             </span>
           </a-col>
         </a-row>
         <a-row :gutter="24">
-          <template v-if="toggleSearchStatus">
-            <a-col :xl="6" :lg="7" :md="8" :sm="24">
-              <a-form-item label="代码">
-                <a-input placeholder="请输入代码" v-model="queryParam.code"></a-input>
-              </a-form-item>
-            </a-col>
+          <template v-if="true">
           </template>
         </a-row>
       </a-form>
@@ -134,13 +134,13 @@
   import StkWarehouseModal from './modules/StkWarehouseModal'
   import StkWarehouseModalView from './modules/StkWarehouseModalView'
   import JDictSelectTag from '@/components/dict/JDictSelectTag'
-  import { initDictOptions,initDictOptionsIop, filterDictText } from '@/components/dict/JDictSelectUtil'
+  import { initDictOptions, initDictOptionsIop, filterDictText } from '@/components/dict/JDictSelectUtil'
 
   export default {
     name: 'StkWarehouseList',
     mixins: [JeecgListMixin],
     components: {
-      StkWarehouseModal,StkWarehouseModalView,JDictSelectTag
+      StkWarehouseModal, StkWarehouseModalView, JDictSelectTag
     },
     data() {
       return {
@@ -162,14 +162,14 @@
             align: 'left',
             dataIndex: 'name'
           },
-          {
-            title: '库存位置',
-            align: 'left',
-            dataIndex: 'stockLocationId',
-            customRender: (text, record, index) => {
-              return filterDictText(this.locationDictOptions, text)
-            }
-          },
+          // {
+          //   title: '库存位置',
+          //   align: 'left',
+          //   dataIndex: 'stockLocationId',
+          //   customRender: (text, record, index) => {
+          //     return filterDictText(this.locationDictOptions, text)
+          //   }
+          // },
           {
             title: '地址',
             align: 'left',
@@ -198,7 +198,7 @@
       }
     },
     created() {
-      this.initDictConfig();
+      this.initDictConfig()
     },
     computed: {
       importExcelUrl: function() {
@@ -206,23 +206,32 @@
       }
     },
     methods: {
+      modalFormOk() {
+          // 新增/修改 成功时，重载列表
+          this.loadData();
+          initDictOptionsIop('stk_location,complete_name,id').then((res) => {
+              if (res.success) {
+                  this.locationDictOptions = res.result
+              }
+          })
+      },
       initDictConfig() {
         // 初始化 库存位置
         initDictOptionsIop('stk_location,complete_name,id').then((res) => {
           if (res.success) {
             this.locationDictOptions = res.result
           }
-        });
+        })
       },
       // 查看详情页面
-      handleDetail:function(record,title){
-        this.$refs.modalFormView.detail(record);
-        if(!title ||  typeof(title) != 'string'){
-          title = "详情";
+      handleDetail: function(record, title) {
+        this.$refs.modalFormView.detail(record)
+        if (!title || typeof (title) != 'string') {
+          title = '详情'
         }
-        this.$refs.modalFormView.title=title;
-        this.$refs.modalFormView.disableSubmit = false;
-      }
+        this.$refs.modalFormView.title = title
+        this.$refs.modalFormView.disableSubmit = false
+      },
     }
   }
 </script>

@@ -1,0 +1,214 @@
+<template>
+<!-- 确认按钮弹出表单-->
+  <a-modal
+    :title="title1"
+    :width="width"
+    :visible="visibleLookScrapModel"
+    @ok="handleOk"
+    @cancel="handleCancelCheck"
+    cancelText="关闭">
+        <a-row :gutter="24">
+          <a-col :span="12">
+            <a-form-item label="报废盘点单号" :labelCol="labelCol" :wrapperCol="wrapperCol">
+              <a-input v-model="scrapInventoryOrder" placeholder="" disabled="disabled"></a-input>
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-row :gutter="24">
+          <a-col :span="12">
+            <a-form-item label="申请人" :labelCol="labelCol" :wrapperCol="wrapperCol">
+               <a-input v-model="applicationWorker" placeholder="" disabled="disabled"></a-input>
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="申请日期" :labelCol="labelCol" :wrapperCol="wrapperCol">
+              <a-input v-model="applicationDate" placeholder="" disabled="disabled"></a-input>
+            </a-form-item>
+          </a-col>
+        </a-row>
+         <a-row :gutter="24">
+        <a-col :span="24">
+            <a-form-item label="申请说明" :labelCol="{span:3}" :wrapperCol="{span:20}">
+              <a-input v-model="applicationAbout" rows="4" placeholder="" disabled="disabled"></a-input>
+            </a-form-item>
+          </a-col>
+        </a-row>
+      <!-- 这里加上添加物料信息的table数据   确认页面需要增加合计行和提交信息-->      
+      <a-table
+        ref="table"
+        size="middle"
+        bordered
+        rowKey="id"
+        :columns="columnsLook"
+        :dataSource="dataSourceLook"
+        :pagination="false"
+      >
+      </a-table>
+      <span>车间: ---------{{updateTime+updateBy}}提交---------</span>
+  </a-modal>
+  
+</template>
+
+<script>
+import { httpAction , getAction } from '@/api/manage'
+export default {
+  components: {
+    name: "sureScrapModal",
+  },
+  data() {
+    return {
+      title1:"确认",
+      width:1200,
+      hight:800,
+      dataSourceLook: [],
+      scrapInventoryOrder: '',
+      applicationWorker: '',
+      applicationDate: '',
+      applicationAbout: '',
+      updateTime:'',
+      updateBy:'',
+      visibleLookScrapModel: false,
+      scrapId:'',
+      labelCol: {
+        span: 6
+      },
+      wrapperCol: {
+        span: 16
+      },
+      columnsLook: [
+                {
+                  title: '序号',
+                  dataIndex: '',
+                  key:'rowIndex',
+                  width:60,
+                  align:"center",
+                  customRender:function (t,r,index) {
+                    return parseInt(index)+1;
+                  }
+                },
+                {
+                  title:'物料名称',
+                  align:"center",
+                  dataIndex: 'rpoductName'
+                },
+                {
+                  title:'物料编号',
+                  align:"center",
+                  dataIndex: 'productNo'
+                },
+                {
+                  title:'规格',
+                  align:"center",
+                  dataIndex: 'attributeCategoryID'
+                },
+                {
+                  title:'单位',
+                  align:"center",
+                  dataIndex: 'productUomID'
+                },
+                {
+                  title:'供应商',
+                  align:"center",
+                  dataIndex: 'vendorID'
+                },
+                {
+                  title:'库存状况',
+                  align:"center",
+                  dataIndex: 'locationID'
+                },
+                {
+                  title:'库存件数',
+                  align:"center",
+                  dataIndex: 'productQty'
+                },
+                {
+                  title:'报废件数',
+                  align:"center",
+                  dataIndex: 'scrapQty'
+                },
+                 {
+                  title:'金额',
+                  align:"center",
+                  dataIndex: 'price'
+                }               
+              ],
+      url: {
+        find:"/scrap/stkScrap/look",//主表 表单回显数据
+        look:"/scrap/stkScrap/lookList",//查看物料列表
+        sure:"/scrap/stkScrap/sure",//确认
+      },
+    };
+  },
+  methods: {
+    handleCancelCheck(){
+      this.visibleLookScrapModel=false;
+      this.dataSourceLook = [];
+    },
+    close () {
+        this.$emit('close');
+        this.visibleLookScrapModel = false;
+      },
+    showCheck(scrapId,v){
+     this.visibleLookScrapModel=true;
+     this.scrapId=scrapId;
+     let InventoryOrder="";
+     console.log('---this.v--',v);
+     //根据报废单ID查询主表信息回显到表单
+     getAction(this.url.find,{id:scrapId}).then((res)=>{
+       if(res.success){
+         this.scrapInventoryOrder=res.result.scrapInventoryOrder;
+         InventoryOrder=res.result.scrapInventoryOrder
+         this.applicationWorker=res.result.applicationWorker;
+         this.applicationDate=res.result.applicationDate;
+         this.applicationAbout=res.result.applicationAbout;
+         this.updateTime=res.result.updateTime;
+         this.updateBy=res.result.updateBy;
+         //根据报废单号查询物料信息列表
+          console.log("报废单号:",InventoryOrder);
+          getAction(this.url.look,{scrapInventoryOrder:InventoryOrder,mark:v}).then((res)=>{
+            if(res.success){
+              this.dataSourceLook=res.result;
+            }else{
+              console.log(res.message);
+            }
+          });
+       }else{
+         console.log(res.message);
+       }
+     });
+     
+   
+    },
+    handleOk(){
+      //点击确定修改状态为保存
+      //console.log('this.scrapId',this.scrapId);
+      const that = this;
+      let httpurl =this.url.sure;
+      let method = 'post';
+      let scrapId = this.scrapId;
+      //let scrapInventoryOrder = this.mscrapInventoryOrder;
+      console.log("---提交的单据id:",this.scrapId);
+      getAction(httpurl,{id : scrapId},method).then((res)=>{
+        if(res.success){
+          that.$message.success(res.message);
+          that.$emit('ok');
+        }else{
+          that.$message.warning(res.message);
+        }
+      }).finally(() => {
+        that.confirmLoading = false;
+        that.close();
+      })
+    },
+    onCellChange(key, dataIndex, value) {
+      const dataSourceLook = [...this.dataSourceLook];
+      const target = dataSourceLook.find(item => item.key === key);
+      if (target) {
+        target[dataIndex] = value;
+        this.dataSourceLook = dataSourceLook;
+      }
+    },
+  },
+};
+</script>
+

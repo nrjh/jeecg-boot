@@ -9,6 +9,12 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import com.nrjh.iop.modules.prd.attrcategory.entity.PrdAttributeCategory;
+import com.nrjh.iop.modules.prd.attrcategory.service.IPrdAttributeCategoryService;
+import com.nrjh.iop.modules.prd.product.service.IPrdProductService;
+import org.apache.commons.lang.StringUtils;
+import org.checkerframework.checker.units.qual.A;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.util.oConvertUtils;
@@ -49,7 +55,13 @@ import org.jeecg.common.aspect.annotation.AutoLog;
 public class PrdCategoryController extends JeecgController<PrdCategory, IPrdCategoryService> {
 	@Autowired
 	private IPrdCategoryService prdCategoryService;
-	
+
+	@Autowired
+	private IPrdAttributeCategoryService prdAttributeCategoryService;
+
+	@Autowired
+	private IPrdProductService prdProductService;
+
 	/**
 	 * 分页列表查询
 	 *
@@ -71,7 +83,7 @@ public class PrdCategoryController extends JeecgController<PrdCategory, IPrdCate
 		IPage<PrdCategory> pageList = prdCategoryService.page(page, queryWrapper);
 		return Result.ok(pageList);
 	}
-	
+
 	/**
 	 *   添加
 	 *
@@ -92,11 +104,13 @@ public class PrdCategoryController extends JeecgController<PrdCategory, IPrdCate
 	  * @param prdCategory
 	  */
 	private void updateComplateName( PrdCategory prdCategory){
-		PrdCategory prdCategoryParent = prdCategoryService.getById(prdCategory.getPid().toString());
-		if(prdCategoryParent!=null){
-			prdCategory.setCompleteName(prdCategoryParent.getCompleteName()+"/"+prdCategory.getName());
-			prdCategory.setIdPath(prdCategoryParent.getIdPath()+"/"+prdCategory.getId());
-			prdCategoryService.updateById(prdCategory);
+		if(StringUtils.isNotBlank(prdCategory.getPid())){
+			PrdCategory prdCategoryParent = prdCategoryService.getById(prdCategory.getPid().toString());
+			if(prdCategoryParent!=null){
+				prdCategory.setCompleteName(prdCategoryParent.getCompleteName()+"/"+prdCategory.getName());
+				prdCategory.setIdPath(prdCategoryParent.getIdPath()+"/"+prdCategory.getId());
+				prdCategoryService.updateById(prdCategory);
+			}
 		}
 	}
 	/**
@@ -113,7 +127,7 @@ public class PrdCategoryController extends JeecgController<PrdCategory, IPrdCate
 		updateComplateName(prdCategory);
 		return Result.ok("编辑成功!");
 	}
-	
+
 	/**
 	 *   通过id删除
 	 *
@@ -124,10 +138,21 @@ public class PrdCategoryController extends JeecgController<PrdCategory, IPrdCate
 	@ApiOperation(value="品类-通过id删除", notes="品类-通过id删除")
 	@DeleteMapping(value = "/delete")
 	public Result<?> delete(@RequestParam(name="id",required=true) String id) {
+		// 相关分类
+		List<PrdCategory> prdCategoryList = prdCategoryService.selectCategoryListByCategoryId(id);
+		// 相关规格
+		List<PrdAttributeCategory> prdAttributeCategoryList = prdAttributeCategoryService.selectAttrCategoryListByCategoryId(id);
+		QueryWrapper queryWrapper = new QueryWrapper();
+		queryWrapper.eq("CATEGORY_ID",id);
+		// 相关物品
+		List prdProductList = prdProductService.list(queryWrapper);
+		if (prdCategoryList.size() != 0 || prdAttributeCategoryList.size() != 0 || prdProductList.size() != 0){
+			return Result.error("品类有关联设备,不可删除");
+		}
 		prdCategoryService.removeById(id);
 		return Result.ok("删除成功!");
 	}
-	
+
 	/**
 	 *  批量删除
 	 *
@@ -141,7 +166,7 @@ public class PrdCategoryController extends JeecgController<PrdCategory, IPrdCate
 		this.prdCategoryService.removeByIds(Arrays.asList(ids.split(",")));
 		return Result.ok("批量删除成功!");
 	}
-	
+
 	/**
 	  * 通过id查询
 	  *

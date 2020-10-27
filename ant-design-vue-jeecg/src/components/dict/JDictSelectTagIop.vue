@@ -53,7 +53,7 @@
     },
     computed: {
       getValueSting() {
-        return this.value ? this.value.toString() : null
+        return this.value ? this.value.toString() : '请选择'
       }
     },
     methods: {

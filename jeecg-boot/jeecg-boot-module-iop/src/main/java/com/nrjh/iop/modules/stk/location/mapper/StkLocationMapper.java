@@ -18,5 +18,5 @@ public interface StkLocationMapper extends BaseMapper<StkLocation> {
 	 * @param status
 	 */
 	void updateTreeNodeStatus(@Param("id") String id, @Param("status") String status);
-
+	void deleteBatchByPid(String pid);
 }

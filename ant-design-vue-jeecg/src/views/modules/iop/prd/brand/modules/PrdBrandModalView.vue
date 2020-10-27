@@ -64,19 +64,9 @@
             :rowSelection="false"
             :actionButton="false"/>
         </a-tab-pane>
-        <!--
         <a-tab-pane tab="相关物品" :key="refKeys[1]" :forceRender="true">
-          <j-editable-table
-            :ref="refKeys[1]"
-            :loading="prdProduceValueTable.loading"
-            :columns="prdProduceValueTable.columns"
-            :dataSource="prdProduceValueTable.dataSource"
-            :maxHeight="300"
-            :rowNumber="true"
-            :rowSelection="false"
-            :actionButton="false"/>
+          <ref-prd-table query-by="brandId" :query-value="model.id"></ref-prd-table>
         </a-tab-pane>
-        -->
       </a-tabs>
 
     </a-spin>
@@ -90,12 +80,14 @@
   import { JEditableTableMixin } from '@/mixins/JEditableTableMixin'
   import { validateDuplicateValue, iopValidateDuplicateValue } from '@/utils/util'
   import JDictSelectTagIop from '@/components/dict/JDictSelectTagIop'
+  import RefPrdTable from './RefPrdTable'
 
   export default {
     name: 'PrdBrandModalView',
     mixins: [JEditableTableMixin],
     components: {
-      JDictSelectTagIop
+      JDictSelectTagIop,
+      RefPrdTable
     },
     data() {
       return {
@@ -128,7 +120,7 @@
           },
           manufactorId: {
             rules: [
-              { required: true, message: '请选择制造商!' }
+              { }
             ]
           },
           active: {
@@ -164,6 +156,16 @@
           loading: false,
           dataSource: [],
           columns: [
+            {
+                title: '#',
+                dataIndex: '',
+                key: 'rowIndex',
+                width: 60,
+                align: 'center',
+                customRender: function(t, r, index) {
+                    return parseInt(index) + 1
+                }
+            },
             {
               title: '物品名称',
               key: 'name',
@@ -208,7 +210,6 @@
         if (this.model.id) {
           let params = { id: this.model.id }
           this.requestSubTableData(this.url.prdCategoryValue.list, params, this.prdCategoryValueTable)
-          this.requestSubTableData(this.url.prdProduceValue.list, params, this.prdProduceValueTable)
         }
       },
       handleOk() {

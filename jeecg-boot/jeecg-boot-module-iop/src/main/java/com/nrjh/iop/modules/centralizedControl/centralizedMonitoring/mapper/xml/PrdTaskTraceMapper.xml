@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nrjh.iop.modules.centralizedControl.centralizedMonitoring.mapper.PrdTaskTraceMapper">
+    <select id="getByHours" resultType="com.nrjh.iop.modules.centralizedControl.centralizedMonitoring.vo.PrdTaskTraceVO">
+        SELECT
+        t1.planNum,
+        t1.planTime,
+        t2.actNum,
+        t2.actTime
+        FROM
+        (
+            WITH t AS ( SELECT ROWNUM - 1 planTime FROM dual CONNECT BY ROWNUM &lt;= 24 ),
+            t1 AS(
+                  SELECT SUM(PLAN_DAY_NUMBER) AS planNum
+                  FROM
+                    (
+                        SELECT
+                            PLAN_DAY_NUMBER
+                        FROM
+                            iop.DEV_PRODUCE_DPLAN dpd
+                        <where>
+                            dpd.CYCLE_YEAR = to_char(#{dto.startDealTime},'yyyy')
+                            AND
+                                dpd.CYCLE_MONTH = to_char(#{dto.startDealTime},'mm')
+                            AND
+                            dpd.CYCLE_DAY = to_char(#{dto.startDealTime},'dd')
+                            <if test="dto.equipCateg != null and dto.equipCateg != ''">
+                               AND dpd.EQUIP_CATEG = #{dto.equipCateg}
+                            </if>
+                        </where>
+                    )
+              )
+              SELECT
+                planTime,
+                planNum
+            FROM
+                t
+                ,t1
+            ORDER BY
+                planTime ASC
+        )t1
+        LEFT JOIN
+        (
+            SELECT
+            count(1) AS actNum,
+            to_char(mpdi.detect_end_date,'hh24') AS actTime
+            FROM
+                midhd.MT_POSITION_DETECT_INFO mpdi
+            <where>
+                IS_DEL = 0
+                AND mpdi.detect_end_date BETWEEN #{dto.startDealTime} AND #{dto.endDealTime}
+               <if test="dto.lineNo != null and dto.lineNo != ''">
+                  AND  mpdi.LINE_NO = #{dto.lineNo}
+               </if>
+                <if test="dto.equipSpecCode != null and dto.equipSpecCode!=''">
+                    AND   mpdi.EQUIP_SPEC_CODE = #{dto.equipSpecCode}
+                </if>
+                <if test="dto.equipCateg != null and dto.equipCateg != ''">
+                   AND mpdi.EQUIP_CATEG = #{dto.equipCateg}
+                </if>
+            </where>
+            GROUP BY
+                to_char(mpdi.detect_end_date,'hh24')
+        ) t2
+        ON t1.planTime = t2.actTime
+    </select>
+
+    <select id="getByDays" resultType="com.nrjh.iop.modules.centralizedControl.centralizedMonitoring.vo.PrdTaskTraceVO">
+        SELECT
+		t1.planNum,
+		t1.planTime,
+		t2.actTime,
+		t2.actNum
+        FROM
+        (
+
+                SELECT
+                        TO_CHAR(TO_DATE((CYCLE_YEAR || CYCLE_MONTH ||CYCLE_DAY),'yyyy/mm/dd'),'yyyy/mm/dd') AS planTime,
+                        SUM(PLAN_DAY_NUMBER) AS planNum
+                FROM  iop.DEV_PRODUCE_DPLAN
+                <where>
+                     TO_CHAR(TO_DATE((CYCLE_YEAR || CYCLE_MONTH ||CYCLE_DAY),'yyyy/mm/dd'),'yyyy/mm/dd') BETWEEN TO_CHAR(#{dto.startDealTime}, 'yyyy/mm/dd') AND TO_CHAR(#{dto.endDealTime}, 'yyyy/mm/dd')
+                    <if test="dto.equipCateg != null and dto.equipCateg != ''">
+                       AND EQUIP_CATEG = #{dto.equipCateg}
+                    </if>
+                </where>
+                GROUP BY (CYCLE_YEAR || CYCLE_MONTH ||CYCLE_DAY)
+        ) t1
+        LEFT JOIN
+        (
+                SELECT
+                        count(1) AS actNum,
+                        to_char(mpdi.detect_end_date,'yyyy/mm/dd') AS actTime
+                FROM
+                        midhd.MT_POSITION_DETECT_INFO mpdi
+                <where>
+                    IS_DEL = 0
+                    AND
+                    to_char(mpdi.detect_end_date,'yyyy/mm/dd')
+                    BETWEEN
+                        TO_CHAR(#{dto.startDealTime}, 'yyyy/mm/dd')
+                    AND
+                        TO_CHAR(#{dto.endDealTime}, 'yyyy/mm/dd')
+                    <if test="dto.lineNo != null and dto.lineNo != ''">
+                      AND  mpdi.LINE_NO = #{dto.lineNo}
+                    </if>
+                    <if test="dto.equipSpecCode != null and dto.equipSpecCode!=''">
+                        AND   mpdi.EQUIP_SPEC_CODE = #{dto.equipSpecCode}
+                    </if>
+                    <if test="dto.equipCateg != null and dto.equipCateg != ''">
+                       AND mpdi.EQUIP_CATEG = #{dto.equipCateg}
+                    </if>
+                </where>
+
+                GROUP BY
+                        to_char(mpdi.detect_end_date,'yyyy/mm/dd')
+        ) t2
+        ON
+        t1.planTime = t2.actTime
+    </select>
+
+    <select id="getByMonths" resultType="com.nrjh.iop.modules.centralizedControl.centralizedMonitoring.vo.PrdTaskTraceVO">
+        SELECT
+            t1.planTime,
+            t1.planNum,
+            t2.actTime,
+            t2.actNum
+        FROM
+        (
+        SELECT
+            TO_CHAR(TO_DATE((CYCLE_YEAR || CYCLE_MONTH),'yyyy/mm'),'yyyy/mm') AS planTime,
+            SUM(PLAN_DAY_NUMBER) AS planNum
+        FROM  iop.DEV_PRODUCE_DPLAN
+        <where>
+           TO_CHAR(TO_DATE((CYCLE_YEAR || CYCLE_MONTH),'yyyy/mm'),'yyyy/mm') BETWEEN TO_CHAR(#{dto.startDealTime}, 'yyyy/mm') AND TO_CHAR(#{dto.endDealTime}, 'yyyy/mm')
+            <if test="dto.equipCateg != null and dto.equipCateg != ''">
+               AND EQUIP_CATEG = #{dto.equipCateg}
+            </if>
+        </where>
+        GROUP BY TO_CHAR(TO_DATE((CYCLE_YEAR || CYCLE_MONTH),'yyyy/mm'),'yyyy/mm')
+        ) t1
+        LEFT JOIN
+        (
+        SELECT
+            count(1) AS actNum,
+            to_char(mpdi.detect_end_date,'yyyy/mm') AS actTime
+        FROM
+            midhd.MT_POSITION_DETECT_INFO mpdi
+        <where>
+             IS_DEL = 0
+             AND
+             to_char(mpdi.detect_end_date,'yyyy/mm') BETWEEN TO_CHAR(#{dto.startDealTime}, 'yyyy/mm') AND TO_CHAR(#{dto.endDealTime}, 'yyyy/mm')
+            <if test="dto.lineNo != null and dto.lineNo != ''">
+              AND  mpdi.LINE_NO = #{dto.lineNo}
+            </if>
+            <if test="dto.equipSpecCode != null and dto.equipSpecCode!=''">
+                AND   mpdi.EQUIP_SPEC_CODE = #{dto.equipSpecCode}
+            </if>
+            <if test="dto.equipCateg != null and dto.equipCateg != ''">
+               AND mpdi.EQUIP_CATEG = #{dto.equipCateg}
+            </if>
+        </where>
+        GROUP BY
+            to_char(mpdi.detect_end_date,'yyyy/mm')
+        )t2
+        ON t1.planTime = t2.actTime
+    </select>
+</mapper>

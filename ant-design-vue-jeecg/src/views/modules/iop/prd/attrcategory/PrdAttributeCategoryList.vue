@@ -16,8 +16,8 @@
           </a-col>
           <a-col :xl="6" :lg="7" :md="8" :sm="24">
             <a-form-item label="所属品类">
-              <j-dict-select-tag-iop placeholder="请选择所属品类" v-model="queryParam.categoryId"
-                                     dictCode="PRD_CATEGORY,COMPLETE_NAME,ID"/>
+              <j-dict-select-tag-iop placeholder="请选择品类" v-model="queryParam.categoryId"
+                                     dictCode="PRD_CATEGORY,COMPLETE_NAME,ID,is_del=0"/>
             </a-form-item>
           </a-col>
 
@@ -26,13 +26,13 @@
               <a-button type="primary" @click="searchQuery" icon="search">查询</a-button>
               <a-button type="primary" @click="searchReset" icon="reload" style="margin-left: 8px">重置</a-button>
               <a @click="handleToggleSearch" style="margin-left: 8px">
-                {{ toggleSearchStatus ? '收起' : '展开' }}
+                {{ toggleSearchStatus ? '展开' : '收起' }}
                 <a-icon :type="toggleSearchStatus ? 'up' : 'down'"/>
               </a>
             </span>
           </a-col>
         </a-row>
-        <template v-if="toggleSearchStatus">
+        <template v-if="!toggleSearchStatus">
           <a-row :gutter="24">
             <a-col :xl="6" :lg="7" :md="8" :sm="24">
               <a-form-item label="状态">
@@ -190,11 +190,11 @@
               return filterDictText(this.categoryDictOptions, text)
             }
           },
-          {
-            title: '属性数量',
-            align: 'right',
-            dataIndex: 'attributeQty'
-          },
+          // {
+          //   title: '属性数量',
+          //   align: 'right',
+          //   dataIndex: 'attributeQty'
+          // },
           {
             title: '序号',
             align: 'right',

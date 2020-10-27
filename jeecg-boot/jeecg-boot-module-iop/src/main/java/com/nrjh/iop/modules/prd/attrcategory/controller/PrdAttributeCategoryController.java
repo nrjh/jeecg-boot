@@ -3,15 +3,13 @@ package com.nrjh.iop.modules.prd.attrcategory.controller;
 import java.io.UnsupportedEncodingException;
 import java.io.IOException;
 import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import cn.hutool.core.date.DateUtil;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
@@ -57,7 +55,7 @@ public class PrdAttributeCategoryController {
 	private IPrdAttributeCategoryService prdAttributeCategoryService;
 	@Autowired
 	private IPrdAttrCategAttrValueRelService prdAttrCategAttrValueRelService;
-	
+
 	/**
 	 * 分页列表查询
 	 *
@@ -77,9 +75,16 @@ public class PrdAttributeCategoryController {
 		QueryWrapper<PrdAttributeCategory> queryWrapper = QueryGenerator.initQueryWrapper(prdAttributeCategory, req.getParameterMap());
 		Page<PrdAttributeCategory> page = new Page<PrdAttributeCategory>(pageNo, pageSize);
 		IPage<PrdAttributeCategory> pageList = prdAttributeCategoryService.page(page, queryWrapper);
+//		List<String> list = pageList.getRecords().stream().map(item->item.getCode().substring(0,item.getCode().indexOf("."))).collect(Collectors.toList());
+		for(PrdAttributeCategory item : pageList.getRecords()){
+			if(item.getCode().contains(".")){
+				String code = item.getCode().substring(0,item.getCode().indexOf("."));
+				item.setCode(code);
+			}
+		}
 		return Result.ok(pageList);
 	}
-	
+
 	/**
 	 *   添加
 	 *
@@ -92,10 +97,13 @@ public class PrdAttributeCategoryController {
 	public Result<?> add(@RequestBody PrdAttributeCategoryPage prdAttributeCategoryPage) {
 		PrdAttributeCategory prdAttributeCategory = new PrdAttributeCategory();
 		BeanUtils.copyProperties(prdAttributeCategoryPage, prdAttributeCategory);
+		StringBuffer sb = new StringBuffer();
+		sb.append("GG").append(DateUtil.format(new Date(), "yyyyMMddHHmmss"));
+		prdAttributeCategory.setCode(sb.toString());
 		prdAttributeCategoryService.saveMain(prdAttributeCategory, prdAttributeCategoryPage.getPrdAttrCategAttrValueRelList());
 		return Result.ok("添加成功！");
 	}
-	
+
 	/**
 	 *  编辑
 	 *
@@ -115,7 +123,7 @@ public class PrdAttributeCategoryController {
 		prdAttributeCategoryService.updateMain(prdAttributeCategory, prdAttributeCategoryPage.getPrdAttrCategAttrValueRelList());
 		return Result.ok("编辑成功!");
 	}
-	
+
 	/**
 	 *   通过id删除
 	 *
@@ -129,7 +137,7 @@ public class PrdAttributeCategoryController {
 		prdAttributeCategoryService.delMain(id);
 		return Result.ok("删除成功!");
 	}
-	
+
 	/**
 	 *  批量删除
 	 *
@@ -143,7 +151,7 @@ public class PrdAttributeCategoryController {
 		this.prdAttributeCategoryService.delBatchMain(Arrays.asList(ids.split(",")));
 		return Result.ok("批量删除成功！");
 	}
-	
+
 	/**
 	 * 通过id查询
 	 *
@@ -161,7 +169,7 @@ public class PrdAttributeCategoryController {
 		return Result.ok(prdAttributeCategory);
 
 	}
-	
+
 	/**
 	 * 通过id查询
 	 *
@@ -187,6 +195,14 @@ public class PrdAttributeCategoryController {
 	 @GetMapping(value = "/selectAttrCategoryListByCategoryId")
 	 public Result<?> selectAttrCategoryListByCategoryId(@RequestParam(name="id",required=true) String id) {
 		 List<PrdAttributeCategory> prdAttributeCategoryList = prdAttributeCategoryService.selectAttrCategoryListByCategoryId(id);
+		 return Result.ok(prdAttributeCategoryList);
+	 }
+
+	 @AutoLog(value = "物品规格与产品属性值关系集合-通过id查询品类相关规格")
+	 @ApiOperation(value="物品规格与产品属性值关系集合-通过id查询品类相关规格", notes="物品规格与产品属性值关系-通过id查询品类相关规格")
+	 @GetMapping(value = "/attributeCategoryNameList")
+	 public Result<?> attributeCategoryNameList() {
+		 List<PrdAttributeCategory> prdAttributeCategoryList = prdAttributeCategoryService.list();
 		 return Result.ok(prdAttributeCategoryList);
 	 }
 

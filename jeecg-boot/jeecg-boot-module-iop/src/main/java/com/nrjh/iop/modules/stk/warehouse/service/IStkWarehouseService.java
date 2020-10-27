@@ -10,5 +10,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @Version: V1.0
  */
 public interface IStkWarehouseService extends IService<StkWarehouse> {
-
+    void deleteById(String id);
+    void saveWithChildLocation(StkWarehouse stkWarehouse);
 }

@@ -5,7 +5,7 @@
         :activeKey="customActiveKey"
         :tabBarStyle="{ textAlign: 'center', borderBottom: 'unset' }"
         @change="handleTabClick">
-        <a-tab-pane key="tab1" tab="账号密码登陆">
+        <a-tab-pane key="tab1" tab="">
           <a-form-item>
             <a-input
               size="large"
@@ -27,72 +27,72 @@
             </a-input>
           </a-form-item>
 
-          <a-row :gutter="0">
-            <a-col :span="16">
-              <a-form-item>
-                <a-input
-                  v-decorator="['inputCode',validatorRules.inputCode]"
-                  size="large"
-                  type="text"
-                  @change="inputCodeChange"
-                  placeholder="请输入验证码">
-                  <a-icon slot="prefix" type="smile" :style="{ color: 'rgba(0,0,0,.25)' }"/>
-                </a-input>
-              </a-form-item>
-            </a-col>
-            <a-col :span="8" style="text-align: right">
-              <img v-if="requestCodeSuccess" style="margin-top: 2px;" :src="randCodeImage" @click="handleChangeCheckCode"/>
-              <img v-else style="margin-top: 2px;" src="../../assets/checkcode.png" @click="handleChangeCheckCode"/>
-              <!--<j-graphic-code @success="generateCode" ref="jgraphicCodeRef" style="float: right" remote></j-graphic-code>-->
-            </a-col>
-          </a-row>
+          <!--<a-row :gutter="0">-->
+            <!--<a-col :span="16">-->
+              <!--<a-form-item>-->
+                <!--<a-input-->
+                  <!--v-decorator="['inputCode',validatorRules.inputCode]"-->
+                  <!--size="large"-->
+                  <!--type="text"-->
+                  <!--@change="inputCodeChange"-->
+                  <!--placeholder="请输入验证码">-->
+                  <!--<a-icon slot="prefix" type="smile" :style="{ color: 'rgba(0,0,0,.25)' }"/>-->
+                <!--</a-input>-->
+              <!--</a-form-item>-->
+            <!--</a-col>-->
+            <!--<a-col :span="8" style="text-align: right">-->
+              <!--<img v-if="requestCodeSuccess" style="margin-top: 2px;" :src="randCodeImage" @click="handleChangeCheckCode"/>-->
+              <!--<img v-else style="margin-top: 2px;" src="../../assets/checkcode.png" @click="handleChangeCheckCode"/>-->
+              <!--&lt;!&ndash;<j-graphic-code @success="generateCode" ref="jgraphicCodeRef" style="float: right" remote></j-graphic-code>&ndash;&gt;-->
+            <!--</a-col>-->
+          <!--</a-row>-->
 
 
         </a-tab-pane>
-        <a-tab-pane key="tab2" tab="手机号登陆">
-          <a-form-item>
-            <a-input
-              v-decorator="['mobile',validatorRules.mobile]"
-              size="large"
-              type="text"
-              placeholder="手机号">
-              <a-icon slot="prefix" type="mobile" :style="{ color: 'rgba(0,0,0,.25)' }"/>
-            </a-input>
-          </a-form-item>
+        <!--<a-tab-pane key="tab2" tab="手机号登陆">-->
+          <!--<a-form-item>-->
+            <!--<a-input-->
+              <!--v-decorator="['mobile',validatorRules.mobile]"-->
+              <!--size="large"-->
+              <!--type="text"-->
+              <!--placeholder="手机号">-->
+              <!--<a-icon slot="prefix" type="mobile" :style="{ color: 'rgba(0,0,0,.25)' }"/>-->
+            <!--</a-input>-->
+          <!--</a-form-item>-->
 
-          <a-row :gutter="16">
-            <a-col class="gutter-row" :span="16">
-              <a-form-item>
-                <a-input
-                  v-decorator="['captcha',validatorRules.captcha]"
-                  size="large"
-                  type="text"
-                  placeholder="请输入验证码">
-                  <a-icon slot="prefix" type="mail" :style="{ color: 'rgba(0,0,0,.25)' }"/>
-                </a-input>
-              </a-form-item>
-            </a-col>
-            <a-col class="gutter-row" :span="8">
-              <a-button
-                class="getCaptcha"
-                tabindex="-1"
-                :disabled="state.smsSendBtn"
-                @click.stop.prevent="getCaptcha"
-                v-text="!state.smsSendBtn && '获取验证码' || (state.time+' s')"></a-button>
-            </a-col>
-          </a-row>
-        </a-tab-pane>
+          <!--<a-row :gutter="16">-->
+            <!--<a-col class="gutter-row" :span="16">-->
+              <!--<a-form-item>-->
+                <!--<a-input-->
+                  <!--v-decorator="['captcha',validatorRules.captcha]"-->
+                  <!--size="large"-->
+                  <!--type="text"-->
+                  <!--placeholder="请输入验证码">-->
+                  <!--<a-icon slot="prefix" type="mail" :style="{ color: 'rgba(0,0,0,.25)' }"/>-->
+                <!--</a-input>-->
+              <!--</a-form-item>-->
+            <!--</a-col>-->
+            <!--<a-col class="gutter-row" :span="8">-->
+              <!--<a-button-->
+                <!--class="getCaptcha"-->
+                <!--tabindex="-1"-->
+                <!--:disabled="state.smsSendBtn"-->
+                <!--@click.stop.prevent="getCaptcha"-->
+                <!--v-text="!state.smsSendBtn && '获取验证码' || (state.time+' s')"></a-button>-->
+            <!--</a-col>-->
+          <!--</a-row>-->
+        <!--</a-tab-pane>-->
       </a-tabs>
 
-      <a-form-item>
-        <a-checkbox v-decorator="['rememberMe', {initialValue: true, valuePropName: 'checked'}]" >自动登陆</a-checkbox>
-        <router-link :to="{ name: 'alteration'}" class="forge-password" style="float: right;">
-          忘记密码
-        </router-link>
-       <router-link :to="{ name: 'register'}" class="forge-password" style="float: right;margin-right: 10px" >
-          注册账户
-        </router-link>
-      </a-form-item>
+      <!--<a-form-item>-->
+        <!--<a-checkbox v-decorator="['rememberMe', {initialValue: true, valuePropName: 'checked'}]" >自动登陆</a-checkbox>-->
+        <!--<router-link :to="{ name: 'alteration'}" class="forge-password" style="float: right;">-->
+          <!--忘记密码-->
+        <!--</router-link>-->
+       <!--<router-link :to="{ name: 'register'}" class="forge-password" style="float: right;margin-right: 10px" >-->
+          <!--注册账户-->
+        <!--</router-link>-->
+      <!--</a-form-item>-->
 
       <a-form-item style="margin-top:24px">
         <a-button

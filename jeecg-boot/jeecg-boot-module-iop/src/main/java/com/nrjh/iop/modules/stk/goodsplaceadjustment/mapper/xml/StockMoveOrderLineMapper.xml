@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nrjh.iop.modules.stk.goodsplaceadjustment.mapper.StockMoveOrderLineMapper">
+    <delete id="deleteByOrderId" parameterType="string">
+        DELETE FROM
+            stock_move_order_line
+        WHERE
+            order_id = #{orderId}
+    </delete>
+
+    <update id="deleteByOrderIdWithLogic" parameterType="string">
+        UPDATE stock_move_order_line SET is_del = 1
+        WHERE is_del=0 AND order_id = #{orderId}
+    </update>
+</mapper>

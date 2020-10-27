@@ -1,7 +1,7 @@
 <template>
   <div :style="{ padding: '0 0 32px 32px' }">
     <h4 :style="{ marginBottom: '20px' }">{{ title }}</h4>
-    <v-chart :forceFit="true" :height="height" :data="dataSource" :scale="scale" :padding="padding">
+    <v-chart :forceFit="true" :height="height" :data="dataSource" :scale="scale" :padding="padding" :onClick="handleClick">
       <v-tooltip/>
       <v-axis/>
       <v-bar position="x*y"/>
@@ -11,9 +11,11 @@
 
 <script>
   import { triggerWindowResizeEvent } from '@/utils/util'
+  import { ChartEventMixins } from './mixins/ChartMixins'
 
   export default {
     name: 'Bar',
+    mixins: [ChartEventMixins],
     props: {
       dataSource: {
         type: Array,

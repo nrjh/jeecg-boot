@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nrjh.iop.modules.workOrder.mapper.OrdWorkOrderInfoMapper">
+
+    <select id="selectProvinceCode" resultType="java.lang.String">
+        select item_value from sys_dict_item i
+                          left join sys_dict d
+                          on i.dict_id = d.id
+                          where dict_code = #{provinceCode}
+    </select>
+    <select id="getEquipNo" resultType="java.lang.String">
+        select EQUIP_NO from O_EQUIP where EQUIP_ID = #{id}
+    </select>
+
+    <select id="page" resultType="com.nrjh.iop.modules.workOrder.entity.OrdWorkOrderInfo">
+        SELECT * FROM ORD_WORK_ORDER_INFO
+        <where>
+        <if test="dataMap.isDownload != '' and dataMap.isDownload != null">
+            and IS_LOAD = #{dataMap.isDownload}
+        </if>
+        <if test="dataMap.downloadStartDate != '' and dataMap.downloadStartDate != null">
+            /*and order_type = #{dataMap.downloadStartDate}*/
+        </if>
+        <if test="dataMap.distributeStartDate != '' and dataMap.distributeStartDate != null">
+            and dispatch_time <![CDATA[ >= ]]> to_date(#{dataMap.distributeStartDate}, 'yyyy-mm-dd')
+        </if>
+        <if test="dataMap.processStatus != '' and dataMap.processStatus != null">
+            and process_status = #{dataMap.processStatus}
+        </if>
+        <if test="dataMap.applicationStartDate != '' and dataMap.applicationStartDate != null">
+            and alarm_time <![CDATA[ >= ]]> to_date(#{dataMap.applicationStartDate}, 'yyyy-mm-dd')
+        </if>
+        <if test="dataMap.forward != '' and dataMap.forward != null">
+            and dispatch_user = #{dataMap.forward}
+        </if>
+        <if test="dataMap.collectionTaskSource != '' and dataMap.collectionTaskSource != null">
+            /*and order_type = #{dataMap.collectionTaskSource}*/
+        </if>
+        <if test="dataMap.applicationEndDate != '' and dataMap.applicationEndDate != null">
+            and alarm_time <![CDATA[ <= ]]> to_date(#{dataMap.applicationEndDate}, 'yyyy-mm-dd')
+        </if>
+        <if test="dataMap.distributeEndDate != '' and dataMap.distributeEndDate != null">
+            and dispatch_time <![CDATA[ <= ]]> to_date(#{dataMap.distributeEndDate}, 'yyyy-mm-dd')
+        </if>
+        <if test="dataMap.source != '' and dataMap.source != null">
+            and alarm_source = #{dataMap.source}
+        </if>
+        <if test="dataMap.type != '' and dataMap.type != null">
+            and line_no = #{dataMap.type}
+        </if>
+        <if test="dataMap.unit != '' and dataMap.unit != null">
+            /*and order_type = #{dataMap.unit}*/
+        </if>
+        <if test="dataMap.equipName != '' and dataMap.equipName != null">
+            and EQUIP_NAME = #{dataMap.equipName}
+        </if>
+        <if test="dataMap.dataStartDate != '' and dataMap.dataStartDate != null">
+            /*and order_type = #{dataMap.dataStartDate}*/
+        </if>
+        <if test="dataMap.downloadEndDate != '' and dataMap.downloadEndDate != null">
+            /*and order_type = #{dataMap.downloadEndDate}*/
+        </if>
+        <if test="dataMap.alarmLevel != '' and dataMap.alarmLevel != null">
+            and alarm_level = #{dataMap.alarmLevel}
+        </if>
+        <if test="dataMap.dataEndDate != '' and dataMap.dataEndDate != null">
+            /*and order_type = #{dataMap.dataEndDate}*/
+        </if>
+        </where>
+        order by create_time desc
+    </select>
+
+</mapper>

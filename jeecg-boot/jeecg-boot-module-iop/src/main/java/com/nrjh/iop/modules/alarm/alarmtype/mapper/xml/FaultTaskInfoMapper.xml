@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nrjh.iop.modules.alarm.alarmtype.mapper.FaultTaskInfoMapper">
+
+    <select id="selectFristEquip" resultType="com.nrjh.iop.modules.alarm.alarmtype.vo.EquipIdModel">
+            SELECT t.param_id,
+                   t.param_name as title
+              FROM P_COMM_CODE T
+             WHERE SORT_ID = 'EQUIP_CATEG'
+               AND STATUS = '1'
+    </select>
+
+    <select id="selectThreeEquip" resultType="com.nrjh.iop.modules.alarm.alarmtype.vo.EquipIdModel" parameterType="java.lang.String">
+       select  oe.equip_id,
+               oe.area_id,
+               oe.name as title,
+               oe.equip_no,
+               oe.equip_type,
+               ( SELECT param_name  FROM P_COMM_CODE T WHERE  SORT_ID = 'EQUIP_TYPE' AND STATUS = '1' and param_id=oe.equip_type ) as type_name
+          from o_equip oe
+         where oe.equip_type in
+               (select pc.param_id
+                  from P_COMM_CODE pc
+                 where pc.SORT_ID = 'EQUIP_TYPE'
+                   AND pc.STATUS = '1'
+                   and pc.parent_param_id like concat(concat('%', #{paramId}), '%'))
+    </select>
+
+
+    <select id="selectEquipById" resultType="com.nrjh.iop.modules.alarm.alarmtype.vo.EquipIdModel" parameterType="java.lang.String">
+        select  oe.equip_id,
+        oe.area_id,
+        oe.name as title,
+        oe.equip_no,
+        oe.equip_type,
+        ( SELECT param_name  FROM P_COMM_CODE T WHERE  SORT_ID = 'EQUIP_TYPE' AND STATUS = '1' and param_id=oe.equip_type ) as type_name
+        from o_equip oe
+       where oe.equip_id = #{equipId}
+    </select>
+
+    <select id="selectEquipType" resultType="com.nrjh.iop.modules.alarm.alarmtype.vo.EquipIdModel" parameterType="java.lang.String">
+        select distinct  pc.param_id,pc.param_name
+                  from P_COMM_CODE pc
+                 where pc.SORT_ID = 'EQUIP_TYPE'
+                   AND pc.STATUS = '1'
+                   and pc.parent_param_id like concat(concat('%', #{paramId}), '%')
+    </select>
+
+    <select id="selectEquipByEquipTypeId" resultType="com.nrjh.iop.modules.alarm.alarmtype.vo.EquipIdModel" parameterType="java.lang.String">
+        select t.name as param_name ,t.EQUIP_ID as param_id,t.equip_no  from o_equip t where t.EQUIP_TYPE= #{paramId}
+    </select>
+
+    <select id="queryFaulNameByEquipType" resultType="map" parameterType="java.lang.String">
+            SELECT
+              distinct t.equip_type,t.faule_name FROM (
+                    SELECT
+                      o.equip_type,
+                      v.REAL_REASON AS faule_name
+                    FROM
+                      V_ALARM_INFO v left join O_EQUIP o ON v.EQUIP_NO = o.EQUIP_NO
+                      OR v.EQUIP_NO = o.EQUIP_FNO
+                    WHERE
+                      v.REAL_REASON IS NOT NULL
+                      AND o.equip_type IS NOT NULL
+                    ORDER BY
+                      v.ALARM_TIME DESC
+              ) t
+                where  t.EQUIP_TYPE =#{equipType}
+
+    </select>
+
+</mapper>

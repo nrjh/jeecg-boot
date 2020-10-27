@@ -1,18 +1,20 @@
 package com.nrjh.iop.modules.stk.picking.entity;
 
-import java.io.Serializable;
-import java.util.Date;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import org.jeecg.common.aspect.annotation.DictIop;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.jeecgframework.poi.excel.annotation.Excel;
-import org.jeecg.common.aspect.annotation.Dict;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import org.jeecg.common.aspect.annotation.DictIop;
+import org.jeecgframework.poi.excel.annotation.Excel;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * @Description: 调拨单
@@ -121,9 +123,9 @@ public class StkPicking implements Serializable {
     @ApiModelProperty(value = "创建人")
     private String createBy;
 	/**创建时间*/
-	@Excel(name = "创建时间", width = 15, format = "yyyy-MM-dd")
-	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd")
-    @DateTimeFormat(pattern="yyyy-MM-dd")
+	@Excel(name = "创建时间", width = 15, format = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "创建时间")
     private Date createTime;
 	/**修改人*/
@@ -136,4 +138,58 @@ public class StkPicking implements Serializable {
     @DateTimeFormat(pattern="yyyy-MM-dd")
     @ApiModelProperty(value = "修改时间")
     private Date updateTime;
+
+
+    @Excel(name = "单据编号", width = 15)
+    @ApiModelProperty(value = "单据编号")
+    private String pickingNo;
+    @Excel(name = "申请班组", width = 15)
+    @ApiModelProperty(value = "申请班组")
+    private String groupNo;
+    @Excel(name = "物品类型", width = 15)
+    @ApiModelProperty(value = "物品类型")
+    private String categoryType;
+    @Excel(name = "单据级别", width = 15)
+    @ApiModelProperty(value = "单据级别")
+    private String orderType;
+
+    @Excel(name = "单价", width = 15)
+    @ApiModelProperty(value = "单价")
+    private BigDecimal price;
+    @Excel(name = "总价", width = 15)
+    @ApiModelProperty(value = "总价")
+    private BigDecimal sumPrice;
+
+    @Excel(name = "检定线Id", width = 15)
+    @ApiModelProperty(value = "检定线Id")
+    private String lineId;
+    @Excel(name = "检定线名称", width = 15)
+    @ApiModelProperty(value = "检定线名称")
+    private String lineName;
+    @Excel(name = "刪除标识", width = 15)
+    @ApiModelProperty(value = "刪除标识")
+    private Integer isDel;
+
+
+    /**
+     * 物料详情
+     */
+    @TableField(exist = false)
+    private String prodDetails;
+
+    @TableField(exist = false)
+    @ApiModelProperty(value = "开始时间")
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd")
+    @DateTimeFormat(pattern="yyyy-MM-dd")
+    private String startTime;
+
+    @TableField(exist = false)
+    @ApiModelProperty(value = "结束时间")
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd")
+    @DateTimeFormat(pattern="yyyy-MM-dd")
+    private String endTime;
+
+    @TableField(exist = false)
+    @ApiModelProperty(value = "物料名称")
+    private String productName;
 }

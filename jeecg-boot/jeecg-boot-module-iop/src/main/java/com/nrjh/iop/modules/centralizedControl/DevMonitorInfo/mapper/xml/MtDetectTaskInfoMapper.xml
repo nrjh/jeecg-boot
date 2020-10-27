@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nrjh.iop.modules.centralizedControl.DevMonitorInfo.mapper.MtDetectTaskInfoMapper">
+    <select id="getAll" resultType="com.nrjh.iop.modules.centralizedControl.DevMonitorInfo.entity.MtDetectTaskInfo" parameterType="java.util.Map">
+        SELECT
+            DETECT_TASK_NO,
+            LINE_NO,
+            ARRIVE_BATCH_NO,
+            EQUIP_QTY,
+            DETECT_START_DATE,
+            DETECT_END_DATE
+        FROM
+            midhd.MT_DETECT_TASK_INFO
+        <where>
+            <if test="params != null">
+                <if test="params.detectTaskNo != null and params.detectTaskNo != ''">
+                    AND DETECT_TASK_NO = #{params.detectTaskNo}
+                </if>
+                <if test="params.lineNo != null and params.lineNo != ''">
+                    AND LINE_NO = #{params.lineNo}
+                </if>
+            </if>
+        </where>
+    </select>
+
+    <select id="checkTaskMonitorList" resultType="com.nrjh.iop.modules.centralizedControl.DevMonitorInfo.entity.MtDetectTaskInfo" parameterType="java.util.Map">
+        SELECT
+            DETECT_TASK_NO,
+            ARRIVE_BATCH_NO,
+            LINE_NO,
+            TASK_TYPE,
+            TASK_STATUS,
+            DETECT_START_DATE,
+            DETECT_END_DATE,
+            EQUIP_QTY
+        FROM
+            midhd.MT_DETECT_TASK_INFO
+        <where>
+            <if test="params != null">
+                <if test="params.detectTaskNo != null and params.detectTaskNo != ''">
+                    AND DETECT_TASK_NO = #{params.detectTaskNo}
+                </if>
+                <if test="params.lineNo != null and params.lineNo != ''">
+                    AND LINE_NO = #{params.lineNo}
+                </if>
+                <if test="params.taskStatus != null and params.taskStatus != ''">
+                    AND TASK_STATUS = #{params.taskStatus}
+                </if>
+            </if>
+        </where>
+    </select>
+</mapper>

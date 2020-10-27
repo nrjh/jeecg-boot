@@ -2,6 +2,7 @@ package org.jeecg.modules.system.util;
 
 import io.minio.MinioClient;
 import io.minio.errors.*;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.multipart.MultipartFile;
 import org.xmlpull.v1.XmlPullParserException;
@@ -10,8 +11,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  * minio文件上传工具类
@@ -90,6 +89,25 @@ public class MinioUtil {
             log.error(e.getMessage(), e);
         }
         return file_url;
+    }
+
+    /**
+     * 下载文件
+     *
+     *            桶名
+     * @param fileName:
+     *            文件名
+     * @return: void
+     * @date : 2020/8/17 0:34
+     */
+    @SneakyThrows(Exception.class)
+    public static InputStream  download(String fileName) {
+        initMinio(minioUrl, minioName,minioPass);
+        // 获取对象的元数据
+//        final ObjectStat stat = minioClient.statObject(bucketName, fileName);
+        InputStream is = minioClient.getObject(bucketName, fileName);
+        return  is;
+
     }
 
     /**

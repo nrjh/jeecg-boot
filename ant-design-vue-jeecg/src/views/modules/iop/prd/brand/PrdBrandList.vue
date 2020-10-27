@@ -20,17 +20,17 @@
             <span style="float: left;overflow: hidden;" class="table-page-search-submitButtons">
               <a-button type="primary" @click="searchQuery" icon="search">查询</a-button>
               <a-button type="primary" @click="searchReset" icon="reload" style="margin-left: 8px">重置</a-button>
-              <a @click="handleToggleSearch" style="margin-left: 8px">
-                {{ toggleSearchStatus ? '收起' : '展开' }}
-                <a-icon :type="toggleSearchStatus ? 'up' : 'down'"/>
-              </a>
+<!--              <a @click="handleToggleSearch" style="margin-left: 8px">-->
+<!--                {{ toggleSearchStatus ? '收起' : '展开' }}-->
+<!--                <a-icon :type="toggleSearchStatus ? 'up' : 'down'"/>-->
+<!--              </a>-->
             </span>
           </a-col>
 
         </a-row>
 
         <a-row :gutter="24">
-          <template v-if="toggleSearchStatus">
+          <template v-if="true">
             <a-col :xl="6" :lg="7" :md="8" :sm="24">
               <a-form-item label="首字母">
                 <a-input placeholder="请输入首字母" v-model="queryParam.firstLetter"></a-input>
@@ -43,12 +43,13 @@
                                    dictCode="RES_PARTNER,NAME,ID"/>
                 -->
                 <!-- 异步搜索 -->
-                <j-search-select-tag-iop
-                  placeholder="请选择制造商"
-                  v-model="queryParam.manufactorId"
-                  dict="RES_PARTNER,NAME,ID"
-                  :async="true">
-                </j-search-select-tag-iop>
+<!--                <j-search-select-tag-iop-->
+<!--                  placeholder="请选择制造商"-->
+<!--                  v-model="queryParam.manufactorId"-->
+<!--                  dict="RES_PARTNER,NAME,ID"-->
+<!--                  :async="true">-->
+<!--                </j-search-select-tag-iop>-->
+                <a-input placeholder="请输入制造商" v-model="queryParam.manufactorName"></a-input>
               </a-form-item>
             </a-col>
           </template>
@@ -56,7 +57,7 @@
       </a-form>
     </div>
     <!-- 查询区域-END -->
-    
+
     <!-- 操作按钮区域 -->
     <div class="table-operator">
       <a-button @click="handleAdd('品牌 / 新建')" type="primary" icon="plus">新建</a-button>
@@ -91,7 +92,7 @@
         :pagination="ipagination"
         :loading="loading"
         :rowSelection="{fixed:true,selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
-        
+
         @change="handleTableChange">
 
         <template slot="htmlSlot" slot-scope="text">
@@ -182,16 +183,16 @@
           },
           {
             title:'品牌名称',
-            align:"left",
+            align:"center",
             dataIndex: 'name'
           },
           {
             title:'制造商',
-            align:"left",
-            dataIndex: 'manufactorId',
-            customRender: (text, record, index) => {
-              return filterDictText(this.manufactorDictOptions, text)
-            }
+            align:"center",
+            dataIndex: 'manufactorName',
+            // customRender: (text, record, index) => {
+            //   return filterDictText(this.manufactorDictOptions, text)
+            // }
           },
           {
             title: '状态',
@@ -236,11 +237,11 @@
         });
 
         // 初始化 制造商
-        initDictOptionsIop('RES_PARTNER,NAME,ID').then((res) => {
-          if (res.success) {
-            this.manufactorDictOptions = res.result
-          }
-        });
+        // initDictOptionsIop('RES_PARTNER,NAME,ID').then((res) => {
+        //   if (res.success) {
+        //     this.manufactorDictOptions = res.result
+        //   }
+        // });
       },
       handleEdit: function (record,title) {
         this.$refs.modalForm.edit(record);

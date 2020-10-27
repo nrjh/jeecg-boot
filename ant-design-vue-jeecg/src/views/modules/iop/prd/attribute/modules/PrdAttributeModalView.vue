@@ -11,7 +11,7 @@
     cancelText="关闭">
     <a-spin :spinning="confirmLoading">
       <!-- 主表单区域 -->
-      <a-form :form="form" >
+      <a-form :form="form">
         <a-row>
           <a-col :span="12">
             <a-form-item label="属性名称" :labelCol="labelCol" :wrapperCol="wrapperCol">
@@ -52,7 +52,9 @@
             :actionButton="false"
             :disabled="true"/>
         </a-tab-pane>
-
+        <a-tab-pane tab="相关物品" :key="refKeys[1]" :forceRender="true">
+          <ref-prd-table query-by="attributeId" :query-value="model.id"/>
+        </a-tab-pane>
       </a-tabs>
 
     </a-spin>
@@ -66,12 +68,14 @@
   import { JEditableTableMixin } from '@/mixins/JEditableTableMixin'
   import { validateDuplicateValue } from '@/utils/util'
   import JDictSelectTag from '@/components/dict/JDictSelectTag'
+  import RefPrdTable from '../../brand/modules/RefPrdTable'
 
   export default {
     name: 'PrdAttributeModalView',
     mixins: [JEditableTableMixin],
     components: {
-      JDictSelectTag
+      JDictSelectTag,
+      RefPrdTable
     },
     data() {
       return {
@@ -108,7 +112,7 @@
             ]
           }
         },
-        refKeys: ['prdAttributeValue'],
+        refKeys: ['prdAttributeValue', 'prdProduceValue'],
         tableKeys: ['prdAttributeValue'],
         activeKey: 'prdAttributeValue',
         // 属性值

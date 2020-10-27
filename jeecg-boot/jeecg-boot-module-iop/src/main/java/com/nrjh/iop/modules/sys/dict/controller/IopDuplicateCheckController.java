@@ -32,7 +32,7 @@ public class IopDuplicateCheckController {
 
 	/**
 	 * 校验数据是否在系统中是否存在
-	 * 
+	 *
 	 * @return
 	 */
 	@RequestMapping(value = "/check", method = RequestMethod.GET)
@@ -56,6 +56,35 @@ public class IopDuplicateCheckController {
 			// 该值不可用
 			log.info("该值不可用，系统中已存在！");
 			return Result.error("该值不可用，系统中已存在！");
+		}
+	}
+
+	/**
+	 * 校验数据是否在系统中是否存在
+	 *
+	 * @return
+	 */
+	@RequestMapping(value = "/checkManufactorName", method = RequestMethod.GET)
+	@ApiOperation("重复校验制造商接口")
+	public Result<Object> checkManufactorName(IopDuplicateCheckVo iopDuplicateCheckVo, HttpServletRequest request) {
+		Long num = null;
+
+		log.info("----duplicate check------："+ iopDuplicateCheckVo.toString());
+		if (StringUtils.isNotBlank(iopDuplicateCheckVo.getDataId())) {
+			// [2].编辑页面校验
+			num = iopDuplicateCheckService.duplicateCheckCountSql(iopDuplicateCheckVo);
+		} else {
+			// [1].添加页面校验
+			num = iopDuplicateCheckService.duplicateCheckCountSqlNoDataId(iopDuplicateCheckVo);
+		}
+
+		if (num == null || num == 0) {
+			// 该值不可用
+			log.info("该值不可用，系统中已存在！");
+			return Result.error("该制造商不存在！请输入已存在的制造商");
+		} else {
+			// 该值可用
+			return Result.ok("该值不可用，系统中已存在！");
 		}
 	}
 }

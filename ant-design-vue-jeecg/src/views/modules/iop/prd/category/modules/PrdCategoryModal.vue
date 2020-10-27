@@ -13,12 +13,14 @@
 
 
         <a-form-item label="品类名称" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input v-decorator="[ 'name', validatorRules.name]" placeholder="请输入品类名称"></a-input>
+          <a-input autocomplete ='off' v-decorator="[ 'name', validatorRules.name]" placeholder="请输入品类名称"></a-input>
         </a-form-item>
         <a-form-item label="上级品类" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <j-search-select-tag-iop placeholder="请选择上级品类" v-decorator="[ 'pid', validatorRules.pid]"
-            dict="PRD_CATEGORY,COMPLETE_NAME,ID"  :async="true">
-          </j-search-select-tag-iop>
+          <j-dict-select-tag-iop placeholder="请选择上级品类" v-decorator="[ 'pid', validatorRules.pid]"
+                                 :triggerChange="true"
+                                 dictCode="PRD_CATEGORY,COMPLETE_NAME,ID,is_del=0"
+                                 >
+          </j-dict-select-tag-iop>
         </a-form-item>
         <a-form-item label="品类类型" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <j-dict-select-tag v-decorator="[ 'categoryType', validatorRules.categoryType]" :triggerChange="true"
@@ -49,13 +51,16 @@
   import pick from 'lodash.pick'
   import { validateDuplicateValue } from '@/utils/util'
   import JDictSelectTag from '@/components/dict/JDictSelectTag'
+  import JDictSelectTagIop from '@/components/dict/JDictSelectTagIop'
   import JSearchSelectTagIop from '@/components/dict/JSearchSelectTagIop'
+  import { initDictOptionsIop,initDictOptions } from '@/components/dict/JDictSelectUtil'
 
   export default {
     name: "PrdCategoryModal",
     components: {
       JDictSelectTag,
-      JSearchSelectTagIop
+      JSearchSelectTagIop,
+      JDictSelectTagIop
     },
     data () {
       return {
@@ -64,6 +69,7 @@
         width:800,
         visible: false,
         model: {},
+        prdCateGoryList: [],
         labelCol: {
           xs: { span: 24 },
           sm: { span: 5 },
@@ -78,7 +84,7 @@
             {required: true, message: '请输入名称!'},
           ]},
           pid: {rules: [
-              {required: true, message: '请选择上级品类!'},
+              {},
           ]},
           categoryType: {rules: [
             {required: true, message: '请选择品类类型!'},
@@ -101,10 +107,18 @@
       }
     },
     created () {
+      this.initDictConfig();
     },
     methods: {
+      initDictConfig(){
+        let teamId="PRD_CATEGORY,COMPLETE_NAME,ID,is_del=0";
+        initDictOptionsIop(teamId).then(res => {
+          this.prdCateGoryList = res.result;
+          console.log("值111111111111",res.result)
+        });
+      },
       add () {
-        this.edit({active:1});
+        this.edit({active:1,pid:this.prdCateGoryList[0].value});
       },
       edit (record) {
         this.form.resetFields();
@@ -117,6 +131,7 @@
       },
       close () {
         this.$emit('close');
+        this.$emit('ok');
         this.visible = false;
       },
       handleOk () {
@@ -149,7 +164,7 @@
               that.close();
             })
           }
-         
+
         })
       },
       handleCancel () {
@@ -159,7 +174,7 @@
         this.form.setFieldsValue(pick(this.model,'name','pid','categoryType','active','sequence','completeName','removalStrategyId'))
       },
 
-      
+
     }
   }
 </script>

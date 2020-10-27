@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nrjh.iop.modules.stk.inventory.mapper.StkInventoryMapper">
+
+
+
+    <insert id="saveInventoryLocation" parameterType="map">
+        INSERT INTO stk_inventory_location_rel
+        (stk_inventory_id,
+        stk_location_id
+        ) values
+        (
+        #{inventoryId},
+        #{locationId})
+    </insert>
+
+
+    <insert id="saveInventoryRel" parameterType="map">
+        INSERT INTO stk_inventory_rel
+        (stk_inventory_id,
+        stk_location_id
+        ) values
+        (
+        #{inventoryId},
+        #{locationId})
+    </insert>
+
+    <select id="queryProdList" parameterType="java.lang.String" resultType="com.nrjh.iop.modules.stk.inventory.entity.InventoryProdVo">
+        SELECT DISTINCT
+                stki.id as inventoryId,
+                stkr.location_ID,
+                stks.product_id,
+                stks.BRAND_ID,
+                stks.CATEGORY_ID,
+                stks.RPODUCT_NAME,
+                stks.price,
+                stks.Product_NO,
+                stks.product_qty,
+                prd.VENDOR_ID,
+                stks.STATUS
+            FROM
+                stk_inventory stki
+            LEFT JOIN stk_inventory_rel stkr ON stki.id = stkr.iinventory_id
+            LEFT JOIN stk_stock stks ON stks.location_id = stkr.location_ID
+            LEFT JOIN prd_product prd on prd.id=stks.product_id
+            WHERE 1=1
+		and 	stks.product_id IS NOT NULL
+		and   stki.id=#{inventoryId}
+
+    </select>
+
+    <select id="queryProdTotal" resultType="com.nrjh.iop.modules.stk.inventory.entity.InventoryProdVo">
+        SELECT
+            stks.product_id,
+            prd.name as rpoductName,
+            stki.id,
+            stkr.location_id,
+            stkh.name as houseName,
+            stks.CATEGORY_ID as categoryId,
+            sum(stks.product_qty) as productTotalQty ,
+            sum(stks.price) as priceTotal
+        FROM
+            stk_inventory stki
+        LEFT JOIN stk_inventory_rel stkr ON stki.id = stkr.iinventory_id
+        LEFT JOIN stk_stock stks ON stks.location_id = stkr.location_ID
+        LEFT JOIN prd_product prd ON prd.id = stks.product_id
+        LEFT JOIN stk_warehouse stkh on stkh.stock_location_id=stkr.location_id
+        WHERE
+            1 = 1
+        AND stks.product_id IS NOT NULL
+        AND stki.id=#{inventoryId}
+        GROUP BY
+            stks.CATEGORY_ID,
+            stki.id
+    </select>
+    <select id="getMaxIdNum" resultType="java.lang.Integer">
+        select max(id) from stk_inventory
+    </select>
+
+
+</mapper>

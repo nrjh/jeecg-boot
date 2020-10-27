@@ -124,6 +124,7 @@
       // 加载柱状图数据
       loadBarData() {
         this.barData = this.loadData('x', 'y', 1000, 200)
+        console.log("this.barData---",this.barData)
       },
       // 加载AreaChartTy的数据
       loadAreaData() {

@@ -28,7 +28,7 @@ public class StkMoveServiceImpl extends ServiceImpl<StkMoveMapper, StkMove> impl
 	private StkMoveMapper stkMoveMapper;
 	@Autowired
 	private StkMoveLineMapper stkMoveLineMapper;
-	
+
 	@Override
 	@Transactional
 	public void saveMain(StkMove stkMove, List<StkMoveLine> stkMoveLineList) {
@@ -46,10 +46,10 @@ public class StkMoveServiceImpl extends ServiceImpl<StkMoveMapper, StkMove> impl
 	@Transactional
 	public void updateMain(StkMove stkMove,List<StkMoveLine> stkMoveLineList) {
 		stkMoveMapper.updateById(stkMove);
-		
+
 		//1.先删除子表数据
 		stkMoveLineMapper.deleteByMainId(stkMove.getId().toString());
-		
+
 		//2.子表数据重新插入
 		if(stkMoveLineList!=null && stkMoveLineList.size()>0) {
 			for(StkMoveLine entity:stkMoveLineList) {
@@ -105,6 +105,11 @@ public class StkMoveServiceImpl extends ServiceImpl<StkMoveMapper, StkMove> impl
 		stkMoveLine.setCompanyId(stkMove.getCompanyId());
 		stkMoveLine.setCreateBy(stkMove.getCreateBy());
 		stkMoveLineMapper.insert(stkMoveLine);
+	}
+
+	@Override
+	public List<StkMove> selectStkMoveByOrign(String orign) {
+		return stkMoveMapper.selectStkMoveByOrign(orign);
 	}
 
 

@@ -1,5 +1,105 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.nrjh.iop.modules.stk.picking.mapper.StkPickingMapper">
+    <insert id="setCateGory">
+        insert IGNORE into prd_product_attr_categ_rel values(#{productId},#{attributeCategoryId})
+    </insert>
+    <update id="updateByPickingNo">
+        update stk_picking set state = #{StkPicking.state} where picking_NO = #{StkPicking.pickingNo}
+    </update>
+
+    <select id="getProdDetails" resultType="map" parameterType="java.lang.String">
+        SELECT
+            stkm.name AS prodName,
+            stkm.product_uom_qty,
+            cate.NAME AS cateName,
+            uu.name AS uuName
+        FROM
+            stk_picking stkp
+        LEFT JOIN stk_move stkm ON stkp.id = stkm.picking_id
+        LEFT JOIN PRD_PRODUCT_ATTR_CATEG_REL prod ON prod.PRODUCT_ID = stkm.product_id
+        LEFT JOIN PRD_ATTRIBUTE_CATEGORY cate ON cate.ID = prod.ATTRIBUTE_CATEGORY_ID
+        LEFT JOIN  UOM_UOM uu ON uu.id = stkm.product_uom_id
+        WHERE
+            stkp.id = #{orderPlanId}
+    </select>
+
+    <select id="selectStkPickingPage" resultType="com.nrjh.iop.modules.stk.picking.entity.StkPicking">
+        SELECT
+        *
+        FROM
+        stk_picking
+        WHERE
+        id IN (
+        SELECT
+        stkp.id
+        FROM
+        stk_picking stkp,
+        stk_move stkm,
+        prd_product pp
+        WHERE
+        stkp.id = stkm.picking_id
+        AND pp.ID = stkm.product_id
+        <if test="stkPicking.productName != null and stkPicking.productName != ''">
+        AND pp. NAME LIKE concat('%',#{stkPicking.productName},'%')
+        </if>
+        )
+        <if test="stkPicking.pickingNo != null and stkPicking.pickingNo != ''">
+        AND picking_NO = #{stkPicking.pickingNo}
+        </if>
+        <if test="stkPicking.createBy != null and stkPicking.createBy != ''">
+        AND create_by LIKE concat('%',#{stkPicking.createBy},'%')
+        </if>
+        <if test="stkPicking.startTime != null and stkPicking.startTime != ''">
+        AND create_time <![CDATA[ >= ]]> #{stkPicking.startTime}
+        </if>
+        <if test="stkPicking.endTime != null and stkPicking.endTime != ''">
+        AND create_time <![CDATA[ <= ]]> #{stkPicking.endTime}
+        </if>
+        <if test="stkPicking.pickingTypeId != null and stkPicking.pickingTypeId != ''">
+        and picking_type_id = #{stkPicking.pickingTypeId}
+        </if>
+        and is_del = '0'
+        order  by create_time desc
+    </select>
+
+    <!-- 查询物料信息列表-->
+    <select  id="queryProdList" resultType="com.nrjh.iop.modules.order.vo.ProdAndStockVo"  parameterType="Map">
+        select p.VENDOR_ID,s.location_id,s.RPODUCT_NAME as NAME ,s.Product_NO,p.CATEGORY_ID,s.ATTRIBUTE_CATEGORY_ID,
+        s.product_uom_id,s.STATUS,s.product_qty,s.price,s.product_id,c.category_type
+        from prd_product as p LEFT JOIN stk_stock s
+        on p.id = s.product_id
+        left join prd_category as c on p.CATEGORY_ID = c.id
+        <trim prefix="WHERE" prefixOverrides="and | or">
+            <if test="name != null and name != ''">
+                and s.RPODUCT_NAME = #{name}
+            </if>
+            <if test="productNo != null and productNo != ''">
+                and s.Product_NO = #{productNo}
+            </if>
+            <if test="attributeCategoryId != null and attributeCategoryId != ''">
+                and p.CATEGORY_ID = #{attributeCategoryId}
+            </if>
+            <if test="vendorId != null and vendorId != ''">
+                and p.VENDOR_ID = #{vendorId}
+            </if>
+            <if test="status != null and status != ''">
+                and s.status = #{status}
+            </if>
+            <if test="categoryId != null and categoryId != ''">
+                and p.categoryID = #{categoryId}
+            </if>
+            <if test="locationId != null and locationId != ''">
+                and s.locationID = #{locationId}
+            </if>
+            and s.product_id is  not NULL
+        </trim>
+
+    </select>
+
+    <select id="getStkPickingById" resultType="com.nrjh.iop.modules.stk.picking.entity.StkPicking">
+SELECT stk_picking.* FROM stk_picking,pcs_purchase_order
+WHERE stk_picking.picking_NO = pcs_purchase_order.orign AND pcs_purchase_order.id = #{id}
+    </select>
 
 </mapper>

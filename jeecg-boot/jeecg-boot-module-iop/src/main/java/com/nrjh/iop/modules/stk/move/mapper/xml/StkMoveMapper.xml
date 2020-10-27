@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.nrjh.iop.modules.stk.move.mapper.StkMoveMapper">
-
     <delete id="deleteByMainId" parameterType="java.lang.String">
         DELETE
         FROM  stk_move
@@ -13,4 +12,9 @@
         FROM  stk_move
         WHERE
         picking_id = #{mainId} 	</select>
+
+    <select id="selectStkMoveByOrign" resultType="com.nrjh.iop.modules.stk.move.entity.StkMove">
+        SELECT sm.* FROM stk_move AS sm, stk_picking as sp
+WHERE sp.id = sm.picking_id AND sp.picking_no = #{orign}
+    </select>
 </mapper>

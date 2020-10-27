@@ -46,11 +46,20 @@ public interface ISysBaseAPI {
 	public List<String> getRolesByUsername(String username);
 
 	/**
+	 * 通过用户账号查询角色Id集合
+	 * @param username
+	 * @return
+	 */
+	public List<String> getRolesIdByUsername(String username);
+
+	/**
 	 * 通过用户账号查询部门集合
 	 * @param username
 	 * @return 部门 id
 	 */
 	List<String> getDepartIdsByUsername(String username);
+
+
 
 	/**
 	 * 通过用户账号查询部门 name

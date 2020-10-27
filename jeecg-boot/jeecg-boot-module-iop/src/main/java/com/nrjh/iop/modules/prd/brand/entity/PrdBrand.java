@@ -6,6 +6,7 @@ import java.util.Date;
 import java.math.BigDecimal;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -51,7 +52,7 @@ public class PrdBrand implements Serializable {
 	/**制造商*/
 	@Excel(name = "制造商", width = 15)
     @ApiModelProperty(value = "制造商")
-    private java.lang.Integer manufactorId;
+    private String manufactorName;
 	/**简介*/
 	@Excel(name = "简介", width = 15)
     @ApiModelProperty(value = "简介")
@@ -80,4 +81,6 @@ public class PrdBrand implements Serializable {
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "修改时间")
     private java.util.Date updateTime;
+    @TableLogic
+    private Integer isDel;
 }

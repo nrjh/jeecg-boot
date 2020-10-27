@@ -1,5 +1,6 @@
 package org.jeecg.modules.system.aspect;
 
+import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -11,11 +12,11 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.jeecg.common.api.vo.Result;
-import org.jeecg.common.aspect.annotation.Dict;
 import org.jeecg.common.aspect.annotation.DictIop;
 import org.jeecg.common.constant.CommonConstant;
 import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.system.service.ISysDictIopService;
+import org.jeecg.modules.system.service.ISysDictOraService;
 import org.jeecg.modules.system.service.ISysDictService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -42,6 +43,9 @@ public class DictIopAspect {
     private ISysDictService dictService;
     @Autowired
     private ISysDictIopService dictIopService;
+
+    @Autowired
+     private ISysDictOraService dictOraService;
 
     // 定义切点Pointcut
     @Pointcut("execution(public * com.nrjh.iop.modules..*.*Controller.*(..))")
@@ -110,7 +114,7 @@ public class DictIopAspect {
                             String key = String.valueOf(item.get(field.getName()));
 
                             //翻译字典值对应的txt
-                            String textValue = translateDictValue(code, text, table, key,dataSource);
+                            String textValue = translateDictValue(code, text, table, key, dataSource);
 
                             log.debug(" 字典Val : " + textValue);
                             log.debug(" __翻译字典字段__ " + field.getName() + CommonConstant.DICT_TEXT_SUFFIX + "： " + textValue);
@@ -125,6 +129,51 @@ public class DictIopAspect {
                     items.add(item);
                 }
                 ((IPage) ((Result) result).getResult()).setRecords(items);
+            } else {
+                //TODO 若record为List则需要迭代
+                if (((Result) result).getResult() instanceof List) {
+                    listDictValue(result);
+                } else {
+                    Object record = ((Result) result).getResult();
+                    if (oConvertUtils.isEmpty(record)) {
+                        return;
+                    }
+                    ObjectMapper mapper = new ObjectMapper();
+                    String json = "{}";
+                    try {
+                        //解决@JsonFormat注解解析不了的问题详见SysAnnouncement类的@JsonFormat
+                        json = mapper.writeValueAsString(record);
+                    } catch (JsonProcessingException e) {
+                        log.error("json解析失败" + e.getMessage(), e);
+                    }
+                    JSONObject item = JSONObject.parseObject(json);
+                    //update-begin--Author:scott -- Date:20190603 ----for：解决继承实体字段无法翻译问题------
+                    //for (Field field : record.getClass().getDeclaredFields()) {
+                    for (Field field : oConvertUtils.getAllFields(record)) {
+                        //update-end--Author:scott  -- Date:20190603 ----for：解决继承实体字段无法翻译问题------
+                        if (field.getAnnotation(DictIop.class) != null) {
+                            String code = field.getAnnotation(DictIop.class).dicCode();
+                            String text = field.getAnnotation(DictIop.class).dicText();
+                            String table = field.getAnnotation(DictIop.class).dictTable();
+                            String dataSource = field.getAnnotation(DictIop.class).dataSource();
+                            String key = String.valueOf(item.get(field.getName()));
+
+                            //翻译字典值对应的txt
+                            String textValue = translateDictValue(code, text, table, key, dataSource);
+
+                            log.debug(" 字典Val : " + textValue);
+                            log.debug(" __翻译字典字段__ " + field.getName() + CommonConstant.DICT_TEXT_SUFFIX + "： " + textValue);
+                            item.put(field.getName() + CommonConstant.DICT_TEXT_SUFFIX, textValue);
+                        }
+                        //date类型默认转换string格式化日期
+                        if (field.getType().getName().equals("java.util.Date") && field.getAnnotation(JsonFormat.class) == null && item.get(field.getName()) != null) {
+                            SimpleDateFormat aDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                            item.put(field.getName(), aDate.format(new Date((Long) item.get(field.getName()))));
+                        }
+
+                    }
+                    ((Result) result).setResult(item);
+                }
             }
 
         }
@@ -139,7 +188,7 @@ public class DictIopAspect {
      * @param key
      * @return
      */
-    private String translateDictValue(String code, String text, String table, String key,String dataSource) {
+    private String translateDictValue(String code, String text, String table, String key, String dataSource) {
         if (oConvertUtils.isEmpty(key)) {
             return null;
         }
@@ -152,15 +201,19 @@ public class DictIopAspect {
                 continue; //跳过循环
             }
             if (!StringUtils.isEmpty(table)) {
-                if("iop".equals(dataSource)){
+                if ("iop".equals(dataSource)) {
                     tmpValue = dictIopService.queryTableDictTextByKey(table, text, code, k.trim());
-                }else{
+                } else if("ora".equals(dataSource)) {
+                    tmpValue = dictOraService.queryTableDictTextByKey(table, text, code, k.trim());
+                }else {
                     tmpValue = dictService.queryTableDictTextByKey(table, text, code, k.trim());
                 }
             } else {
-                if("iop".equals(dataSource)){
+                if ("iop".equals(dataSource)) {
                     tmpValue = dictIopService.queryDictTextByKey(code, k.trim());
-                }else{
+                } else if("ora".equals(dataSource)){
+                    tmpValue = dictOraService.queryDictTextByKey(code, k.trim());
+                }else {
                     tmpValue = dictService.queryDictTextByKey(code, k.trim());
                 }
             }
@@ -174,6 +227,66 @@ public class DictIopAspect {
 
         }
         return textValue.toString();
+    }
+
+    /**
+     * 自定义结果集不是IPage 返回字典
+     * by--shiyiteng
+     *
+     * @param result
+     */
+    private void listDictValue(Object result) {
+        List resList = new ArrayList();
+        List recordList = (List) ((Result) result).getResult();
+        if (oConvertUtils.isEmpty(recordList)) {
+            return;
+        }
+        for (Object record : recordList) {
+            ObjectMapper mapper = new ObjectMapper();
+            String json = "{}";
+            try {
+                //解决@JsonFormat注解解析不了的问题详见SysAnnouncement类的@JsonFormat
+                json = mapper.writeValueAsString(record);
+            } catch (JsonProcessingException e) {
+                log.error("json解析失败" + e.getMessage(), e);
+            }
+            JSONObject item = null;
+            //  xiehongjiang 20200825 list泛型为String 转成JSONObject出错 跳过不进行翻译
+            try {
+                item = JSONObject.parseObject(json);
+            } catch (JSONException e) {
+                log.error("json解析失败" + e.getMessage(), e);
+                return;
+            }
+            //update-begin--Author:scott -- Date:20190603 ----for：解决继承实体字段无法翻译问题------
+            //for (Field field : record.getClass().getDeclaredFields()) {
+            for (Field field : oConvertUtils.getAllFields(record)) {
+                //update-end--Author:scott  -- Date:20190603 ----for：解决继承实体字段无法翻译问题------
+                if (field.getAnnotation(DictIop.class) != null) {
+                    String code = field.getAnnotation(DictIop.class).dicCode();
+                    String text = field.getAnnotation(DictIop.class).dicText();
+                    String table = field.getAnnotation(DictIop.class).dictTable();
+                    String dataSource = field.getAnnotation(DictIop.class).dataSource();
+                    String key = String.valueOf(item.get(field.getName()));
+
+                    //翻译字典值对应的txt
+                    String textValue = translateDictValue(code, text, table, key, dataSource);
+
+                    log.debug(" 字典Val : " + textValue);
+                    log.debug(" __翻译字典字段__ " + field.getName() + CommonConstant.DICT_TEXT_SUFFIX + "： " + textValue);
+                    item.put(field.getName() + CommonConstant.DICT_TEXT_SUFFIX, textValue);
+                }
+                //date类型默认转换string格式化日期
+                if (field.getType().getName().equals("java.util.Date") && field.getAnnotation(JsonFormat.class) == null && item.get(field.getName()) != null) {
+                    SimpleDateFormat aDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    item.put(field.getName(), aDate.format(new Date((Long) item.get(field.getName()))));
+                }
+
+            }
+            resList.add(item);
+        }
+        ((Result) result).setResult(resList);
+
     }
 
 }

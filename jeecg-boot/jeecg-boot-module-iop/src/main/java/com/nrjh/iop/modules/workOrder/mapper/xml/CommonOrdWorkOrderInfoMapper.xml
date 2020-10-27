@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nrjh.iop.modules.workOrder.mapper.CommonOrdWorkOrderInfoMapper">
+
+    <select id="queryUserInfo" resultType="com.nrjh.iop.modules.workOrder.entity.SysUser">
+        select * from sys_user
+        where 1 = 1
+        <if test="dataMap.paramId != null and dataMap.paramId !=''">
+            and area_id = #{dataMap.lineNo}
+        </if>
+        <if test="dataMap.realname != '' and dataMap.realname != null">
+            and realname = #{dataMap.realname}
+        </if>
+        order by create_time desc
+    </select>
+    <select id="getUserInfoById" resultType="com.nrjh.iop.modules.workOrder.entity.SysUser">
+        select * from sys_user where id = #{id}
+    </select>
+</mapper>

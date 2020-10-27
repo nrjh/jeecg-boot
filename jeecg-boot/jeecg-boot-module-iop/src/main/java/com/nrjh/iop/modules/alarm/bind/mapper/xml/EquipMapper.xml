@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nrjh.iop.modules.alarm.bind.mapper.EquipMapper">
+    <select id="queryEquipNo" parameterType="java.lang.String"  resultType="java.lang.String">
+                    SELECT
+	                     o.EQUIP_NO AS EQUIP_NO
+                    FROM
+                        O_EQUIP o
+                    WHERE
+                        o.EQUIP_TYPE = #{equipType}
+                        UNION ALL
+                    SELECT
+                        en.EQUIP_FNO AS EQUIP_NO
+                    FROM
+                        O_EQUIP en
+                    WHERE
+                        en.EQUIP_TYPE =#{equipType}
+                        AND en.EQUIP_FNO IS NOT NULL
+    </select>
+
+
+</mapper>

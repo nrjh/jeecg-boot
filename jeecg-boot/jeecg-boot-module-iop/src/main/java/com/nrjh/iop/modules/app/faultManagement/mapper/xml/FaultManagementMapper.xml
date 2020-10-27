@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nrjh.iop.modules.app.faultManagement.mapper.FaultMannagementMapper">
+
+    <select id="queryEquipAndAreaById" resultType="com.nrjh.iop.modules.app.faultManagement.vo.EquipAndAreaVo">
+        select o.NAME as equipName,o.EQUIP_ID as equipId,o.EQUIP_NO as equipNo,
+               a.AREA_NAME as lineName,a.area_id as lineId, a.EQUIP_CATEG as euipCateg
+        from O_EQUIP o
+        left join O_AREA a on o.area_id = a.area_id
+        where EQUIP_NO = #{equipNo}
+    </select>
+
+    <select id="queryFaultMessageList" resultType="com.nrjh.iop.modules.alarm.record.entity.VAlarmInfo">
+-- 		SELECT
+-- 		    v.id AS id,
+-- 			v.ANL_REASON AS anlReason,
+-- 			 NVL(v.REAL_REASON,'') AS realReason,
+-- 			 NVL(v.EQUIP_NAME,'') AS equipName,
+-- 			 NVL(v.EXEC_STATUS,'01') AS execStatus,
+-- 			 NVL(v.EQUIP_NO,'') AS equipNo,
+-- 			o.IOP_AREA_ID AS lineNo,
+-- 			 NVL(a.AREA_NAME,'') AS lineName,
+-- 			v.ALARM_TIME AS alarmTime,
+-- 			NVL((
+-- 		SELECT
+-- 			f.FAULT_GRADE
+-- 		FROM
+-- 			fault_prd_product_info f
+-- 		WHERE
+-- 			1 = 1
+-- 			AND f.fault_grade IS NOT NULL
+-- 			AND rownum = 1
+-- 			AND f.product_Id = oe.equip_id
+-- 			AND f.line_no = a.AREA_ID
+-- 			),'') AS alarmLevel
+-- 		FROM
+-- 			V_ALARM_INFO v
+-- 			LEFT JOIN LINE_EXPLAIN_INFO o ON v.LINE_NO = o.LINE_EXPLAIN_ID
+-- 			OR v.LINE_NO = o.IOP_AREA_ID
+-- 			LEFT JOIN O_AREA a ON o.IOP_AREA_ID = a.AREA_ID
+-- 			LEFT JOIN O_EQUIP oe ON oe.EQUIP_NO = v.EQUIP_NO
+-- 		WHERE
+-- 			ALARM_TIME IS NOT NULL
+-- 		ORDER BY
+-- 			ALARM_TIME DESC
+        SELECT
+            v.id AS id,
+            v.ANL_REASON AS anlReason,
+            NVL ( v.REAL_REASON, '' ) AS realReason,
+            NVL ( v.EQUIP_NAME, '' ) AS equipName,
+            NVL ( v.EXEC_STATUS, '01' ) AS execStatus,
+            NVL ( v.EQUIP_NO, '' ) AS equipNo,
+            NVL ( a.AREA_NAME, '' ) AS lineName,
+            a.AREA_ID AS lineNo,
+            v.ALARM_TIME AS alarmTime,
+            v.alarm_Level AS alarmLevel
+        FROM
+            V_ALARM_INFO v
+            LEFT JOIN O_AREA a ON v.line_no = a.AREA_ID
+        WHERE
+            1 = 1
+            AND v.ALARM_TIME IS NOT NULL
+            AND v.EQUIP_no IN ( SELECT f.product_Id FROM fault_prd_product_info f )
+        ORDER BY
+            v.ALARM_TIME DESC
+    </select>
+	<select id="queryEquipByLineId" resultType="com.nrjh.iop.modules.alarm.bind.entity.Equip">
+		select p.* from O_EQUIP p
+		left join O_AREA a on a.AREA_ID = p.AREA_ID
+		where a.AREA_ID =#{lineId}
+	</select>
+
+	<select id="queryAreaInfo" resultType="com.nrjh.iop.modules.app.faultManagement.entity.Oarea">
+		select * from O_AREA
+	</select>
+</mapper>

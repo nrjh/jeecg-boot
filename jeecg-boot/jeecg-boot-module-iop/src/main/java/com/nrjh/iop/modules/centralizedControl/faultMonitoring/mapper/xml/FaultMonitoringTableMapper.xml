@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nrjh.iop.modules.centralizedControl.faultMonitoring.mapper.FaultMonitoringTableMapper">
+
+    <select id="getFaultMonitoringTableListByDay"
+            resultType="com.nrjh.iop.modules.centralizedControl.faultMonitoring.vo.FaultMonitoringTableResultVo">
+        select a.AREA_NAME as lineName,o.NAME as equipName,
+               t.counts as frequency,t.totalTime from
+               (select EQUIP_NO as equipNo,count(EQUIP_NO) as counts,
+				   cast(sum(NVL((r.RECOVERY_TIME- r.ALARM_TIME)*24*60,0)) as decimal(10,2)) as totalTime
+                   from ORD_WORK_ORDER_INFO r
+                   where to_char(ALARM_TIME,'yyyy-MM-dd') between #{startTime} and #{endTime} group by EQUIP_NO) t
+		left join O_EQUIP o on t.equipNo = o.EQUIP_NO
+		left join O_AREA a on a.AREA_ID = o.AREA_ID
+        where 1=1
+        <if test="faultMonitoringVo.areaId != null and faultMonitoringVo.areaId != ''">
+            and a.AREA_ID = #{faultMonitoringVo.areaId}
+        </if>
+        <if test="faultMonitoringVo.equipCateg != null and faultMonitoringVo.equipCateg != ''">
+            and a.EQUIP_CATEG = #{faultMonitoringVo.equipCateg}
+        </if>
+        and rownum &lt; 9
+        order by counts desc
+    </select>
+    <select id="getFaultMonitoringTableListByMonth"
+            resultType="com.nrjh.iop.modules.centralizedControl.faultMonitoring.vo.FaultMonitoringTableResultVo">
+        select a.AREA_NAME as lineName,o.NAME as equipName,
+        t.counts as frequency,t.totalTime from
+        (select EQUIP_NO as equipNo,count(EQUIP_NO) as counts,
+        cast(sum(NVL((r.RECOVERY_TIME- r.ALARM_TIME)*24*60,0)) as decimal(10,2)) as totalTime
+        from ORD_WORK_ORDER_INFO r
+        where to_char(ALARM_TIME,'yyyy-MM') between #{startTime} and #{endTime} group by EQUIP_NO) t
+        left join O_EQUIP o on t.equipNo = o.EQUIP_NO
+        left join O_AREA a on a.AREA_ID = o.AREA_ID
+        where 1=1
+        <if test="faultMonitoringVo.areaId != null and faultMonitoringVo.areaId != ''">
+            and a.AREA_ID = #{faultMonitoringVo.areaId}
+        </if>
+        <if test="faultMonitoringVo.equipCateg != null and faultMonitoringVo.equipCateg != ''">
+            and a.EQUIP_CATEG = #{faultMonitoringVo.equipCateg}
+        </if>
+        and rownum &lt; 9
+        order by counts desc
+    </select>
+
+    <select id="getFaultTypeTableDataByDay"
+            resultType="com.nrjh.iop.modules.centralizedControl.faultMonitoring.vo.FaultMonitoringTableResultVo">
+        SELECT t.nums as frequency,a.AREA_NAME as lineName,
+		CASE t.faultLabe
+	     WHEN '01' THEN
+		    '机械故障'
+		 WHEN '02' THEN
+			'电测故障'
+		 ELSE
+		    '其他故障'
+         END FAULTLABE
+        from
+        (select count(*) AS nums,e.IOP_AREA_ID as areaId,f.FAULT_LABE as faultLabe
+        from V_ALARM_INFO v right join LINE_EXPLAIN_INFO e
+        on v.LINE_NO = e.LINE_EXPLAIN_ID or v.LINE_NO = e.IOP_AREA_ID
+        left join FAULT_TASK_INFO f on f.FAULT_NAME = v.REAL_REASON
+        where to_char(ALARM_TIME,'yyyy-MM-dd') between #{startTime} and #{endTime}
+        group by e.IOP_AREA_ID,f.FAULT_LABE) t
+        left join O_AREA a on t.areaId = a.AREA_ID
+    </select>
+    <select id="getTotalFrequency" resultType="java.lang.Integer">
+        select count(*) AS totalFrequency
+        from V_ALARM_INFO v right join LINE_EXPLAIN_INFO e
+        on v.LINE_NO = e.LINE_EXPLAIN_ID or v.LINE_NO = e.IOP_AREA_ID
+        left join O_AREA a on e.IOP_AREA_ID = a.AREA_ID
+        where to_char(ALARM_TIME,'yyyy-MM-dd') between #{startTime} and #{endTime}
+        and a.AREA_NAME = #{lineName}
+    </select>
+
+    <select id="getFaultTypeTableDataByMonth"
+            resultType="com.nrjh.iop.modules.centralizedControl.faultMonitoring.vo.FaultMonitoringTableResultVo">
+        select t.nums as frequency,a.AREA_NAME as lineName,
+		CASE t.faultLabe
+	     WHEN '01' THEN
+		    '机械故障'
+		 WHEN '02' THEN
+			'电测故障'
+		 ELSE
+		    '其他故障'
+         END FAULTLABE
+        from
+        (select count(*) AS nums,e.IOP_AREA_ID as areaId,f.FAULT_LABE as faultLabe
+        from V_ALARM_INFO v right join LINE_EXPLAIN_INFO e
+        on v.LINE_NO = e.LINE_EXPLAIN_ID or v.LINE_NO = e.IOP_AREA_ID
+        left join FAULT_TASK_INFO f on f.FAULT_NAME = v.REAL_REASON
+        where to_char(ALARM_TIME,'yyyy-MM') between #{startTime} and #{endTime}
+        group by e.IOP_AREA_ID,f.FAULT_LABE) t
+        left join O_AREA a on t.areaId = a.AREA_ID
+    </select>
+
+    <select id="getTotalFrequencyByMonth" resultType="java.lang.Integer">
+         select count(*) AS totalFrequency
+        from V_ALARM_INFO v right join LINE_EXPLAIN_INFO e
+        on v.LINE_NO = e.LINE_EXPLAIN_ID or v.LINE_NO = e.IOP_AREA_ID
+        left join O_AREA a on e.IOP_AREA_ID = a.AREA_ID
+        where to_char(ALARM_TIME,'yyyy-MM-dd') between #{startTime} and #{endTime}
+        and a.AREA_NAME = #{lineName}
+    </select>
+</mapper>

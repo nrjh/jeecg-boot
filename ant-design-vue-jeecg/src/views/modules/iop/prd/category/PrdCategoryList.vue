@@ -117,7 +117,7 @@
     </div>
 
     <prdCategory-modal ref="modalForm" @ok="modalFormOk"></prdCategory-modal>
-    <prdCategory-modalView ref="modalFormView" @ok=""></prdCategory-modalView>
+    <prdCategory-modalView ref="modalFormView" @ok="modalFormOk"></prdCategory-modalView>
   </a-card>
 </template>
 

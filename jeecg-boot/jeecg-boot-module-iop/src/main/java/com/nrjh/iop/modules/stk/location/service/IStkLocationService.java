@@ -4,6 +4,8 @@ import com.nrjh.iop.modules.stk.location.entity.StkLocation;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.jeecg.common.exception.JeecgBootException;
 
+import java.util.List;
+
 /**
  * @Description: 位置
  * @Author: jeecg-boot
@@ -14,22 +16,25 @@ public interface IStkLocationService extends IService<StkLocation> {
 
 	/**根节点父ID的值*/
 	public static final String ROOT_PID_VALUE = "0";
-	
+
 	/**树节点有子节点状态值*/
 	public static final String HASCHILD = "1";
-	
+
 	/**树节点无子节点状态值*/
 	public static final String NOCHILD = "0";
 
 	/**新增节点*/
 	void addStkLocation(StkLocation stkLocation);
-	
+
 	/**修改节点*/
 	void updateStkLocation(StkLocation stkLocation) throws JeecgBootException;
-	
+
 	/**删除节点*/
 	void deleteStkLocation(String id) throws JeecgBootException;
 
 	void updateComplateName(StkLocation stkLocation);
-
+	/**根据pid批量删除**/
+	void deleteBatchByPid(String pid);
+	/**根据pid查询与之相关的数据**/
+	List<StkLocation> getStkLocationByPid(String pid);
 }

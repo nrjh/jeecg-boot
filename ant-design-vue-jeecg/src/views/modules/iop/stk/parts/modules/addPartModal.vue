@@ -1,0 +1,314 @@
+<template>
+  <div>
+    <a-modal
+      :width="width"
+      :visible="visible"
+      :title="title"
+      :confirmLoading="confirmLoading"
+      :footer="null"
+      @ok="handleAddOk"
+      @cancel="handleCancel"
+      cancelText="关闭">
+      <a-spin :spinning="confirmLoading">
+        <a-form :form="form">
+
+          <a-row :gutter="24">
+
+            <a-col :span="8">
+              <a-form-item label="名称" :labelCol="labelCol" :wrapperCol="wrapperCol">
+                <a-input  placeholder="请输入备品备件名称"  v-model='mproName'></a-input>
+              </a-form-item>
+            </a-col>
+            <a-col :span="8">
+              <a-form-item label="编号" :labelCol="labelCol" :wrapperCol="wrapperCol">
+                <a-input  placeholder="请输入备品备件编号" v-model='mproNo'></a-input>
+              </a-form-item>
+            </a-col>
+            <a-col :span="8">
+              <a-form-item label="规格" :labelCol="labelCol" :wrapperCol="wrapperCol">
+                <a-input  placeholder="请输入规格信息" v-model='mproCategoryID'></a-input>
+              </a-form-item>
+            </a-col>
+          </a-row>
+
+          <a-row :gutter="24">
+            <a-col :span="8">
+              <a-form-item label="供应商" :labelCol="labelCol" :wrapperCol="wrapperCol">
+                <a-input  placeholder="请输入供应商信息（Id）" v-model='mproVendorId'></a-input>
+              </a-form-item>
+            </a-col>
+            <a-col :span="8">
+              <a-form-item label="状态" :labelCol="labelCol" :wrapperCol="wrapperCol">
+                <!--               <JDictSelectTagIop :triggerChange="true"-->
+                <!--                                  placeholder="请选择状态"-->
+                <!--                                  dictCode="stk_stock,status,id" v-model='mstatus' />-->
+                <j-dict-select-tag placeholder="请输入备品备件状态" v-model="mstatus" dictCode="IOP_STK_SPARE_PARTS_STATUS_PRO"/>
+              </a-form-item>
+            </a-col>
+            <a-col :span="8">
+              <a-form-item label="类别" :labelCol="labelCol" :wrapperCol="wrapperCol">
+                <j-dict-select-tag
+                  placeholder="请选择类别"
+                  disabled
+                  dictCode="IOP_PRD_CATEGORY_TYPE" v-model='mcategoryID'/>
+              </a-form-item>
+            </a-col>
+          </a-row>
+
+
+          <a-button @click="handleAddQueryBtn" type="primary" >查询</a-button>
+
+          <!-- 这里加上添加物料弹出框的自定义表单-->
+          <a-table
+            ref="table"
+            size="middle"
+            bordered
+            rowKey="productId"
+            :pagination="ipagination"
+            :columns="columns"
+            @change="handleTableChange"
+            :dataSource="dataSource"
+            :rowSelection="{fixed:true,selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
+          >
+          </a-table>
+
+          <!-- 添加物料表单下方两个按钮，可以不加这两个按钮，弹出框有确认和关闭按钮-->
+          <div class="table-operator">
+           <span style="overflow: hidden; padding-left: 40%;" class="table-page-search-submitButtons">
+             <a-button @click="handleAddOk" type="primary" >确定</a-button>
+             <a-button @click="handleCancel" type="primary" >关闭</a-button>
+           </span>
+          </div>
+
+        </a-form>
+      </a-spin>
+    </a-modal>
+  </div>
+</template>
+
+<script>
+  import { getAction } from '@/api/manage'
+  import pick from 'lodash.pick'
+  import JDate from '@/components/jeecg/JDate'
+  import ATextarea from "ant-design-vue/es/input/TextArea";
+  import JDictSelectTagIop from '@/components/dict/JDictSelectTagIop'
+  import JDictSelectTag from '@/components/dict/JDictSelectTag'
+  import JMultiSelectTagIop from '@/components/dict/JMultiSelectTagIop'
+
+  export default {
+    name: "addPartModal",
+    components: {
+      ATextarea, JDate,JDictSelectTagIop,JDictSelectTag,JMultiSelectTagIop
+    },
+    data () {
+      return {
+        ipagination: {
+          current: 1,
+          pageSize: 8,
+          pageSizeOptions: ['8', '10', '15'],
+          showTotal: (total, range) => {
+            return range[0] + '-' + range[1] + ' 共' + total + '条'
+          },
+          showQuickJumper: true,
+          showSizeChanger: true,
+          total: 0
+        },
+        form: this.$form.createForm(this),
+        title:"添加备品备件",
+        width:800,
+        visible: false,
+        dataSource: [],
+        model: {},
+        labelCol: {
+          span: 6
+        },
+        wrapperCol: {
+          span: 16
+        },
+        formItemLayoutWithOutLabel: {
+          wrapperCol: {
+            xs: { span: 24, offset: 0 },
+            sm: { span: 20, offset: 4 },
+          },
+        },
+        validatorRules: {
+          scrapInventoryOrder: {rules: [
+            ]},
+          applicationWorker: {rules: [
+            ]},
+          applicationDate: {rules: [
+            ]},
+          applicationAbout: {rules: [
+            ]},
+        },
+        selectedRowKeys: [],
+        selectedRows: [],
+        mscrapInventoryOrder:'',
+        mapplicationWorker:'',
+        mapplicationDate:'',
+        mapplicationAbout:'',//第一个表单数据，下面为第二个表单数据
+        mproName:'',
+        mproNo:'',
+        mproCategoryID:'',
+        mproVendorId:'',
+        mstatus:'',
+        mcategoryID:'',
+        selectedData:[],
+        columns: [
+          {
+            title: '序号',
+            dataIndex: '',
+            key:'rowIndex',
+            width:60,
+            align:"center",
+            customRender:function (t,r,index) {
+              return parseInt(index)+1;
+            }
+          },
+//          {
+//            title:'供应商',
+//            align:"center",
+//            dataIndex: 'vendorID'
+//          },
+//          //对应第一个弹框table中的库存状况
+//          {
+//            title:'货位',
+//            align:"center",
+//            dataIndex: 'locationID'
+//          },
+          {
+            title:'备品备件名称',
+            align:"center",
+            dataIndex: 'rpoductName'
+          },
+          {
+            title:'备品备件编号',
+            align:"center",
+            dataIndex: 'productNo'
+          },
+          {
+            title:'类别',
+            align:"center",
+            dataIndex: 'categoryType',
+            customRender:function (text) {
+              if(text === 'equip'){
+                return "生产设施"
+              }else if(text === 'spare'){
+                return "备品备件"
+              }else {
+                return "办公用品"
+              }
+            }
+          },
+          {
+            title:'规格',
+            align:"center",
+            dataIndex: 'acName'
+          },
+          {
+            title:'单位',
+            align:"center",
+            dataIndex: 'uuName'
+          },
+          {
+            title:'状态',
+            align:"center",
+            dataIndex: 'status',
+            customRender:function (value) {
+              if(value=='normal'){
+                return '正常';
+              }
+            }
+          },
+
+          {
+            title:'库存件数',
+            align:"center",
+            dataIndex: 'virtualQty'
+          }
+        ],
+        confirmLoading: false,
+        url: {
+          list:"/iop/order/orderPlan/wlList",
+        }
+      }
+    },
+    beforeCreate() {
+      this.form = this.$form.createForm(this, { name: 'dynamic_form_item' });
+      this.form.getFieldDecorator('keys', { initialValue: [], preserve: true });
+    },
+    created () {
+    },
+    methods: {
+      add (value,data) {
+        console.log("2222222222222222222222222222222222222",data)
+        if (data != '' && data != undefined && data != null){
+            this.selectedRowKeys = [];
+            for (var i = 0; i < data.length; i++){
+              this.selectedRowKeys.push(data[i].id);
+            }
+        }
+        console.log("传值222222222",value)
+        this.visible = true;
+        this.mcategoryID = value;
+        this.handleAddQueryBtn(data);
+      },
+      close () {
+        // this.$emit('close');
+        this.visible = false;
+        this.companyName='';
+        this.selectedRowKeys= [],
+          this.selectedRows=[]
+      },
+      handleTableChange(pagination) {
+        console.log("pagination---",pagination)
+        this.ipagination.current = pagination.current
+      },
+      handleCancel () {
+        this.close()
+      },
+      popupCallback(row){
+        this.form.setFieldsValue(pick(row,'name','dateDone','state','companyId','taskNo','planStartTime','planEndTime','sendTime','endTime','remark'))
+      },
+      handleAddQueryBtn(data){
+        getAction(this.url.list, {rpoductName : this.mproName,productNo : this.mproNo,attributeCategoryId : this.mproCategoryID,vendorId : this.mproVendorId,
+          status : this.mstatus,categoryType : this.mcategoryID,
+          pageNo : this.ipagination.current,pageSize :this.ipagination.pageSize}).then((res) => {
+          console.log("查询结果222222222",res.result);
+          if (res.success) {
+            this.dataSource = res.result;
+          } else {
+            this.dataSource = null;
+          }
+        })
+
+      },
+      onSelectChange(selectedRowKeys, selectionRows) {
+        this.selectedRowKeys = selectedRowKeys;
+        this.selectionRows = selectionRows;
+      },
+      handleAddOk(){
+        // 封装获取选中行的值
+        let selectedData=[];
+        for (let item of this.selectedRowKeys) {
+          this.dataSource.forEach(function(record,index){
+            if(record.productId == item){
+              selectedData.push(record);
+            }
+          })
+        }
+        console.log("3333333333333333333333333",selectedData)
+        this.close();
+        this.$emit("select",selectedData);
+      },
+      handleAddwlCancel(){
+        this.$emit('close');
+        this.dataSource = [];
+        this.visible = false;
+      },
+
+    }
+  }
+
+
+</script>

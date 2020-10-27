@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nrjh.iop.modules.outOrder.mapper.StockOutOrderLineMapper">
+	<update id="updateStock">
+		update stk_stock set product_qty = product_qty - #{reduceProductQty},virtual_qty = virtual_qty - #{virtualInventory},
+		                 update_by = #{stkStock.updateBy},update_time = #{stkStock.updateTime}
+		                 where Product_NO = #{stkStock.productNo}
+	</update>
+
+	<delete id="deleteByMainId" parameterType="java.lang.Integer">
+		DELETE
+		FROM  stock_out_order_line
+		WHERE
+			 order_id = #{mainId} 	</delete>
+
+	<select id="selectByMainId" parameterType="java.lang.Integer" resultType="com.nrjh.iop.modules.outOrder.entity.StockOutOrderLine">
+		SELECT *
+		FROM  stock_out_order_line
+		WHERE
+			 order_id = #{mainId}
+    </select>
+	<select id="selectProductQty" resultType="java.lang.Integer">
+		select product_qty from stk_stock where Product_NO = #{defaultCode}
+	</select>
+
+    <select id="selectByOrderId" resultType="com.nrjh.iop.modules.outOrder.entity.StockOutOrderLine">
+		select * from stock_out_order_line where order_id = #{id}
+	</select>
+</mapper>

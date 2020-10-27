@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nrjh.iop.modules.order.mapper.PcsPurchaseOrderMapper">
+
+    <select id="selectPage" parameterType="com.nrjh.iop.modules.order.entity.PcsPurchaseOrder" resultType="com.nrjh.iop.modules.order.entity.PcsPurchaseOrder">
+
+		SELECT
+			pcs.id,
+			pcs.picking_no,
+			pcs.orign,
+			pcs.date_order,
+			pcs.date_planned,
+			pcs.partner_id,
+			pcs.create_name,
+			pcs.amount_total,
+			pcs.number_total,
+			pcs.state,
+			"" AS order_type
+		FROM
+			pcs_purchase_order pcs
+		UNION
+			(
+				SELECT
+					stk.id,
+					"" AS picking_no,
+					stk.picking_NO AS orign,
+					stk.create_time AS date_order,
+					stk.scheduled_date AS date_planned,
+					"" AS partner_id,
+					stk.create_by AS create_name,
+					"" AS amount_total,
+					"" AS number_total,
+					stk.state,
+					stk.ORDER_TYPE
+				FROM
+					stk_picking stk
+				WHERE
+					stk.picking_type_id = 5
+				AND stk.picking_NO NOT IN (
+					SELECT
+						orign
+					FROM
+						pcs_purchase_order
+				)
+			)
+
+
+    </select>
+
+	<select id="selectPageOrders" parameterType="java.util.Map" resultType="com.nrjh.iop.modules.order.entity.PcsPurchaseOrder">
+		select * from pcs_purchase_order
+		where 1 = 1
+		<if test="dataMap.orign != null and dataMap.orign !=''">
+		and orign = #{dataMap.orign}
+		</if>
+		<if test="dataMap.pickingNo != '' and dataMap.pickingNo != null">
+		and picking_no = #{dataMap.pickingNo}
+		</if>
+		<if test="dataMap.startTime != null and dataMap.startTime != ''">
+		and date_order <![CDATA[ >= ]]> #{dataMap.startTime}
+		</if>
+		<if test="dataMap.endTime != null and dataMap.endTime != ''">
+		and date_order <![CDATA[ <= ]]> #{dataMap.endTime}
+		</if>
+		<if test="dataMap.contract != '' and dataMap.contract != null">
+		and contract = #{dataMap.contract}
+		</if>
+		<if test="dataMap.orderType != '' and dataMap.orderType != null">
+		and order_type = #{dataMap.orderType}
+		</if>
+		<if test="dataMap.businessSequence != '' and dataMap.businessSequence != null">
+			and business_sequence in (1,2)
+		</if>
+		<if test="dataMap.roleIds != null">
+			and next_role_id in
+
+			<foreach item="key" collection="dataMap.roleIds" open="(" separator="," close=")">
+				#{key}
+			</foreach>
+		</if>
+		and is_del = 0
+		order by date_order desc
+	</select>
+
+</mapper>

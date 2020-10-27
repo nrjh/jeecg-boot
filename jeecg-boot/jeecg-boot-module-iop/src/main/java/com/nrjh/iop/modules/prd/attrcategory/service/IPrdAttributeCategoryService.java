@@ -40,5 +40,9 @@ public interface IPrdAttributeCategoryService extends IService<PrdAttributeCateg
 	public void delBatchMain(Collection<? extends Serializable> idList);
 
 	public List<PrdAttributeCategory> selectAttrCategoryListByCategoryId( String categoryId);
-	
+
+	/**
+	 *
+	 */
+	PrdAttributeCategory selectAttributeByProductId(String productId);
 }

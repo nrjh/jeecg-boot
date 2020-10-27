@@ -1,9 +1,11 @@
 package com.nrjh.iop.modules.stk.warehouse.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.nrjh.iop.modules.stk.location.entity.StkLocation;
 import com.nrjh.iop.modules.stk.location.entity.StkLocationEnum;
 import com.nrjh.iop.modules.stk.location.entity.StkUsageTypeEnum;
@@ -20,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.jeecg.common.system.base.controller.JeecgController;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import io.swagger.annotations.Api;
@@ -74,49 +77,10 @@ public class StkWarehouseController extends JeecgController<StkWarehouse, IStkWa
     @ApiOperation(value = "库房-添加", notes = "库房-添加")
     @PostMapping(value = "/add")
     public Result<?> add(@RequestBody StkWarehouse stkWarehouse) {
-        stkWarehouseService.save(stkWarehouse);
-        //  增加其下默认位置 并保存到相应位置
-        addChildLocation(stkWarehouse);
+        stkWarehouseService.saveWithChildLocation(stkWarehouse);
         return Result.ok("添加成功！");
     }
 
-    private void addChildLocation(StkWarehouse stkWarehouse) {
-        // 视图位置
-        StkLocation local1 = saveLocation("1", stkWarehouse.getName(), StkLocationEnum.LOCATION.getUsageType(), stkWarehouse.getActive());
-        stkWarehouse.setViewLocationId(local1.getId());
-        // 库存位置  stocklocation
-        StkLocation local2 = saveLocation(local1.getId().toString(), StkLocationEnum.STOCK.getName(), StkLocationEnum.STOCK.getUsageType(), stkWarehouse.getActive());
-        stkWarehouse.setStockLocationId(local2.getId());
-        // 入库区 whInput
-        StkLocation local3 = saveLocation(local1.getId().toString(), StkLocationEnum.STOCK_INPUT.getName(), StkLocationEnum.STOCK_INPUT.getUsageType(), stkWarehouse.getActive());
-        stkWarehouse.setWhInputStockLotId(local3.getId());
-        // 质检区 whQc
-        StkLocation local4 = saveLocation(local1.getId().toString(), StkLocationEnum.STOCK_QC.getName(), StkLocationEnum.STOCK_QC.getUsageType(), stkWarehouse.getActive());
-        stkWarehouse.setWhQcStockLocId(local4.getId());
-        // 出库区  whOut
-        StkLocation local5 = saveLocation(local1.getId().toString(), StkLocationEnum.STOCK_OUT.getName(), StkLocationEnum.STOCK_OUT.getUsageType(), stkWarehouse.getActive());
-        stkWarehouse.setWhOutputStockLocId(local5.getId());
-        // 打包qu  whPack
-        StkLocation local6 = saveLocation(local1.getId().toString(), StkLocationEnum.STOCK_PACK.getName(), StkLocationEnum.STOCK_PACK.getUsageType(), stkWarehouse.getActive());
-        stkWarehouse.setWhPackStockLocId(local6.getId());
-
-        // 作业类型  默认
-        stkWarehouse.setInTypeId(1) ; // 入库类型
-        stkWarehouse.setIntTypeId(2); // 内部调拨类型
-        stkWarehouse.setOutTypeId(3); // 出库类型
-        stkWarehouseService.updateById(stkWarehouse);
-    }
-
-    private StkLocation saveLocation(String pid, String name, String usageType, int active) {
-        StkLocation stkLocation = new StkLocation();
-        stkLocation.setName(name);
-        stkLocation.setUsageType(usageType);
-        stkLocation.setPid(pid);
-        stkLocation.setActive(active);
-        stkLocationService.addStkLocation(stkLocation);
-        stkLocationService.updateComplateName(stkLocation);
-        return stkLocation;
-    }
 
     /**
      * 编辑
@@ -171,8 +135,15 @@ public class StkWarehouseController extends JeecgController<StkWarehouse, IStkWa
     @ApiOperation(value = "库房-通过id删除", notes = "库房-通过id删除")
     @DeleteMapping(value = "/delete")
     public Result<?> delete(@RequestParam(name = "id", required = true) String id) {
-        stkWarehouseService.removeById(id);
-        return Result.ok("删除成功!");
+        StkWarehouse tempStkWarehouse = stkWarehouseService.getById(id);
+        List<StkLocation> stkLocationByPid = stkLocationService.getStkLocationByPid(tempStkWarehouse.getViewLocationId() + "");
+        if(CollectionUtil.isEmpty(stkLocationByPid)){
+            stkWarehouseService.deleteById(id);
+            stkLocationService.deleteBatchByPid(tempStkWarehouse.getViewLocationId()+"");
+            return Result.ok("删除成功!");
+        }else {
+            return Result.error("库房下有地址，不可删除!");
+        }
     }
 
     /**
@@ -185,7 +156,13 @@ public class StkWarehouseController extends JeecgController<StkWarehouse, IStkWa
     @ApiOperation(value = "库房-批量删除", notes = "库房-批量删除")
     @DeleteMapping(value = "/deleteBatch")
     public Result<?> deleteBatch(@RequestParam(name = "ids", required = true) String ids) {
-        this.stkWarehouseService.removeByIds(Arrays.asList(ids.split(",")));
+//        this.stkWarehouseService.removeByIds(Arrays.asList(ids.split(",")));
+        List<String> arrayids = Arrays.asList(ids.split(","));
+        arrayids.forEach(e -> {
+            StkWarehouse tempStkWarehouse = stkWarehouseService.getById(e);
+            stkWarehouseService.removeById(e);
+            stkLocationService.deleteBatchByPid(tempStkWarehouse.getViewLocationId()+"");
+        });
         return Result.ok("批量删除成功!");
     }
 
@@ -228,5 +205,4 @@ public class StkWarehouseController extends JeecgController<StkWarehouse, IStkWa
     public Result<?> importExcel(HttpServletRequest request, HttpServletResponse response) {
         return super.importExcel(request, response, StkWarehouse.class);
     }
-
 }

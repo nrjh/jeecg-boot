@@ -22,4 +22,10 @@
         WHERE
         CATEGORY_ID = #{categoryId}))
     </select>
+
+    <select id="selectAttributeByProductId" resultType="com.nrjh.iop.modules.prd.attrcategory.entity.PrdAttributeCategory">
+     select pac.* from PRD_ATTRIBUTE_CATEGORY AS pac, prd_product_attr_categ_rel as ppac
+        WHERE ppac.ATTRIBUTE_CATEGORY_ID = pac.ID AND ppac.PRODUCT_ID = #{productId}
+    </select>
+
 </mapper>

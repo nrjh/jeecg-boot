@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nrjh.iop.modules.centralizedControl.centralizedMonitoring.mapper.EquipCategAndAreaMapper">
+
+    <select id="getAllEquipCateg" resultType="com.nrjh.iop.modules.centralizedControl.centralizedMonitoring.po.KeyIdAndValuePO">
+        select param_name as "value",param_id as "keyId" from P_COMM_CODE where SORT_ID = 'EQUIP_CATEG' AND STATUS = '1'
+    </select>
+    <select id="getAllCheckLine" resultType="com.nrjh.iop.modules.centralizedControl.centralizedMonitoring.po.KeyIdAndValuePO">
+        select area_name as "value",area_id as "keyId" from o_area
+    </select>
+</mapper>

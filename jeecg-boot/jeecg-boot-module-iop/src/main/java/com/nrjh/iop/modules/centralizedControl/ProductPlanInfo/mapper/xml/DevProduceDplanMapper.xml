@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nrjh.iop.modules.centralizedControl.ProductPlanInfo.mapper.DevProduceDplanMapper">
+
+    <select id="getMaxId" resultType="java.lang.String">
+        SELECT MAX(id) FROM DEV_PRODUCE_DPLAN
+    </select>
+    <select id="detailList" resultType="com.nrjh.iop.modules.centralizedControl.ProductPlanInfo.entity.DevProduceDplan">
+        select * from DEV_PRODUCE_DPLAN
+        where EQUIP_CATEG = #{categ} and PRODUCE_CYCLE_ID = #{produceCycleId}
+        order by CYCLE_DAY asc
+    </select>
+</mapper>

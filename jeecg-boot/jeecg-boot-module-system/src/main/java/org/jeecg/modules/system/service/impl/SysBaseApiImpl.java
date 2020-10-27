@@ -155,6 +155,11 @@ public class SysBaseApiImpl implements ISysBaseAPI {
 	}
 
 	@Override
+	public List<String> getRolesIdByUsername(String username) {
+		return sysUserRoleMapper.getRoleIdByUserName(username);
+	}
+
+	@Override
 	public List<String> getDepartIdsByUsername(String username) {
 		List<SysDepart> list = sysDepartService.queryDepartsByUsername(username);
 		List<String> result = new ArrayList<>(list.size());

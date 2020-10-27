@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nrjh.iop.modules.app.orderWorkManagement.mapper.CommonOrderWorkManagementMapper">
+
+    <select id="queryUserMessage" resultType="com.nrjh.iop.modules.workOrder.entity.SysUser">
+        select * from sys_user
+        where 1 = 1
+        <if test="sysUser.realname != null and sysUser.realname !=''">
+            and realname = #{sysUser.realname}
+        </if>
+        <if test="sysUser.shiftId != null and sysUser.shiftId !=''">
+            and shift_id = #{sysUser.shiftId}
+        </if>
+        order by create_time desc
+    </select>
+</mapper>

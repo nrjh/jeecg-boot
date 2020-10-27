@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nrjh.iop.modules.centralizedControl.centralizedMonitoring.mapper.DetectTaskListMapper">
+    <select id="getDetectTaskList" resultType="com.nrjh.iop.modules.centralizedControl.centralizedMonitoring.vo.DetectTaskListVO">
+        SELECT
+            DISTINCT
+            to_Char(t.TASK_BGN_DATE,'yyyy-mm-dd') checkDateTime,
+            (
+            CASE
+            WHEN  t.DETECT_TYPE = '09' THEN 1
+            WHEN t.DETECT_TYPE = '10' THEN 1
+            ELSE 0 END
+            ) isNormalCheck,
+            t.DETECT_TYPE,
+            t.TASK_NO,
+            t.ARRIVE_BATCH_NO,
+            t.SUPPLY_NO,
+            t.TASK_BGN_DATE,
+            t.TASK_SATUS,
+            t.DETECT_QTY,
+            t.DETECT_CONC_P,
+            ROUND(t.DETECT_CONC_P/t.DETECT_QTY,2) passRate,
+            t.AUDIT_STATUS,
+            t.MAKER_NAME,
+            mdti.LINE_NO
+        FROM
+            MIDHD_MDS.T_DETECT_TASK  t
+        LEFT JOIN
+            MIDHD.MT_DETECT_TASK_INFO mdti
+        ON
+            mdti.DETECT_TASK_NO = t.TASK_NO
+        WHERE
+            t.IS_DEL = 0
+        <if test='dto.timeFlag =="1"'>
+            AND to_char(t.TASK_BGN_DATE,'yyyy-mm-dd') = to_char(#{dto.startDealTime},'yyyy-mm-dd')
+        </if>
+        <if test='dto.timeFlag == "2"'>
+            AND to_char(t.TASK_BGN_DATE,'yyyy-mm-dd') between to_char(#{dto.startDealTime},'yyyy-mm-dd') AND to_char(#{dto.endDealTime},'yyyy-mm-dd')
+        </if>
+        <if test='dto.timeFlag == "3"'>
+            AND to_char(t.TASK_BGN_DATE,'yyyy-mm') between to_char(#{dto.startDealTime},'yyyy-mm') AND to_char(#{dto.endDealTime},'yyyy-mm')
+        </if>
+        <if test="dto.lineNo != null and dto.lineNo!=''">
+            AND mdti.LINE_NO = #{dto.lineNo}
+        </if>
+        <if test="dto.equipCateg != null and dto.equipCateg!=''">
+            AND t.EQUIP_CATEG = #{dto.equipCateg} AND mdti.EQUIP_CATEG = #{dto.equipCateg}
+        </if>
+        ORDER BY
+            checkDateTime
+    </select>
+</mapper>

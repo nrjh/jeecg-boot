@@ -20,8 +20,8 @@ export const JeecgListMixin = {
       /* 分页参数 */
       ipagination:{
         current: 1,
-        pageSize: 10,
-        pageSizeOptions: ['10', '20', '30'],
+        pageSize: 15,
+        pageSizeOptions: ['15', '30', '45'],
         showTotal: (total, range) => {
           return range[0] + "-" + range[1] + " 共" + total + "条"
         },
@@ -53,9 +53,9 @@ export const JeecgListMixin = {
   created() {
     if(!this.disableMixinCreated){
       console.log(' -- mixin created -- ')
-      this.loadData();
       //初始化字典配置 在自己页面定义
       this.initDictConfig();
+      this.loadData();
     }
   },
   methods:{
@@ -71,8 +71,21 @@ export const JeecgListMixin = {
       var params = this.getQueryParams();//查询条件
       this.loading = true;
       getAction(this.url.list, params).then((res) => {
+        console.log('++++++++++++++++++++++++',res)
         if (res.success) {
+
+
           this.dataSource = res.result.records;
+
+          this.dataSource.forEach(el=>{
+            if(el.prodDetails){
+              el.prodDetails = el.prodDetails.replace(/\;/g,`;\n`)
+            }
+            if(el.prodLines){
+              el.prodLines = el.prodLines.replace(/\;/g,`;\n`)
+            }
+          })
+
           this.ipagination.total = res.result.total;
         }
         if(res.code===510){
@@ -110,9 +123,11 @@ export const JeecgListMixin = {
     getQueryField() {
       //TODO 字段权限控制
       var str = "id,";
-      this.columns.forEach(function (value) {
-        str += "," + value.dataIndex;
-      });
+      if(this.columns){
+        this.columns.forEach(function (value) {
+          str += "," + value.dataIndex;
+        });
+      }
       return str;
     },
 
@@ -209,6 +224,7 @@ export const JeecgListMixin = {
     modalFormOk() {
       // 新增/修改 成功时，重载列表
       this.loadData();
+      this.onClearSelected();
     },
     handleDetail:function(record){
       this.$refs.modalForm.edit(record);

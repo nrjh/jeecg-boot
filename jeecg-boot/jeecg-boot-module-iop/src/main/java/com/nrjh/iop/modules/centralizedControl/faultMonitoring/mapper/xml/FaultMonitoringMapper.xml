@@ -1,0 +1,448 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nrjh.iop.modules.centralizedControl.faultMonitoring.mapper.FaultMonitoringMapper">
+
+    <select id="getFaultEquipMentBarByDay" resultType="java.util.Map">
+        select t.nums,p.PARAM_NAME as paramName, t.equipCateg as equipCateg from
+        (select count(a.EQUIP_CATEG) AS nums,a.EQUIP_CATEG as equipCateg
+        from V_ALARM_INFO v left join O_EQUIP e
+        on v.EQUIP_NO = e.EQUIP_NO or v.EQUIP_NO = e.EQUIP_FNO
+        left join O_AREA a on e.AREA_ID = a.AREA_ID
+        where to_char(ALARM_TIME,'yyyy-MM-dd') = #{alarmTime}
+        and e.EQUIP_ID in (select PRODUCT_ID from   fault_prd_product_info fap where fap.LINE_NO=a.AREA_ID)
+        <if test="faultMonitoringVo.areaId != null and faultMonitoringVo.areaId != ''">
+            and a.AREA_ID = #{faultMonitoringVo.areaId}
+        </if>
+        <if test="faultMonitoringVo.equipCateg != null and faultMonitoringVo.equipCateg != ''">
+            and a.EQUIP_CATEG = #{faultMonitoringVo.equipCateg}
+        </if>
+        <if test="faultMonitoringVo.faultGrade != null and faultMonitoringVo.faultGrade != ''">
+            and   e.EQUIP_ID in (select PRODUCT_ID from   fault_prd_product_info fap where fap.LINE_NO=a.AREA_ID and fap.fault_grade = #{faultMonitoringVo.faultGrade})
+        </if>
+        group by  a.EQUIP_CATEG)t left join P_COMM_CODE p on t.equipCateg = P.PARAM_ID and SORT_ID = 'EQUIP_CATEG'
+
+    </select>
+
+    <select id="getFaultEquipMentBarByMonth" resultType="java.util.Map">
+        select t.nums,p.PARAM_NAME as paramName,t.equipCateg from (select count(a.EQUIP_CATEG) AS nums,
+        a.EQUIP_CATEG as equipCateg
+        from V_ALARM_INFO v left join O_EQUIP e
+        on (v.EQUIP_NO = e.EQUIP_NO or v.EQUIP_NO = e.EQUIP_FNO)
+        left join O_AREA a on e.AREA_ID = a.AREA_ID
+        where to_char(ALARM_TIME,'yyyy-MM') = #{alarmTime}
+        and e.EQUIP_ID in (select PRODUCT_ID from   fault_prd_product_info fap where fap.LINE_NO=a.AREA_ID)
+        <if test="faultMonitoringVo.areaId != null and faultMonitoringVo.areaId != ''">
+            and a.AREA_ID = #{faultMonitoringVo.areaId}
+        </if>
+        <if test="faultMonitoringVo.equipCateg != null and faultMonitoringVo.equipCateg != ''">
+            and a.EQUIP_CATEG = #{faultMonitoringVo.equipCateg}
+        </if>
+        <if test="faultMonitoringVo.faultGrade != null and faultMonitoringVo.faultGrade != ''">
+            and   e.EQUIP_ID in (select PRODUCT_ID from   fault_prd_product_info fap where fap.LINE_NO=a.AREA_ID and fap.fault_grade = #{faultMonitoringVo.faultGrade})
+        </if>
+        group by  a.EQUIP_CATEG)t left join P_COMM_CODE p on t.equipCateg = P.PARAM_ID and SORT_ID = 'EQUIP_CATEG'
+
+    </select>
+
+    <select id="getAreaLinePieByDay" resultType="java.util.Map">
+        select t.nums,t.areaId as areaId,ar.AREA_NAME as areaName from
+        (select count(a.AREA_ID) AS nums,a.AREA_ID as areaId
+        from V_ALARM_INFO v left join O_EQUIP e
+        on (v.EQUIP_NO = e.EQUIP_NO or v.EQUIP_NO = e.EQUIP_FNO)
+        left join O_AREA a on e.AREA_ID = a.AREA_ID
+        where to_char(ALARM_TIME,'yyyy-MM-dd') between #{startTime} and #{endTime}
+        and e.EQUIP_ID in (select PRODUCT_ID from   fault_prd_product_info fap where fap.LINE_NO=a.AREA_ID)
+        group by a.AREA_ID
+        order by count(a.AREA_ID) desc
+        ) t
+        left join O_AREA ar on t.areaId = ar.AREA_ID
+    </select>
+    <select id="getAreaLinePieByMonth" resultType="java.util.Map">
+        select t.nums,t.areaId as areaId,ar.AREA_NAME as areaName from
+        (select count(a.AREA_ID) AS nums,a.AREA_ID as areaId
+        from V_ALARM_INFO v left join O_EQUIP e
+        on (v.EQUIP_NO = e.EQUIP_NO or v.EQUIP_NO = e.EQUIP_FNO)
+        left join O_AREA a on e.AREA_ID = a.AREA_ID
+        where to_char(ALARM_TIME,'yyyy-MM') between #{startTime} and #{endTime}
+        and   e.EQUIP_ID in (select PRODUCT_ID from   fault_prd_product_info fap where fap.LINE_NO=a.AREA_ID)
+        group by a.AREA_ID) t
+        left join O_AREA ar on t.areaId = ar.AREA_ID
+    </select>
+
+
+    <select id="getFailureEquipmentPieByDay" resultType="java.util.Map">
+        select t.nums,e.NAME as equipName
+               from(select count(v.EQUIP_NO) as nums,v.EQUIP_NO  from V_ALARM_INFO v where to_char(ALARM_TIME,'yyyy-MM-dd')
+               between #{startTime} and #{endTime} GROUP BY v.EQUIP_NO)t
+			   left join O_EQUIP e
+			   on (t.EQUIP_NO = e.EQUIP_NO or t.EQUIP_NO = e.EQUIP_FNO)
+               left join O_AREA a on e.AREA_ID = a.AREA_ID
+               where 1=1
+               and  e.EQUIP_ID in (select PRODUCT_ID from   fault_prd_product_info fap where fap.LINE_NO=a.AREA_ID)
+               <if test="faultMonitoringVo.areaId != null and faultMonitoringVo.areaId != ''">
+               and a.AREA_ID = #{faultMonitoringVo.areaId}
+               </if>
+               <if test="faultMonitoringVo.equipCateg != null and faultMonitoringVo.equipCateg != ''">
+               and a.EQUIP_CATEG = #{faultMonitoringVo.equipCateg}
+               </if>
+                <if test="faultMonitoringVo.faultGrade != null and faultMonitoringVo.faultGrade != ''">
+                    and   e.EQUIP_ID in (select PRODUCT_ID from   fault_prd_product_info fap where fap.LINE_NO=a.AREA_ID and fap.fault_grade = #{faultMonitoringVo.faultGrade})
+                </if>
+    </select>
+
+    <select id="getFailureEquipTypePieByDay" resultType="java.util.Map">
+        SELECT DISTINCT
+            Sum( nums ) over ( PARTITION BY EQUIP_TYPE ) total,
+            EQUIP_TYPE,
+            param_name
+        FROM
+            (
+        SELECT
+            t.nums,
+            e.NAME AS equipName ,
+             e.EQUIP_TYPE,
+            pc.param_name
+        FROM
+            (
+        SELECT
+            count( v.EQUIP_NO ) AS nums,
+            v.EQUIP_NO
+        FROM
+            V_ALARM_INFO v
+        WHERE
+            1 = 1
+            and  to_char ( ALARM_TIME, 'yyyy-MM-dd' ) BETWEEN #{startTime} and #{endTime}
+
+        GROUP BY
+            v.EQUIP_NO
+            ) t
+            LEFT JOIN O_EQUIP e ON ( t.EQUIP_NO = e.EQUIP_NO OR t.EQUIP_NO = e.EQUIP_FNO )
+            LEFT JOIN O_AREA a ON e.AREA_ID = a.AREA_ID
+            LEFT JOIN P_COMM_CODE pc ON e.equip_type = pc.param_id
+            AND pc.SORT_ID = 'EQUIP_TYPE'
+            AND pc.STATUS = '1'
+        WHERE
+            1 = 1
+            AND e.EQUIP_ID IN ( SELECT PRODUCT_ID FROM fault_prd_product_info fap WHERE fap.LINE_NO = a.AREA_ID )
+            )
+            order by total desc
+    </select>
+
+
+    <select id="getFailureEquipTypeBarByArea"  resultType="java.util.Map" >
+        SELECT DISTINCT
+            Sum( nums ) over ( PARTITION BY EQUIP_TYPE,AREA_ID ) total,
+            AREA_NAME || param_name AS NAME,
+            AREA_ID
+        FROM
+            (
+        SELECT
+            t.nums,
+            e.EQUIP_TYPE, a.AREA_NAME,
+            a.AREA_ID,
+            pc.param_name
+        FROM
+            (
+        SELECT
+            count( v.EQUIP_NO ) AS nums,
+            v.EQUIP_NO
+        FROM
+            V_ALARM_INFO v
+        WHERE
+            1 = 1
+           and  to_char ( ALARM_TIME, 'yyyy-MM-dd' ) BETWEEN #{startTime} and #{endTime}
+        GROUP BY
+            v.EQUIP_NO
+            ) t
+            LEFT JOIN O_EQUIP e ON ( t.EQUIP_NO = e.EQUIP_NO OR t.EQUIP_NO = e.EQUIP_FNO )
+            LEFT JOIN O_AREA a ON e.AREA_ID = a.AREA_ID
+            LEFT JOIN P_COMM_CODE pc ON e.equip_type = pc.param_id
+        WHERE
+            1 = 1
+            AND e.EQUIP_ID IN ( SELECT PRODUCT_ID FROM fault_prd_product_info fap WHERE fap.LINE_NO = a.AREA_ID )
+            AND equip_type =#{equipType}
+            )
+            order by total desc
+    </select>
+
+    <select id="getFailureEquipNoBarByEquipType"    resultType="java.util.Map" >
+        select DISTINCT  Sum( nums ) over ( PARTITION BY EQUIP_NO ) total, EQUIP_NO, AREA_NAME ||equipName as name ,equipName    from (
+           SELECT
+            t.nums,
+            e.NAME AS equipName,
+            e.EQUIP_TYPE,
+            e.EQUIP_NO,
+            a.AREA_NAME,
+            a.AREA_ID
+        FROM
+            (
+        SELECT
+            count( v.EQUIP_NO ) AS nums,
+            v.EQUIP_NO
+        FROM
+            V_ALARM_INFO v
+        WHERE  1=1
+            and  to_char ( ALARM_TIME, 'yyyy-MM-dd' ) BETWEEN #{startTime} and #{endTime}
+            GROUP BY v.EQUIP_NO)t
+            LEFT JOIN O_EQUIP e ON ( t.EQUIP_NO = e.EQUIP_NO OR t.EQUIP_NO = e.EQUIP_FNO )
+            LEFT JOIN O_AREA a ON e.AREA_ID = a.AREA_ID
+            LEFT JOIN P_COMM_CODE pc ON e.equip_type = pc.param_id  AND pc.SORT_ID = 'EQUIP_TYPE'
+            AND pc.STATUS = '1'
+        WHERE
+            1 = 1
+            AND e.EQUIP_ID IN ( SELECT PRODUCT_ID FROM fault_prd_product_info fap WHERE fap.LINE_NO = a.AREA_ID )
+        and 	equip_type = #{equipType}
+        and     a.area_id= #{areaId}
+        ) order by total desc
+    </select>
+
+    <select id="getFailureEquipmentPieByMonth" resultType="java.util.Map">
+        select t.nums,e.NAME as equipName
+               from(select count(v.EQUIP_NO) as nums,v.EQUIP_NO from V_ALARM_INFO v where to_char(ALARM_TIME,'yyyy-MM')
+               between #{startTime} and #{endTime} GROUP BY v.EQUIP_NO)t
+               left join O_EQUIP e on t.EQUIP_NO = e.EQUIP_NO or t.EQUIP_NO = e.EQUIP_FNO
+               left join O_AREA a on e.AREA_ID = a.AREA_ID
+               where 1=1
+               and e.EQUIP_ID in (select PRODUCT_ID from   fault_prd_product_info fap where fap.LINE_NO=a.AREA_ID)
+               <if test="faultMonitoringVo.areaId != null and faultMonitoringVo.areaId != ''">
+                 and a.AREA_ID = #{faultMonitoringVo.areaId}
+               </if>
+               <if test="faultMonitoringVo.equipCateg != null and faultMonitoringVo.equipCateg != ''">
+                 and a.EQUIP_CATEG = #{faultMonitoringVo.equipCateg}
+               </if>
+                <if test="faultMonitoringVo.faultGrade != null and faultMonitoringVo.faultGrade != ''">
+                    and   e.EQUIP_ID in (select PRODUCT_ID from   fault_prd_product_info fap where fap.LINE_NO=a.AREA_ID and fap.fault_grade = #{faultMonitoringVo.faultGrade})
+                </if>
+    </select>
+
+    <select id="getFaultTypePieByDay" resultType="java.util.Map">
+        select t.nums,a.AREA_NAME as areaName,
+		CASE t.faultLabe
+	     WHEN '01' THEN
+		    '机械故障'
+		 ELSE
+		    '电测故障'
+         END FAULTLABE
+        from
+        (select count(*) AS nums,e.IOP_AREA_ID as areaId,f.FAULT_LABE as faultLabe
+        from V_ALARM_INFO v left join LINE_EXPLAIN_INFO e
+        on v.LINE_NO = e.LINE_EXPLAIN_ID or v.LINE_NO = e.IOP_AREA_ID
+        left join FAULT_TASK_INFO f on f.FAULT_NAME = v.REAL_REASON
+        where to_char(ALARM_TIME,'yyyy-MM-dd') between #{startTime} and #{endTime}
+       and e.IOP_AREA_ID in  (select  fap.LINE_NO  from   fault_prd_product_info fap)
+        group by e.IOP_AREA_ID,f.FAULT_LABE) t
+        left join O_AREA a on t.areaId = a.AREA_ID
+    </select>
+    <select id="getFaultTypePieByMonth" resultType="java.util.Map">
+        select t.nums,a.AREA_NAME as areaName,
+		CASE t.faultLabe
+	     WHEN '01' THEN
+		    '机械故障'
+		 ELSE
+		    '电测故障'
+         END FAULTLABE
+        from
+        (select count(*) AS nums,e.IOP_AREA_ID as areaId,f.FAULT_LABE as faultLabe
+        from V_ALARM_INFO v left join LINE_EXPLAIN_INFO e
+        on v.LINE_NO = e.LINE_EXPLAIN_ID or v.LINE_NO = e.IOP_AREA_ID
+        left join FAULT_TASK_INFO f on f.FAULT_NAME = v.REAL_REASON
+        where to_char(ALARM_TIME,'yyyy-MM') between #{startTime} and #{endTime}
+        and e.IOP_AREA_ID in  (select  fap.LINE_NO  from   fault_prd_product_info fap)
+        group by e.IOP_AREA_ID,f.FAULT_LABE) t
+        left join O_AREA a on t.areaId = a.AREA_ID
+    </select>
+
+    <select id="getFailureEquipmetTotalByDay" resultType="java.util.Map">
+        select NVL(count(*),0) as count from V_ALARM_INFO v
+        left join O_EQUIP e
+        on v.EQUIP_NO = e.EQUIP_NO or v.EQUIP_NO = e.EQUIP_FNO
+        left join O_AREA a on e.AREA_ID = a.AREA_ID
+        where to_char(v.ALARM_TIME,'yyyy-MM-dd')= #{alarmTime}
+        and e.EQUIP_ID in (select PRODUCT_ID from   fault_prd_product_info fap where fap.LINE_NO=a.AREA_ID)
+        <if test="faultMonitoringVo.areaId != null and faultMonitoringVo.areaId != ''">
+            and a.AREA_ID = #{faultMonitoringVo.areaId}
+        </if>
+        <if test="faultMonitoringVo.equipCateg != null and faultMonitoringVo.equipCateg != ''">
+            and a.EQUIP_CATEG = #{faultMonitoringVo.equipCateg}
+        </if>
+        <if test="faultMonitoringVo.faultGrade != null and faultMonitoringVo.faultGrade != ''">
+            and   e.EQUIP_ID in (select PRODUCT_ID from   fault_prd_product_info fap where fap.LINE_NO=a.AREA_ID and fap.fault_grade = #{faultMonitoringVo.faultGrade})
+        </if>
+
+    </select>
+
+    <select id="getFailureTotalTimeByDay" resultType="java.util.Map">
+        select 	NVL((o.RECOVERY_TIME- o.ALARM_TIME)*24*60,0) as processTime,o.ALARM_LEVEL as alarmLevel
+        from ORD_WORK_ORDER_INFO o
+        left join O_AREA a on a.AREA_ID = o.LINE_NO
+        where to_char(o.ALARM_TIME,'yyyy-MM-dd') = #{alarmTime}
+        <if test="faultMonitoringVo.areaId != null and faultMonitoringVo.areaId != ''">
+            and a.AREA_ID = #{faultMonitoringVo.areaId}
+        </if>
+        <if test="faultMonitoringVo.equipCateg != null and faultMonitoringVo.equipCateg != ''">
+            and a.EQUIP_CATEG = #{faultMonitoringVo.equipCateg}
+        </if>
+<!--        <if test="faultMonitoringVo.faultGrade != null and faultMonitoringVo.faultGrade != ''">-->
+<!--            and   e.EQUIP_ID in (select PRODUCT_ID from   fault_prd_product_info fap where fap.LINE_NO=a.AREA_ID and fap.fault_grade = #{faultMonitoringVo.faultGrade})-->
+<!--        </if>-->
+    </select>
+
+    <select id="getFailureEquipmetTotalByMonth" resultType="java.util.Map">
+        select NVL(count(*),0) as count from V_ALARM_INFO v
+        left join O_EQUIP e
+        on v.EQUIP_NO = e.EQUIP_NO or v.EQUIP_NO = e.EQUIP_FNO
+        left join O_AREA a on e.AREA_ID = a.AREA_ID
+        where to_char(v.ALARM_TIME,'yyyy-MM')= #{alarmTime}
+        and e.EQUIP_ID in (select PRODUCT_ID from   fault_prd_product_info fap where fap.LINE_NO=a.AREA_ID)
+        <if test="faultMonitoringVo.areaId != null and faultMonitoringVo.areaId != ''">
+            and a.AREA_ID = #{faultMonitoringVo.areaId}
+        </if>
+        <if test="faultMonitoringVo.equipCateg != null and faultMonitoringVo.equipCateg != ''">
+            and a.EQUIP_CATEG = #{faultMonitoringVo.equipCateg}
+        </if>
+    </select>
+    <select id="getFailureTotalTimeByMonth" resultType="java.util.Map">
+        select NVL((o.RECOVERY_TIME- o.ALARM_TIME)*24*60,0) as processTime,o.ALARM_LEVEL as alarmLevel
+        from ORD_WORK_ORDER_INFO o
+        left join O_AREA a on a.AREA_ID = o.LINE_NO
+        where to_char(o.ALARM_TIME,'yyyy-MM') = #{alarmTime}
+        <if test="faultMonitoringVo.areaId != null and faultMonitoringVo.areaId != ''">
+            and a.AREA_ID = #{faultMonitoringVo.areaId}
+        </if>
+        <if test="faultMonitoringVo.equipCateg != null and faultMonitoringVo.equipCateg != ''">
+            and a.EQUIP_CATEG = #{faultMonitoringVo.equipCateg}
+        </if>
+    </select>
+
+    <select id="detailEquipTypeByAreaId" resultType="java.util.Map">
+SELECT
+	T .param_id ID,
+	oa.area_name || pcc.param_name NAME,
+    T .num num,
+	oa.area_id
+FROM
+	(
+		SELECT
+			pcc.param_id,
+			oa.area_id,
+			COUNT (vai.equip_no) num
+		FROM
+			IOP.V_ALARM_INFO vai
+		LEFT JOIN IOP.O_EQUIP oe ON (
+			oe.equip_no = vai.equip_no
+			OR oe.equip_fno = vai.equip_no
+		)
+		LEFT JOIN IOP.O_AREA oa ON oa.area_id = oe.AREA_ID
+		AND oa.area_id = #{faultMonitoringVo.areaId}
+		LEFT JOIN IOP.P_COMM_CODE pcc ON oe.equip_type = pcc.param_id
+		AND pcc.SORT_ID = 'EQUIP_TYPE'
+		AND pcc.STATUS = '1'
+		WHERE
+			oe.equip_id IN (
+				SELECT
+					fppi.product_id
+				FROM
+					IOP.FAULT_PRD_PRODUCT_INFO fppi
+				WHERE
+					fppi.line_no = #{faultMonitoringVo.areaId}
+				and  to_char ( vai.ALARM_TIME, 'yyyy-MM-dd' ) BETWEEN #{startTime} and #{endTime}
+			)
+		GROUP BY
+			pcc.param_id,
+			oa.area_id
+		ORDER BY COUNT (vai.equip_no) DESC
+	) T
+LEFT JOIN IOP.P_COMM_CODE pcc ON pcc.SORT_ID = 'EQUIP_TYPE'
+AND pcc.STATUS = '1'
+AND pcc.param_id = T .param_id
+LEFT JOIN IOP.O_AREA oa ON oa.area_id = T .AREA_ID
+    </select>
+
+    <select id="detailEquipByAreaIdAndEquipNO" resultType="java.util.Map">
+SELECT
+	T.ID ID,
+	oa.area_name || OE.NAME NAME,
+	T.num,
+	oa.area_id
+FROM
+	(
+		SELECT
+			COUNT (vai.equip_no) num,
+			oe.equip_no ID,
+			oa.area_id
+		FROM
+			IOP.V_ALARM_INFO vai
+		LEFT JOIN IOP.O_EQUIP oe ON (
+			oe.equip_no = vai.equip_no
+			OR oe.equip_fno = vai.equip_no
+		)
+		LEFT JOIN IOP.O_AREA oa ON oa.area_id = OE.AREA_ID
+		AND oa.area_id = #{faultMonitoringVo.areaId}
+		WHERE
+			oe.equip_id IN (
+				SELECT
+					fppi.product_id
+				FROM
+					IOP.FAULT_PRD_PRODUCT_INFO fppi
+				WHERE
+					fppi.line_no = #{faultMonitoringVo.areaId}
+				and  to_char ( vai.ALARM_TIME, 'yyyy-MM-dd' ) BETWEEN #{startTime} and #{endTime}
+			)
+		AND oe.equip_type = #{faultMonitoringVo.equipType}
+		GROUP BY
+			oe.equip_no,
+			oa.area_id
+	) T
+LEFT JOIN IOP.O_EQUIP oe ON oe.equip_no = T . ID
+LEFT JOIN IOP.O_AREA oa ON oa.area_id = T .AREA_ID
+ORDER BY T.num DESC
+    </select>
+
+    <select id="detailFaultByEquipNOAndAreaId" resultType="java.util.Map">
+SELECT
+	COUNT (ft.FAULT_NAME) AS num,
+	ft.FAULT_NAME NAME,
+	oa.area_id,
+  oe.equip_no
+FROM
+	IOP.FAULT_PRD_PRODUCT_INFO fap
+LEFT JOIN IOP.FAULT_TASK_INFO ft ON fap.FAULT_TASK_ID = ft. ID
+LEFT JOIN IOP.O_EQUIP oe ON oe.equip_id = fap.PRODUCT_ID
+LEFT JOIN IOP.O_AREA oa ON oa.area_id = OE.AREA_ID
+LEFT JOIN IOP.LINE_EXPLAIN_INFO lei ON lei.IOP_AREA_ID = oa.area_id
+ LEFT JOIN IOP.V_ALARM_INFO VAI ON (VAI.LINE_NO = LEI.LINE_EXPLAIN_ID OR VAI.LINE_NO = LEI.iop_area_id) AND VAI.EQUIP_NO = OE.EQUIP_NO
+WHERE oe.equip_no = #{faultMonitoringVo.equipNO}
+ and  to_char (vai.alarm_time, 'yyyy-MM-dd' ) BETWEEN #{startTime} and #{endTime}
+ AND oa.area_id = #{faultMonitoringVo.areaId}
+GROUP BY
+	ft.FAULT_NAME,
+	oa.area_id,
+  oe.equip_no
+ORDER BY COUNT (ft.FAULT_NAME) DESC
+    </select>
+
+    <select id="detailFaultComparisonByAreaIdAndEquipNO" resultType="java.util.Map">
+SELECT
+	COUNT (ft.FAULT_NAME) AS num,
+	ft.FAULT_NAME NAME,
+	oa.area_id,
+  oe.equip_no
+FROM
+	IOP.FAULT_PRD_PRODUCT_INFO fap
+LEFT JOIN IOP.FAULT_TASK_INFO ft ON fap.FAULT_TASK_ID = ft. ID
+LEFT JOIN IOP.O_EQUIP oe ON oe.equip_id = fap.PRODUCT_ID
+LEFT JOIN IOP.O_AREA oa ON oa.area_id = OE.AREA_ID
+LEFT JOIN IOP.LINE_EXPLAIN_INFO lei ON lei.IOP_AREA_ID = oa.area_id
+ LEFT JOIN IOP.V_ALARM_INFO VAI ON (VAI.LINE_NO = LEI.LINE_EXPLAIN_ID OR VAI.LINE_NO = LEI.iop_area_id) AND VAI.EQUIP_NO = OE.EQUIP_NO
+WHERE to_char (vai.alarm_time, 'yyyy-MM' ) = #{time}
+AND oa.area_id = #{faultMonitoringVo.areaId}
+AND ft.FAULT_NAME = #{faultMonitoringVo.faultName}
+AND oe.equip_no = #{faultMonitoringVo.equipNO}
+GROUP BY
+	ft.FAULT_NAME,
+	oa.area_id,
+  oe.equip_no
+ORDER BY COUNT (ft.FAULT_NAME) DESC
+    </select>
+
+</mapper>

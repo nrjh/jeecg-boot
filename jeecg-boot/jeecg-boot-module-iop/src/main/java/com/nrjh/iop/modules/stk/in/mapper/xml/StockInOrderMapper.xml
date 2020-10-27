@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nrjh.iop.modules.stk.in.mapper.StockInOrderMapper">
+
+    <select id="selectByInOrderAndDetail" parameterType="map"
+            resultType="com.nrjh.iop.modules.stk.in.entity.StockInOrder">
+        SELECT DISTINCT stock_in_order.* FROM stock_in_order INNER JOIN stock_in_order_line ON stock_in_order.id
+        =stock_in_order_line.order_id
+        <where>
+            <if test="map.orderInId != null">
+                and stock_in_order.order_in_id = #{map.orderInId}
+            </if>
+            <if test="map.createName!=null">
+                and stock_in_order.create_name = #{map.createName}
+            </if>
+            <if test="map.partnerId!=null">
+                and stock_in_order.partner_id = #{map.partnerId}
+            </if>
+            <if test="map.state!=null">
+                and stock_in_order.state = #{map.state}
+            </if>
+            <if test="map.productName!=null">
+                and stock_in_order_line.product_name = #{map.productName}
+            </if>
+            <if test="map.defaultCode!=null">
+                and stock_in_order_line.default_code = #{map.defaultCode}
+            </if>
+            <if test="map.createTimeBegin!=null and map.createTimeEnd!=null">
+                and stock_in_order.create_time between #{map.createTimeBegin} and #{map.createTimeEnd}
+            </if>
+            <if test="map.businessSequence != '' and map.businessSequence != null">
+                and business_sequence in (1,2)
+            </if>
+            <if test="map.roleIds != null">
+                and next_role_id in
+
+                <foreach item="key" collection="map.roleIds" open="(" separator="," close=")">
+                    #{key}
+                </foreach>
+            </if>
+        </where>
+    </select>
+</mapper>

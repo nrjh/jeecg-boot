@@ -18,6 +18,21 @@
         BRAND_ID = #{brandId})
     </select>
 
+<!--    <select id="selectCategoryListByCategoryId" parameterType="java.lang.String"-->
+<!--            resultType="com.nrjh.iop.modules.prd.category.entity.PrdCategory">-->
+<!--        SELECT-->
+<!--        *-->
+<!--        FROM-->
+<!--        PRD_CATEGORY-->
+<!--        WHERE-->
+<!--        PID = (-->
+<!--        SELECT PID-->
+<!--        FROM-->
+<!--        PRD_CATEGORY-->
+<!--        WHERE-->
+<!--        ID = #{categoryId})-->
+<!--        and id != #{categoryId}-->
+<!--    </select>-->
     <select id="selectCategoryListByCategoryId" parameterType="java.lang.String"
             resultType="com.nrjh.iop.modules.prd.category.entity.PrdCategory">
         SELECT
@@ -25,12 +40,6 @@
         FROM
         PRD_CATEGORY
         WHERE
-        PID = (
-        SELECT PID
-        FROM
-        PRD_CATEGORY
-        WHERE
-        ID = #{categoryId})
-        and id != #{categoryId}
+        PID = #{categoryId}
     </select>
 </mapper>

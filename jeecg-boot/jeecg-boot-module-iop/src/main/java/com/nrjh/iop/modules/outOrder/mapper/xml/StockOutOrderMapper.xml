@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nrjh.iop.modules.outOrder.mapper.StockOutOrderMapper">
+    <update id="updateStock">
+        update stk_stock set virtual_qty = virtual_qty - #{entity.productPlyQty} where Product_NO = #{entity.defaultCode}
+    </update>
+
+    <update id="updateStockByChange">
+        update stk_stock set virtual_qty = virtual_qty - #{virtualInventory} where Product_NO = #{entity.defaultCode}
+    </update>
+    <update id="backOutOrderById">
+        update stock_out_order set state = 'back' where order_out_id = #{id}
+    </update>
+    <update id="backStkStockById">
+        update stk_stock set virtual_qty = virtual_qty + #{stockOutOrderLine.productPlyQty} where Product_NO = #{stockOutOrderLine.defaultCode}
+    </update>
+
+    <select id="queryLoction" resultType="java.lang.String">
+        select l.name
+        from stk_stock s
+        left join stk_location l on s.location_id = l.id
+        where Product_NO = #{defaultCode}
+
+    </select>
+    <select id="getProdDetails" resultType="java.util.Map">
+        select stl.product_name AS prodName,
+               stl.product_ply_qty AS product_uom_qty,
+               uum.name as unit,
+               cate.NAME AS cateName
+        from stock_out_order sto
+        left join stock_out_order_line stl on sto.id = stl.order_id
+        left join PRD_ATTRIBUTE_CATEGORY cate on stl.attribute_category_id = cate.id
+        left join UOM_UOM uum on stl.product_uom_id = uum.id
+        where sto.id = #{id}
+    </select>
+</mapper>

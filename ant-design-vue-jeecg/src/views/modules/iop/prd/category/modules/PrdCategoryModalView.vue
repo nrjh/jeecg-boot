@@ -66,19 +66,9 @@
             :rowSelection="false"
             :actionButton="false"/>
         </a-tab-pane>
-        <!--
         <a-tab-pane tab="相关物品" :key="refKeys[2]" :forceRender="true">
-          <j-editable-table
-            :ref="refKeys[1]"
-            :loading="prdProduceValueTable.loading"
-            :columns="prdProduceValueTable.columns"
-            :dataSource="prdProduceValueTable.dataSource"
-            :maxHeight="300"
-            :rowNumber="true"
-            :rowSelection="false"
-            :actionButton="false"/>
+          <ref-prd-table query-by="categoryId" :query-value="model.id"></ref-prd-table>
         </a-tab-pane>
-        -->
       </a-tabs>
     </a-spin>
   </a-modal>
@@ -91,13 +81,16 @@
   import { JEditableTableMixin } from '@/mixins/JEditableTableMixin'
   import JDictSelectTag from '@/components/dict/JDictSelectTag'
   import JDictSelectTagIop from '@/components/dict/JDictSelectTagIop'
+  // 相关物品
+  import RefPrdTable from '../../brand/modules/RefPrdTable'
 
   export default {
     name: 'PrdCategoryModalView',
     mixins: [JEditableTableMixin],
     components: {
       JDictSelectTag,
-      JDictSelectTagIop
+      JDictSelectTagIop,
+      RefPrdTable
     },
     data() {
       return {
@@ -148,7 +141,7 @@
         },
         refKeys: ['prdCategoryValue', 'prdAttrCategoryValue', 'prdProduceValue'],
         activeKey: 'prdCategoryValue',
-        // 先关类品
+        // 相关分类
         prdCategoryValueTable: {
           loading: false,
           dataSource: [],
@@ -197,9 +190,11 @@
           ]
         },
         url: {
+          // 相关分类
           prdCategoryValue: {
             list: '/iop/prd/category/queryPrdCategoryListByCategoryId'
           },
+          // 相关规格
           prdAttrCategoryValue: {
             list: '/iop/prd/attrcategory/selectAttrCategoryListByCategoryId'
           },
@@ -235,8 +230,11 @@
         if (this.model.id) {
           let params = { id: this.model.id }
           // 加载相关信息
+          // 加载相关物品
           this.requestSubTableData(this.url.prdProduceValue.list, params, this.prdProduceValueTable)
+          // 加载相关规格
           this.requestSubTableData(this.url.prdAttrCategoryValue.list, params, this.prdAttrCategoryValueTable)
+          // 加载相关分类
           this.requestSubTableData(this.url.prdCategoryValue.list, params, this.prdCategoryValueTable)
         }
       },

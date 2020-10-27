@@ -58,7 +58,7 @@ public class WebSocket {
     	log.debug("【websocket消息】收到客户端消息:"+message);
     	JSONObject obj = new JSONObject();
     	obj.put("cmd", "heartcheck");//业务类型
-    	obj.put("msgTxt", "心跳响应");//消息内容
+    	obj.put("msgTxt", message);//消息内容
     	session.getAsyncRemote().sendText(obj.toJSONString());
     }
     

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nrjh.iop.modules.alarm.alarmtype.mapper.FaultRepairInfoMapper">
+
+	<delete id="deleteByMainId" parameterType="java.lang.String">
+		DELETE 
+		FROM  fault_repair_info 
+		WHERE
+			 fault_task_id = #{mainId} 	</delete>
+	
+	<select id="selectByMainId" parameterType="java.lang.String" resultType="com.nrjh.iop.modules.alarm.alarmtype.entity.FaultRepairInfo">
+		SELECT * 
+		FROM  fault_repair_info
+		WHERE
+			 fault_task_id = #{mainId} 	</select>
+</mapper>

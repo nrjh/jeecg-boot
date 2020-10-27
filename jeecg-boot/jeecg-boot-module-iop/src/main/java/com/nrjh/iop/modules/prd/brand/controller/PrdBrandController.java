@@ -12,6 +12,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.nrjh.iop.modules.prd.category.entity.PrdCategory;
 import com.nrjh.iop.modules.prd.category.service.IPrdCategoryService;
+import com.nrjh.iop.modules.prd.product.entity.PrdProduct;
+import com.nrjh.iop.modules.prd.product.service.IPrdProductService;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.util.oConvertUtils;
@@ -54,7 +56,8 @@ public class PrdBrandController extends JeecgController<PrdBrand, IPrdBrandServi
     private IPrdBrandService prdBrandService;
     @Autowired
     private IPrdCategoryService prdCategoryService;
-
+    @Autowired
+    private IPrdProductService prdProductService;
 
     /**
      * 分页列表查询
@@ -116,6 +119,13 @@ public class PrdBrandController extends JeecgController<PrdBrand, IPrdBrandServi
     @ApiOperation(value = "品牌-通过id删除", notes = "品牌-通过id删除")
     @DeleteMapping(value = "/delete")
     public Result<?> delete(@RequestParam(name = "id", required = true) String id) {
+        List<PrdCategory> prdCategoryList = prdCategoryService.selectCategoryListByBrandId(id);
+        QueryWrapper<PrdProduct> wrapper = new QueryWrapper<>();
+        wrapper.eq("brand_id", id);
+        List<PrdProduct> prdProductList = prdProductService.list(wrapper);
+        if(prdCategoryList.size() != 0 || prdProductList.size() != 0){
+            return Result.error("设备有备品备件关联,不可删除");
+        }
         prdBrandService.removeById(id);
         return Result.ok("删除成功!");
     }

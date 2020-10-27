@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nrjh.iop.modules.centralizedControl.faultMonitoring.mapper.SparePartTableMapper">
+
+    <select id="getSparePartTableListByDay"
+            resultType="com.nrjh.iop.modules.centralizedControl.faultMonitoring.vo.FaultMonitoringTableResultVo">
+        select p.NAME as productName, t.totalNum, s.product_qty as productQty
+        from
+          (select sl.product_id as productId,sum(sl.product_ply_qty) as totalNum
+           from stock_out_order_line sl
+           left join stock_out_order so on sl.order_id = so.id
+		   where sl.category_type = 'spare'and date_format(sl.create_time,'%Y-%m-%d') between #{startTime} and #{endTime}
+           <if test="faultMonitoringVo.areaId != null and faultMonitoringVo.areaId != ''">
+            and so.line_id = #{faultMonitoringVo.areaId}
+           </if>
+		   group by product_id) t
+        left join stk_stock s on t.productId = s.product_id
+        left join prd_product p on s.product_id = p.id
+        order by t.totalNum desc limit 0,8
+    </select>
+    <select id="getSparePartTableListByMonth"
+            resultType="com.nrjh.iop.modules.centralizedControl.faultMonitoring.vo.FaultMonitoringTableResultVo">
+        select p.NAME as productName, t.totalNum, s.product_qty as productQty
+        from
+        (select sl.product_id as productId,sum(sl.product_ply_qty) as totalNum
+        from stock_out_order_line sl
+        left join stock_out_order so on sl.order_id = so.id
+        where sl.category_type = 'spare'and date_format(sl.create_time,'%Y-%m') between #{startTime} and #{endTime}
+        <if test="faultMonitoringVo.areaId != null and faultMonitoringVo.areaId != ''">
+            and so.line_id = #{faultMonitoringVo.areaId}
+        </if>
+        group by product_id) t
+        left join stk_stock s on t.productId = s.product_id
+        left join prd_product p on s.product_id = p.id
+        order by t.totalNum desc limit 0,8
+    </select>
+</mapper>

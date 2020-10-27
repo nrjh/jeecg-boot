@@ -3,6 +3,7 @@ package com.nrjh.iop.modules.stk.move.service;
 import com.nrjh.iop.modules.stk.move.entity.StkMoveLine;
 import com.nrjh.iop.modules.stk.move.entity.StkMove;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.nrjh.iop.modules.stk.picking.entity.StkPicking;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -18,26 +19,25 @@ public interface IStkMoveService extends IService<StkMove> {
 
 	/**
 	 * 添加一对多
-	 * 
+	 *
 	 */
 	public void saveMain(StkMove stkMove, List<StkMoveLine> stkMoveLineList) ;
-	
+
 	/**
 	 * 修改一对多
-	 * 
+	 *
 	 */
 	public void updateMain(StkMove stkMove, List<StkMoveLine> stkMoveLineList);
-	
+
 	/**
 	 * 删除一对多
 	 */
 	public void delMain(String id);
-	
+
 	/**
 	 * 批量删除一对多
 	 */
 	public void delBatchMain(Collection<? extends Serializable> idList);
-
 
 
 	public List<StkMove> selectByPickingId(String mainId);
@@ -49,4 +49,10 @@ public interface IStkMoveService extends IService<StkMove> {
 	 */
 	public void createMoveLineByMove(StkMove stkMove);
 
+	/**
+	 * 根据pickingNO查询
+	 * @param orign
+	 * @return
+	 */
+	List<StkMove> selectStkMoveByOrign(String orign );
 }

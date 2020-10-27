@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nrjh.iop.modules.centralizedControl.ProductPlanInfo.mapper.DevProduceCycleMapper">
+
+    <select id="selectYearList" resultType="com.nrjh.iop.modules.centralizedControl.ProductPlanInfo.entity.vo.TreeModel">
+SELECT ID,CYCLE_YEAR title,PARENT_ID pid,0 isend, 0 is_year, 1 is_month
+FROM IOP.DEV_PRODUCE_CYCLE
+WHERE PARENT_ID = '1' AND IS_DEL = '0'
+ORDER BY CYCLE_YEAR DESC
+    </select>
+
+    <select id="selectMonthList" resultType="com.nrjh.iop.modules.centralizedControl.ProductPlanInfo.entity.vo.TreeModel">
+SELECT ID,CYCLE_MONTH title,PARENT_ID pid,0 is_end,0 is_year,0 is_month FROM IOP.DEV_PRODUCE_CYCLE
+WHERE PARENT_ID  IN
+(SELECT ID
+FROM IOP.DEV_PRODUCE_CYCLE
+WHERE PARENT_ID = '1' AND IS_DEL = '0') AND IS_DEL = '0'
+    </select>
+
+    <select id="selectMonthData" resultType="com.nrjh.iop.modules.centralizedControl.ProductPlanInfo.entity.DevProduceCycle">
+SELECT * FROM IOP.DEV_PRODUCE_CYCLE
+WHERE PARENT_ID IN
+(SELECT ID FROM IOP.DEV_PRODUCE_CYCLE
+WHERE PARENT_ID IN
+(SELECT ID
+FROM IOP.DEV_PRODUCE_CYCLE
+WHERE PARENT_ID = '1' AND IS_DEL = '0') AND IS_DEL = '0') AND IS_DEL = '0'
+    </select>
+
+<!--    <select id="">
+
+    </select>-->
+
+<!--    <select id="selectSum" resultType="com.nrjh.iop.modules.centralizedControl.ProductPlanInfo.entity.DevProduceCycle">
+SELECT ID,IS_DEL,CYCLE_YEAR,CYCLE_MONTH,SUM(CYCLE_SUM_D) AS CYCLE_SUM_D,SUM(CYCLE_SUM_S) AS CYCLE_SUM_S,SUM(CYCLE_SUM_C) AS CYCLE_SUM_C,SUM(CYCLE_SUM_H) AS CYCLE_SUM_H FROM DEV_PRODUCE_CYCLE
+GROUP BY CYCLE_YEAR,CYCLE_MONTH,IS_DEL
+HAVING IS_DEL = 0
+    </select>-->
+</mapper>

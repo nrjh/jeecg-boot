@@ -4,8 +4,8 @@
  * date: 20190109
  */
 
-import {ajaxGetDictItems,ajaxGetDictItemsIop} from '@/api/api'
-import {getAction} from '@/api/manage'
+import { ajaxGetDictItems, ajaxGetDictItemsIop, ajaxGetDictItemsOra } from '@/api/api'
+import { getAction } from '@/api/manage'
 
 /**
  * 获取字典数组
@@ -14,11 +14,11 @@ import {getAction} from '@/api/manage'
  */
 export async function initDictOptions(dictCode) {
   if (!dictCode) {
-    return '字典Code不能为空!';
+    return '字典Code不能为空!'
   }
   //获取字典数组
-  let res = await ajaxGetDictItems(dictCode);
-  return res;
+  let res = await ajaxGetDictItems(dictCode)
+  return res
 }
 
 /**
@@ -28,11 +28,25 @@ export async function initDictOptions(dictCode) {
  */
 export async function initDictOptionsIop(dictCode) {
   if (!dictCode) {
-    return '字典Code不能为空!';
+    return '字典Code不能为空!'
   }
   //获取字典数组
-  let  res = await ajaxGetDictItemsIop(dictCode);
-  return res;
+  let res = await ajaxGetDictItemsIop(dictCode)
+  return res
+}
+
+/**
+ * 获取字典数组  智能运维调用 add by xhj 2020-0826
+ * @param dictCode 字典Code
+ * @return List<Map>
+ */
+export async function initDictOptionsOra(dictCode) {
+  if (!dictCode) {
+    return '字典Code不能为空!'
+  }
+  //获取字典数组
+  let res = await ajaxGetDictItemsOra(dictCode)
+  return res
 }
 
 /**
@@ -46,11 +60,11 @@ export function filterDictText(dictOptions, text) {
   if (dictOptions instanceof Array) {
     for (let dictItem of dictOptions) {
       // update by zzy 2020-04-16
-      if(typeof text == typeof dictItem.value){
+      if (typeof text == typeof dictItem.value) {
         if (text === dictItem.value) {
           return dictItem.text
         }
-      }else{
+      } else {
         if (text == dictItem.value) {
           return dictItem.text
         }
@@ -70,7 +84,7 @@ export function filterDictText(dictOptions, text) {
  */
 export function filterMultiDictText(dictOptions, text) {
   //js “!text” 认为0为空，所以做提前处理
-  if(text === 0 || text === '0'){
+  if (text === 0 || text === '0') {
     for (let dictItem of dictOptions) {
       if (text == dictItem.value) {
         return dictItem.text
@@ -78,24 +92,24 @@ export function filterMultiDictText(dictOptions, text) {
     }
   }
 
-  if(!text || !dictOptions || dictOptions.length==0){
-    return ""
+  if (!text || !dictOptions || dictOptions.length == 0) {
+    return ''
   }
-  let re = "";
+  let re = ''
   text = text.toString()
-  let arr = text.split(",")
-  dictOptions.forEach(function (option) {
-    for(let i=0;i<arr.length;i++){
+  let arr = text.split(',')
+  dictOptions.forEach(function(option) {
+    for (let i = 0; i < arr.length; i++) {
       if (arr[i] === option.value) {
-        re += option.text+",";
-        break;
+        re += option.text + ','
+        break
       }
     }
-  });
-  if(re==""){
-    return text;
+  })
+  if (re == '') {
+    return text
   }
-  return re.substring(0,re.length-1);
+  return re.substring(0, re.length - 1)
 }
 
 /**
@@ -105,18 +119,18 @@ export function filterMultiDictText(dictOptions, text) {
  */
 export async function ajaxFilterDictText(dictCode, key) {
   if (!dictCode) {
-    return '字典Code不能为空!';
+    return '字典Code不能为空!'
   }
   //console.log(`key : ${key}`);
   if (!key) {
-    return '';
+    return ''
   }
   //通过请求读取字典文本
-  let res = await getAction(`/sys/dict/getDictText/${dictCode}/${key}`);
+  let res = await getAction(`/sys/dict/getDictText/${dictCode}/${key}`)
   if (res.success) {
     // console.log('restult: '+ res.result);
-    return res.result;
+    return res.result
   } else {
-    return '';
+    return ''
   }
 }

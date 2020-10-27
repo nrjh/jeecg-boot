@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nrjh.iop.modules.alarm.alarmtype.mapper.FaultReasonInfoMapper">
+    <delete id="deleteByMainId" parameterType="java.lang.String">
+		DELETE
+		FROM  fault_reason_info
+		WHERE
+			 fault_task_id = #{mainId} 	</delete>
+
+
+	<select id="selectByMainId" parameterType="java.lang.String" resultType="com.nrjh.iop.modules.alarm.alarmtype.entity.FaultReasonInfo">
+		SELECT *
+		FROM  fault_reason_info
+		WHERE
+			 fault_task_id = #{mainId} 	</select>
+	<select id="errorReasonNameAndId" parameterType="java.lang.String" resultType="com.nrjh.iop.modules.alarm.alarmtype.entity.FaultReasonInfo">
+		SELECT
+			fri.REASON_NAME,
+			fri.ID
+		FROM
+			FAULT_PRD_PRODUCT_INFO fppi
+			LEFT JOIN FAULT_REASON_INFO fri ON fppi.FAULT_TASK_ID = fri.FAULT_TASK_ID
+			LEFT JOIN O_EQUIP oe ON oe.EQUIP_ID  = fppi.PRODUCT_ID
+		WHERE
+			fppi.LINE_NO = #{lineNO}
+			AND
+			oe.EQUIP_NO  =  #{productId}
+	</select>
+</mapper>

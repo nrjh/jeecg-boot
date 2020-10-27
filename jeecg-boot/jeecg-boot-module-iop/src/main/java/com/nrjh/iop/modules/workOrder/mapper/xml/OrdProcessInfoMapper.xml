@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nrjh.iop.modules.workOrder.mapper.OrdProcessInfoMapper">
+<!--    select r.ID,r.FAULT_TASK_ID,r.SEQUENCE,r.REPAIR_NAME,r.EXEC_MODE,r.IS_REPLACE,r.REMARK-->
+<!--    from FAULT_TASK_INFO t right join FAULT_REPAIR_INFO r-->
+<!--    on t.id = r.FAULT_TASK_ID-->
+<!--    where t.EQUIP_NO = #{equipNo,jdbcType=VARCHAR} and t.FAULT_NAME = #{faultName,jdbcType=VARCHAR}-->
+    <select id="queryRepairInfo" resultType="com.nrjh.iop.modules.alarm.alarmtype.entity.FaultRepairInfo">
+        SELECT
+            r.ID,
+            r.FAULT_TASK_ID,
+            r.SEQUENCE,
+            r.REPAIR_NAME,
+            r.EXEC_MODE,
+            r.IS_REPLACE,
+            r.REMARK
+        FROM
+                FAULT_TASK_INFO t
+            LEFT JOIN
+                FAULT_REPAIR_INFO r
+            ON
+                t.id = r.FAULT_TASK_ID
+            LEFT JOIN
+                O_EQUIP oe
+            ON
+                t.EQUIP_NO = oe.EQUIP_NO
+        WHERE
+                    oe.EQUIP_TYPE = t.FAULT_TYPE
+            AND
+                    t.EQUIP_NO = #{equipNo}
+            AND
+                    t.FAULT_NAME = #{faultName}
+    </select>
+</mapper>

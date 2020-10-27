@@ -18,9 +18,11 @@
             dict="stk_location,name,id"
             pidField="pid"
             pidValue="1"
-            hasChildField="has_child">
+            hasChildField="has_child"
+            condition='{"is_del":"0"}'>
           </j-tree-select-iop>
         </a-form-item>
+
         <a-form-item label="名称" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input v-decorator="[ 'name', validatorRules.name]" placeholder="请输入名称"></a-input>
         </a-form-item>
@@ -61,6 +63,7 @@
         width: 800,
         visible: false,
         model: {},
+        condition:'',
         labelCol: {
           xs: { span: 24 },
           sm: { span: 5 }
@@ -113,7 +116,6 @@
         this.edit({ active: 1 })
       },
       edit(record) {
-        debugger;
         this.form.resetFields()
         record.active = record.active == 1 ? true : false
         this.model = Object.assign({}, record)

@@ -228,14 +228,15 @@
         return this.treeData
       },
       validateProp(){
-        let mycondition = this.condition
+        let mycondition = this.condition;
+        console.log("aaaaasdsdd",typeof mycondition)
+        console.log("aaaaasdsdd-----", mycondition)
         return new Promise((resolve,reject)=>{
           if(!mycondition){
             resolve();
           }else{
             try {
               let test=JSON.parse(mycondition);
-              console.log("aaaaasdsdd",typeof test)
               if(typeof test == 'object' && test){
                 resolve()
               }else{

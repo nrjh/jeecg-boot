@@ -1,6 +1,7 @@
 package com.nrjh.iop.modules.prd.attrcategory.service.impl;
 
 import com.baomidou.dynamic.datasource.annotation.DS;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.nrjh.iop.modules.prd.attrcategory.entity.PrdAttrCategAttrValueRel;
 import com.nrjh.iop.modules.prd.attrcategory.mapper.PrdAttrCategAttrValueRelMapper;
 import com.nrjh.iop.modules.prd.attrcategory.service.IPrdAttrCategAttrValueRelService;
@@ -18,12 +19,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Service
 @DS("iop")
 public class PrdAttrCategAttrValueRelServiceImpl extends ServiceImpl<PrdAttrCategAttrValueRelMapper, PrdAttrCategAttrValueRel> implements IPrdAttrCategAttrValueRelService {
-	
+
 	@Autowired
 	private PrdAttrCategAttrValueRelMapper prdAttrCategAttrValueRelMapper;
-	
+
 	@Override
 	public List<PrdAttrCategAttrValueRel> selectByMainId(String mainId) {
-		return prdAttrCategAttrValueRelMapper.selectByMainId(mainId);
+		QueryWrapper queryWrapper = new QueryWrapper();
+		queryWrapper.eq("attribute_category_id",mainId);
+		return baseMapper.selectList(queryWrapper);
 	}
 }

@@ -87,6 +87,8 @@ export const ajaxGetDictItems = (code, params)=>getAction(`/sys/dict/getDictItem
 // 智能运维 add by zzy 20200319
 export const ajaxGetDictItemsIop = (code, params)=>getAction(`/iop/sys/dict/getDictItems/${code}`,params);
 
+export const ajaxGetDictItemsOra = (code, params)=>getAction(`/ora/sys/dict/getDictItems/${code}`,params);
+
 //系统通告
 const doReleaseData = (params)=>getAction("/sys/annountCement/doReleaseData",params);
 const doReovkeData = (params)=>getAction("/sys/annountCement/doReovkeData",params);
@@ -105,6 +107,9 @@ const queryUserRoleMap = (params)=>getAction("/sys/user/queryUserRoleMap",params
 const duplicateCheck = (params)=>getAction("/sys/duplicate/check",params);
 // iop 重复校验
 const iopDuplicateCheck = (params)=>getAction("/iop/sys/duplicate/check",params);
+const oraDuplicateCheck = (params)=>getAction("/ora/sys/duplicate/check",params);
+// 校验iop的制造商
+const iopManufactorCheck = (params)=>getAction("/iop/sys/duplicate/checkManufactorName",params);
 // 加载分类字典
 const loadCategoryData = (params)=>getAction("/sys/category/loadAllData",params);
 const checkRuleByCode = (params) => getAction('/sys/checkRule/checkByCode', params)
@@ -159,6 +164,7 @@ export {
   queryUserRoleMap,
   duplicateCheck,
   iopDuplicateCheck,
+  iopManufactorCheck,
   queryTreeListForRole,
   getSystemMenuList,
   getSystemSubmenu,

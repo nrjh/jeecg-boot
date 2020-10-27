@@ -57,7 +57,7 @@ public class UomCategoryController {
 	private IUomCategoryService uomCategoryService;
 	@Autowired
 	private IUomUomService uomUomService;
-	
+
 	/**
 	 * 分页列表查询
 	 *
@@ -79,7 +79,20 @@ public class UomCategoryController {
 		IPage<UomCategory> pageList = uomCategoryService.page(page, queryWrapper);
 		return Result.ok(pageList);
 	}
-	
+
+	 /**
+	  * 获取单位的list
+	  *
+	  * @return
+	  */
+	 @AutoLog(value = "获取单位的list")
+	 @ApiOperation(value="获取单位的list", notes="获取单位的list")
+	 @GetMapping(value = "/uomUomList")
+	 public Result<?> uomUomList() {
+		 List<UomUom> uomUomList = uomUomService.list();
+		 return Result.ok(uomUomList);
+	 }
+
 	/**
 	 *   添加
 	 *
@@ -95,7 +108,7 @@ public class UomCategoryController {
 		uomCategoryService.saveMain(uomCategory, uomCategoryPage.getUomUomList());
 		return Result.ok("添加成功！");
 	}
-	
+
 	/**
 	 *  编辑
 	 *
@@ -115,7 +128,7 @@ public class UomCategoryController {
 		uomCategoryService.updateMain(uomCategory, uomCategoryPage.getUomUomList());
 		return Result.ok("编辑成功!");
 	}
-	
+
 	/**
 	 *   通过id删除
 	 *
@@ -129,7 +142,7 @@ public class UomCategoryController {
 		uomCategoryService.delMain(id);
 		return Result.ok("删除成功!");
 	}
-	
+
 	/**
 	 *  批量删除
 	 *
@@ -143,7 +156,7 @@ public class UomCategoryController {
 		this.uomCategoryService.delBatchMain(Arrays.asList(ids.split(",")));
 		return Result.ok("批量删除成功！");
 	}
-	
+
 	/**
 	 * 通过id查询
 	 *
@@ -161,7 +174,7 @@ public class UomCategoryController {
 		return Result.ok(uomCategory);
 
 	}
-	
+
 	/**
 	 * 通过id查询
 	 *

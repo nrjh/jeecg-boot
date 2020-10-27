@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nrjh.iop.modules.centralizedControl.DevMonitorInfo.mapper.DIoTaskMapper">
+    <select id="getAllDIotaskInfo" parameterType="java.util.Map" resultType="com.nrjh.iop.modules.centralizedControl.DevMonitorInfo.entity.DIoTask">
+        SELECT
+            TASK_NO,
+            IO_FLAG,
+            TASK_PRIO,
+            CREAT_DATE,
+            QTY,
+            FINISHED_IO_QTY
+        FROM
+            midhd_mds.D_IO_TASK
+        <where>
+            <if test="params != null">
+                <if test="params.taskNo != null and params.taskNo != ''">
+                    AND TASK_NO = #{params.taskNo}
+                </if>
+                <if test="params.ioFlag != null and params.ioFlag != ''">
+                    AND IO_FLAG = #{params.ioFlag}
+                </if>
+            </if>
+        </where>
+    </select>
+    <select id="getListByRelaNo" resultType="com.nrjh.iop.modules.centralizedControl.DevMonitorInfo.entity.MdIoTask" parameterType="string">
+        select
+            QTY,
+            IO_TASK_NO,
+            RELA_NO
+        from
+            MIDHD_MDS.MD_IO_TASK
+        WHERE
+        RELA_NO = #{relaNo}
+    </select>
+
+
+
+    <select id="getCountAndTaskNo" resultType="com.nrjh.iop.modules.centralizedControl.DevMonitorInfo.dto.CountAndTaskDTO">
+         SELECT
+        DISTINCT
+         count( 1 ) as taskCount,
+         md.IO_TASK_NO as ioTaskNo
+        FROM
+         MIDHD_MDS.MD_IO_DET md
+         LEFT JOIN MIDHD_MDS.MD_IO_TASK mt ON md.IO_TASK_NO = mt.IO_TASK_NO
+        group
+        BY
+        md.IO_TASK_NO
+    </select>
+
+</mapper>

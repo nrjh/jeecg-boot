@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nrjh.iop.modules.backorder.mapper.StockBackOrderLineMapper">
+
+	<delete id="deleteByMainId" parameterType="java.lang.Integer">
+		DELETE 
+		FROM  stock_back_order_line 
+		WHERE
+			 order_id = #{mainId} 	</delete>
+	
+	<select id="selectByMainId" parameterType="java.lang.Integer" resultType="com.nrjh.iop.modules.backorder.entity.StockBackOrderLine">
+		SELECT * 
+		FROM  stock_back_order_line
+		WHERE
+			 order_id = #{mainId} 	</select>
+</mapper>

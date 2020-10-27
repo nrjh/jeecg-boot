@@ -32,8 +32,14 @@
           </a-col>
           <a-col :span="12">
             <a-form-item label="状态" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <j-dict-select-tag type="list" v-decorator="['active', validatorRules.active]" :trigger-change="true"
-                                 dictCode="IOP_PUB_ACTION" placeholder="请选择状态" disabled="disabled"/>
+              <a-radio-group :default-value="this.activeStatus" disabled="disabled">
+                <a-radio :value="1">
+                  启用
+                </a-radio>
+                <a-radio :value="0">
+                  禁用
+                </a-radio>
+              </a-radio-group>
             </a-form-item>
           </a-col>
           <a-col :span="12">
@@ -60,7 +66,9 @@
             :actionButton="false"
             :disabled="true"/>
         </a-tab-pane>
-
+        <a-tab-pane tab="相关物品" :key="refKeys[1]" :forceRender="true">
+          <ref-prd-table query-by="attributeCategoryId" :query-value="model.id"></ref-prd-table>
+        </a-tab-pane>
       </a-tabs>
 
     </a-spin>
@@ -74,12 +82,14 @@
   import { JEditableTableMixin } from '@/mixins/JEditableTableMixin'
   import { validateDuplicateValueIop } from '@/utils/util'
   import JDictSelectTagIop from '@/components/dict/JDictSelectTagIop'
+  import RefPrdTable from '../../brand/modules/RefPrdTable'
 
   export default {
     name: 'PrdAttributeCategoryModalView',
     mixins: [JEditableTableMixin],
     components: {
-      JDictSelectTagIop
+      JDictSelectTagIop,
+      RefPrdTable
     },
     data() {
       return {
@@ -125,9 +135,9 @@
             rules: [
               { required: true, message: '请选择所属品类!' }
             ]
-          },
+          }
         },
-        refKeys: ['prdAttrCategAttrValueRel'],
+        refKeys: ['prdAttrCategAttrValueRel', 'prdProduceValue'],
         tableKeys: ['prdAttrCategAttrValueRel'],
         activeKey: 'prdAttrCategAttrValueRel',
         // 物品规格与产品属性值关系
@@ -165,7 +175,8 @@
           prdAttrCategAttrValueRel: {
             list: '/iop/prd/attrcategory/queryPrdAttrCategAttrValueRelByMainId'
           }
-        }
+        },
+        activeStatus:"",
       }
     },
     methods: {
@@ -179,8 +190,10 @@
         this.visible = true
         this.activeKey = this.refKeys[0]
         this.form.resetFields()
-       // record.active = record.active == 1 ? true : false
+        // record.active = record.active == 1 ? true : false
         this.model = Object.assign({}, record)
+        this.activeStatus = record.active
+        console.log("activeStatus",this.activeStatus)
         if (typeof this.editAfter === 'function') this.editAfter(this.model)
       },
       getAllTable() {
@@ -189,7 +202,7 @@
       },
       /** 调用完edit()方法之后会自动调用此方法 */
       editAfter() {
-        let fieldval = pick(this.model, 'active', 'sequence', 'name', 'code', 'categoryId' )
+        let fieldval = pick(this.model, 'active', 'sequence', 'name', 'code', 'categoryId')
         this.$nextTick(() => {
           this.form.setFieldsValue(fieldval)
         })
@@ -212,7 +225,7 @@
         this.$message.error(msg)
       },
       popupCallback(row) {
-        this.form.setFieldsValue(pick(row, 'active', 'sequence', 'name', 'code', 'categoryId' ))
+        this.form.setFieldsValue(pick(row, 'active', 'sequence', 'name', 'code', 'categoryId'))
       }
 
     }

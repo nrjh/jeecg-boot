@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nrjh.iop.modules.centralizedControl.DevMonitorInfo.mapper.UDistTaskMapper">
+    <select id="getAll" resultType="com.nrjh.iop.modules.centralizedControl.DevMonitorInfo.entity.UDistTask" parameterType="java.util.Map">
+        SELECT
+            auto_info,
+            org_no,
+            dist_task_num,
+            made_time,
+            sign_date
+        FROM
+            midhd_mds.U_DIST_TASK
+        <where>
+            <if test="params != null">
+                <if test="params.autoInfo != null and params.autoInfo != ''">
+                    auto_info = #{params.autoInfo}
+                </if>
+                <if test="params.orgNo != null and params.orgNo != ''">
+                    AND org_no = #{params.orgNo}
+                </if>
+            </if>
+        </where>
+        ORDER BY MADE_TIME DESC
+    </select>
+</mapper>
+

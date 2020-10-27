@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nrjh.iop.modules.stk.spareparts.mapper.StkStockMapper">
+
+
+    <!-- 通过合同号查询物料信息列表-->
+    <select  id="queryStockList" resultType="com.nrjh.iop.modules.stk.spareparts.entity.StkStock" >
+        select * from stk_stock where Product_NO = #{productNo}
+    </select>
+</mapper>
